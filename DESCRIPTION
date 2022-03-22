@@ -1,0 +1,18 @@
+Package: rcc.billing
+Title: REDCap Custodian Billing
+Version: 0.0.0
+Authors@R: c(
+  person("Philip", "Chase", email = "pbc@ufl.edu", role = c("aut", "cre")),
+  person("Laurence", "James-Woodley", email = "lawjames1@ufl.edu", role = "aut"),
+  person("Kyle", "Chesney", email = "kyle.chesney@ufl.edu", role = "aut"),
+  person("Bentz", "Michael", email = "mbentz@ufl.edu", role = "aut"),
+  person("Taryn", "Stoffs", email = "tls@ufl.edu", role = "ctb"),
+  person("Christopher", "Barnes", email = "cpb@ufl.edu", role = "ctb")
+  )
+Maintainer: Philip B Chase <pbc@ufl.edu>
+Description: Automated, data-driven service billing implemented on REDCap Custodian.
+License: Apache License (>= 2)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
