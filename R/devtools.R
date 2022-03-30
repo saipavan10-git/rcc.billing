@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' convert_schema_to_sqlite(table_name = "service_type")
+#'  convert_schema_to_sqlite(table_name = "service_type")
 #' }
 #' @export
 convert_schema_to_sqlite <- function(table_name) {
@@ -25,28 +25,44 @@ convert_schema_to_sqlite <- function(table_name) {
   result <- system(cmd, intern = TRUE) %>% paste(collapse = "")
 }
 
-#' Creates a table in sqlite for the provided table.
+#' Creates a table for table_name.
 #' A corresponding data set and sqlite schema are required in /data and /schema respectively.
 #' Use \code{\link{convert_schema_to_sqlite}} to generate a sqlite schema from a mysql schema.
 #'
-#' @param table_name, the name of the table to create in sqlite. A _test_data file in /data
+#' @param conn, a DBI connection object
+#' @param sqlite_schema, the ddl to execute against conn
 #'
 #' @examples
 #' \dontrun{
-#' write_to_sqlite(table_name = "service_type")
+#'  table_name <- "service_type"
+#'  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+#'
+#'  schema <- convert_schema_to_sqlite(table_name)
+#'  create_table(conn = conn, sqlite_schema = schema)
 #' }
 #' @export
-write_to_sqlite <- function(table_name, sqlite_schema) {
-  # get test data
-  test_data <- get0(paste0(table_name, "_test_data"))
-
-  # connect to sqlite db
-  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
-
+create_table <- function(conn, sqlite_schema) {
   # create table
   result <- DBI::dbSendQuery(conn, sqlite_schema)
+
   # close result set to avoid warning
   DBI::dbClearResult(result)
+}
+
+#' Populates table_name with the corresponding test data found in /data.
+#'
+#' @param conn, a DBI connection object
+#' @param table_name, the table to populate with test data
+#'
+#' @examples
+#' \dontrun{
+#'  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+#'  populate_table(conn = conn, table_name = "service_type")
+#' }
+#' @export
+populate_table <- function(conn, table_name) {
+  # get test data
+  test_data <- get0(paste0(table_name, "_test_data"))
 
   # write sample data
   result <- DBI::dbAppendTable(
