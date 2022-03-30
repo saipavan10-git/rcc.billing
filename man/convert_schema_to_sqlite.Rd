@@ -2,17 +2,20 @@
 % Please edit documentation in R/sqlite.R
 \name{convert_schema_to_sqlite}
 \alias{convert_schema_to_sqlite}
-\title{Converts a mysql schema to a sqlite schema for the provided table.
-A corresponding schema file with the same name is required in /schema.}
+\title{Locates a MySQL schema file for table_name, converts it to a sqlite schema
+and returns that schema.}
 \usage{
 convert_schema_to_sqlite(table_name)
 }
 \arguments{
 \item{table_name, }{the name of the table to convert}
 }
+\value{
+sqlite schema for table_name
+}
 \description{
-Converts a mysql schema to a sqlite schema for the provided table.
-A corresponding schema file with the same name is required in /schema.
+Locates a MySQL schema file for table_name, converts it to a sqlite schema
+and returns that schema.
 }
 \examples{
 \dontrun{

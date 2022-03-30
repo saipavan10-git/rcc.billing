@@ -6,7 +6,7 @@
 A corresponding data set and sqlite schema are required in /data and /schema respectively.
 Use \code{\link{convert_schema_to_sqlite}} to generate a sqlite schema from a mysql schema.}
 \usage{
-write_to_sqlite(table_name)
+write_to_sqlite(table_name, sqlite_schema)
 }
 \arguments{
 \item{table_name, }{the name of the table to create in sqlite. A _test_data file in /data}

@@ -12,6 +12,8 @@ Authors@R: c(
 Maintainer: Philip B Chase <pbc@ufl.edu>
 Description: Automated, data-driven service billing implemented on REDCap Custodian.
 License: Apache License (>= 2)
+Imports:
+  magrittr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

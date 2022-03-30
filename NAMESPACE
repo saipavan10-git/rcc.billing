@@ -2,3 +2,4 @@
 
 export(convert_schema_to_sqlite)
 export(write_to_sqlite)
+importFrom(magrittr,"%>%")
