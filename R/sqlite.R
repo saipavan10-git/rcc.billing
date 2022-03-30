@@ -11,6 +11,7 @@
 convert_schema_to_sqlite <- function(table_name) {
   schema_file_name <- paste0(table_name, ".sql")
   lite_schema_file_name <- paste0(table_name, "_lite.sql")
+  pl_to_sqlite <- system.file("to_sqlite.pl", package = "rcc.billing")
 
   # read original
   original_schema <- readr::read_file(file = system.file("schema", schema_file_name, package = "rcc.billing"))
@@ -22,7 +23,7 @@ convert_schema_to_sqlite <- function(table_name) {
   readr::write_file(x = original_schema, file = temp_file)
 
   # convert to sqlite
-  cmd <- paste("cat", temp_file, "|", "perl to_sqlite.pl", ">", paste0("./schema/", lite_schema_file_name))
+  cmd <- paste("cat", temp_file, "|", "perl", pl_to_sqlite, ">", paste0("./schema/", lite_schema_file_name))
 
   system(cmd)
 }
