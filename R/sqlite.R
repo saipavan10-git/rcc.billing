@@ -45,7 +45,6 @@ write_to_sqlite <- function(table_name) {
   test_data <- get0(paste0(table_name, "_test_data"))
 
   # read sqlite schema
-  #lite_schema <- readr::read_file(paste0("./schema/", table_name, "_lite.sql"))
   lite_schema <- readr::read_file(system.file("schema", schema_file_name, package = "rcc.billing"))
 
   # connect to sqlite db
