@@ -13,7 +13,6 @@
 #' @export
 convert_schema_to_sqlite <- function(table_name) {
   schema_file_name <- paste0(table_name, ".sql")
-  lite_schema_file_name <- paste0(table_name, "_lite.sql")
   pl_to_sqlite <- system.file("", "to_sqlite.pl", package = "rcc.billing")
 
   # read original
@@ -23,6 +22,7 @@ convert_schema_to_sqlite <- function(table_name) {
   cmd <- paste("cat", original_schema_file, "|", "perl", pl_to_sqlite)
 
   result <- system(cmd, intern = TRUE) %>% paste(collapse = "")
+  return(result)
 }
 
 #' Creates a table for table_name.
