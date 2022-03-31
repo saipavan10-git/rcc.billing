@@ -25,9 +25,8 @@ convert_schema_to_sqlite <- function(table_name) {
   return(result)
 }
 
-#' Creates a table for table_name.
-#' A corresponding data set and sqlite schema are required in /data and /schema respectively.
-#' Use \code{\link{convert_schema_to_sqlite}} to generate a sqlite schema from a mysql schema.
+#' Creates a table with sqlite_schema.
+#' Use \code{\link{convert_schema_to_sqlite}} to convert a sqlite schema from a mysql schema.
 #'
 #' @param conn, a DBI connection object
 #' @param sqlite_schema, the ddl to execute against conn

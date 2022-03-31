@@ -2,9 +2,8 @@
 % Please edit documentation in R/devtools.R
 \name{create_table}
 \alias{create_table}
-\title{Creates a table for table_name.
-A corresponding data set and sqlite schema are required in /data and /schema respectively.
-Use \code{\link{convert_schema_to_sqlite}} to generate a sqlite schema from a mysql schema.}
+\title{Creates a table with sqlite_schema.
+Use \code{\link{convert_schema_to_sqlite}} to convert a sqlite schema from a mysql schema.}
 \usage{
 create_table(conn, sqlite_schema)
 }
@@ -14,9 +13,8 @@ create_table(conn, sqlite_schema)
 \item{sqlite_schema, }{the ddl to execute against conn}
 }
 \description{
-Creates a table for table_name.
-A corresponding data set and sqlite schema are required in /data and /schema respectively.
-Use \code{\link{convert_schema_to_sqlite}} to generate a sqlite schema from a mysql schema.
+Creates a table with sqlite_schema.
+Use \code{\link{convert_schema_to_sqlite}} to convert a sqlite schema from a mysql schema.
 }
 \examples{
 \dontrun{
