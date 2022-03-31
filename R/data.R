@@ -1,4 +1,5 @@
 #' Sample data for service_type table
+#' Recommended approach from https://r-pkgs.org/data.html#documenting-data
 #'
 #' @format
 #' tribble(

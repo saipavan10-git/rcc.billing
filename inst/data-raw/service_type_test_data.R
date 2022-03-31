@@ -1,4 +1,4 @@
-## code to prepare `service_type_test_data` dataset goes here
+# Recommended approach from https://www.rdocumentation.org/packages/usethis/versions/2.1.5/topics/use_data
 library(tibble)
 library(usethis)
 
