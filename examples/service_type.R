@@ -7,7 +7,7 @@ conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 sqlite_schema <- convert_schema_to_sqlite(table_name = table_name)
 create_table(
     conn = conn,
-    sqlite_schema = sqlite_schema
+    schema = sqlite_schema
 )
 populate_table(
     conn = conn,
