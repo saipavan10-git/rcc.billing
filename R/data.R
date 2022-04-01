@@ -1,18 +1,12 @@
 #' Sample data for service_type table
-#' Recommended approach from https://r-pkgs.org/data.html#documenting-data
 #'
 #' @format
-#' tribble(
-#'   ~service_type_code,
-#'   ~service_type,
-#'   ~cost,
-#'   ~billing_frequency,
-#'   1, "redcap_project_prod", 100, 12,
-#'   2, "redcap_project_phone", 1000, 0,
-#'   3, "redcap_table_account_prod", 35, 6,
-#'   4, "redcap_table_account_phone", 35, 6,
-#'   5, "redcap_mobile", 1000, 0,
-#'   6, "redcap_consulting", 100, 0
-#' )
+#' \describe{
+#'   \item{service_type_code}{a numeric code that uniquely identifies the service_type}
+#'   \item{service_type}{short name describing the service_type, in snake case}
+#'   \item{cost}{price for one unit of the service, in US dollars}
+#'   \item{billing_frequency}{frequency at which this service ir billed, in months}
+#' }
+#'
 #' @source \url{https://github.com/ctsit/rcc.billing/issues/1}
 "service_type_test_data"

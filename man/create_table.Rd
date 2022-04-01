@@ -2,19 +2,17 @@
 % Please edit documentation in R/devtools.R
 \name{create_table}
 \alias{create_table}
-\title{Creates a table with sqlite_schema.
-Use \code{\link{convert_schema_to_sqlite}} to convert a sqlite schema from a mysql schema.}
+\title{Creates a table based on a schema.}
 \usage{
-create_table(conn, sqlite_schema)
+create_table(conn, schema)
 }
 \arguments{
 \item{conn, }{a DBI connection object}
 
-\item{sqlite_schema, }{the ddl to execute against conn}
+\item{schema, }{the ddl to execute against conn}
 }
 \description{
-Creates a table with sqlite_schema.
-Use \code{\link{convert_schema_to_sqlite}} to convert a sqlite schema from a mysql schema.
+Creates a table based on a schema.
 }
 \examples{
 \dontrun{
@@ -22,6 +20,6 @@ Use \code{\link{convert_schema_to_sqlite}} to convert a sqlite schema from a mys
  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 
  schema <- convert_schema_to_sqlite(table_name)
- create_table(conn = conn, sqlite_schema = schema)
+ create_table(conn = conn, schema = schema)
 }
 }
