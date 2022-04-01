@@ -5,7 +5,7 @@ library(usethis)
 service_type_test_data <- tribble(
   ~service_type_code,
   ~service_type,
-  ~cost,
+  ~price,
   ~billing_frequency,
   1, "redcap_project_prod", 100, 12,
   2, "redcap_project_phone", 1000, 0,
