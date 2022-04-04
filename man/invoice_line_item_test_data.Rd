@@ -13,7 +13,7 @@
   \item{ctsi_study_id}{CSBT's unique identifier for a service}
   \item{name_of_service}{name of the service}
   \item{other_system_invoicing_comments}{additional invoice information, either project url, or sponsor and pi}
-  \item{cost_of_service}{price of the service, in US dollars}
+  \item{price_of_service}{price of the service, in US dollars}
   \item{qty_provided}{quantity provided}
   \item{amount_due}{amount due, in US dollars}
   \item{fiscal_year}{fiscal year of the invoice}

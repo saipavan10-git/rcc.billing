@@ -10,7 +10,7 @@ invoice_line_item_test_data <- tribble(
     ~ctsi_study_id,
     ~name_of_service,
     ~other_system_invoicing_comments,
-    ~cost_of_service,
+    ~price_of_service,
     ~qty_provided,
     ~amount_due,
     ~fiscal_year,
