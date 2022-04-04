@@ -18,6 +18,10 @@ convert_schema_to_sqlite <- function(table_name) {
   # read original
   original_schema_file = system.file("schema", schema_file_name, package = "rcc.billing")
 
+  if (original_schema_file == "") {
+    stop(paste("Schema file does not exist for", table_name))
+  }
+
   # convert to sqlite
   cmd <- paste("cat", original_schema_file, "|", "perl", pl_to_sqlite)
 
