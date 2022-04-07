@@ -3,7 +3,7 @@
 \docType{data}
 \name{invoice_line_item_test_data}
 \alias{invoice_line_item_test_data}
-\title{Sample data for service_type table}
+\title{Sample data for invoice_line_item table}
 \format{
 \describe{
   \item{id}{the primary key}
@@ -35,6 +35,6 @@
 invoice_line_item_test_data
 }
 \description{
-Sample data for service_type table
+Sample data for invoice_line_item table
 }
 \keyword{datasets}

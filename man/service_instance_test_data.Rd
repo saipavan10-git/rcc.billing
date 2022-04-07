@@ -3,7 +3,7 @@
 \docType{data}
 \name{service_instance_test_data}
 \alias{service_instance_test_data}
-\title{Sample data for service_type table}
+\title{Sample data for service_instance table}
 \format{
 \describe{
   \item{service_instance_id}{the primary key}
@@ -20,6 +20,6 @@
 service_instance_test_data
 }
 \description{
-Sample data for service_type table
+Sample data for service_instance table
 }
 \keyword{datasets}
