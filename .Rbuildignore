@@ -19,3 +19,4 @@
 ^LICENSE\.md$
 .github
 .vscode
+^data-raw$
