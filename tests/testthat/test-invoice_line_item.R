@@ -11,7 +11,8 @@ test_that("service_type sqlite schema is created and correct test data is return
   results <- populate_table(
     conn = conn,
     table_name = table_name
-  )
+  ) %>%
+    dplyr::mutate(dplyr::across(c(created, updated, je_posting_date), ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz="UTC")))
 
   DBI::dbDisconnect(conn)
   expect_identical(test_data, dplyr::as_tibble(results))
