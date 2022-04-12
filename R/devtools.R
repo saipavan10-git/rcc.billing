@@ -55,6 +55,7 @@ create_table <- function(conn, schema) {
 #'
 #' @param conn, a DBI connection object
 #' @param table_name, the table to populate with test data
+#' @param use_test_data, whether to use "_test_data"
 #'
 #' @examples
 #' \dontrun{
@@ -62,18 +63,24 @@ create_table <- function(conn, schema) {
 #'  populate_table(conn = conn, table_name = "service_type")
 #' }
 #' @export
-populate_table <- function(conn, table_name) {
+populate_table <- function(conn, table_name, use_test_data = FALSE) {
+  data_ref <- table_name
+
+  if (isTRUE(use_test_data)) {
+    data_ref <-  paste0(data_ref, "_test_data")
+  }
+
   # get test data
-  test_data <- get0(paste0(table_name, "_test_data"))
+  data <- get0(data_ref)
 
   # write sample data
   result <- DBI::dbAppendTable(
     conn = conn,
     name = table_name,
-    value = test_data,
+    value = data,
     overwrite = TRUE
   )
 
-  data <- DBI::dbGetQuery(conn, paste("select * from", table_name))
-  return(data)
+  result <- DBI::dbGetQuery(conn, paste("select * from", table_name))
+  return(result)
 }

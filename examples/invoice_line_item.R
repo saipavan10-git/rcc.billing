@@ -11,5 +11,6 @@ create_table(
 )
 populate_table(
     conn = conn,
-    table_name = table_name
+    table_name = table_name,
+    use_test_data = TRUE
 )

@@ -4,12 +4,14 @@
 \alias{populate_table}
 \title{Populates table_name with the corresponding test data found in /data.}
 \usage{
-populate_table(conn, table_name)
+populate_table(conn, table_name, use_test_data = FALSE)
 }
 \arguments{
 \item{conn, }{a DBI connection object}
 
 \item{table_name, }{the table to populate with test data}
+
+\item{use_test_data, }{whether to use "_test_data"}
 }
 \description{
 Populates table_name with the corresponding test data found in /data.
