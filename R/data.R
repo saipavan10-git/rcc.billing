@@ -20,13 +20,13 @@
 #'   \item{\code{gatorlink}}{gatorlink of the person invoiced}
 #'   \item{\code{reason}}{reason for the invoice}
 #'   \item{\code{status}}{status of the invoice}
-#'   \item{\code{created}}{created at timestamp}
-#'   \item{\code{updated}}{updated at timestamp}
 #'   \item{\code{sender}}{character: message sender, typically an email address}
 #'   \item{\code{recipient}}{character: message recipient, typically an email address}
 #'   \item{\code{date_sent}}{POSIXct: date CTSI sent the message}
 #'   \item{\code{date_received}}{POSIXct: date CTSIT received the email}
 #'   \item{\code{script_name}}{character: the script that created this record}
+#'   \item{\code{created}}{created at timestamp}
+#'   \item{\code{updated}}{updated at timestamp}
 #' }
 #'
 #' @source \url{https://github.com/ctsit/rcc.billing/issues/3}
