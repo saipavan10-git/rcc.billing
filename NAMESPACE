@@ -2,5 +2,7 @@
 
 export(convert_schema_to_sqlite)
 export(create_table)
+export(invoice_line_item_df_from)
 export(populate_table)
 importFrom(magrittr,"%>%")
+importFrom(rlang,.data)
