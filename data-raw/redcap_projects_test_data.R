@@ -34,7 +34,8 @@ project_table_cols <-
 #   filter(is.na(date_deleted)) %>%
 #   head(nrow(project_table_cols)) %>%
 #   collect() %>%
-#   select(-colnames(project_table_cols))
+#   mutate(across(colnames(project_table_cols), ~ NA))
+#
 # usethis::use_data(projects_table_fragment, overwrite = T)
 #
 # one_deleted_project_record <- projects %>%
@@ -52,7 +53,9 @@ project_table_cols <-
 
 redcap_projects_test_data <-
   bind_cols(project_table_cols,
-            projects_table_fragment) %>%
-  bind_rows(one_deleted_project_record)
+            projects_table_fragment %>% select(-colnames(project_table_cols))) %>%
+  bind_rows(one_deleted_project_record) %>%
+  select(colnames(projects_table_fragment)) %>%
+  mutate(twilio_from_number = as.integer(NA))
 
 usethis::use_data(redcap_projects_test_data, overwrite = T)

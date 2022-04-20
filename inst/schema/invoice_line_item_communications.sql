@@ -1,7 +1,7 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-CREATE TABLE `invoice_line_item` (
+CREATE TABLE `invoice_line_item_communications` (
   `id` double NOT NULL,
   `service_identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `service_type_code` double DEFAULT NULL,
@@ -26,17 +26,17 @@ CREATE TABLE `invoice_line_item` (
   `je_posting_date` datetime DEFAULT NULL,
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
   `sender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `recipient` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `date_sent` datetime DEFAULT NULL,
   `date_received` datetime DEFAULT NULL,
-  `script_name`varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `updated` datetime DEFAULT NULL
+  `script_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-ALTER TABLE `invoice_line_item`
+ALTER TABLE `invoice_line_item_communications`
   ADD PRIMARY KEY (`id`),
   ADD KEY `service_identifier` (`service_identifier`),
   ADD KEY `service_type_code` (`service_type_code`),
@@ -52,3 +52,5 @@ ALTER TABLE `invoice_line_item`
   ADD KEY `created` (`created`),
   ADD KEY `updated` (`updated`),
   ADD KEY `reason` (`reason`);
+  ADD KEY `sender` (`sender`);
+  ADD KEY `recipient` (`recipient`);

@@ -2,26 +2,31 @@
 #'
 #' @format
 #' \describe{
-#'   \item{id}{the primary key}
-#'   \item{service_identifier}{either a redcap project ID, or redcap username}
-#'   \item{service_type_code}{a numeric code that uniquely identifies the service_type}
-#'   \item{service_instance_id}{a numeric code that uniquely identifies the service_instance}
-#'   \item{ctsi_study_id}{CSBT's unique identifier for a service}
-#'   \item{name_of_service}{name of the service}
-#'   \item{other_system_invoicing_comments}{additional invoice information, either project url, or sponsor and pi}
-#'   \item{price_of_service}{price of the service, in US dollars}
-#'   \item{qty_provided}{quantity provided}
-#'   \item{amount_due}{amount due, in US dollars}
-#'   \item{fiscal_year}{fiscal year of the invoice}
-#'   \item{month_invoiced}{month of the invoice}
-#'   \item{pi_last_name}{last name of the person invoiced}
-#'   \item{pi_first_name}{first name of the person invoiced}
-#'   \item{pi_email}{email of the person invoiced}
-#'   \item{gatorlink}{gatorlink of the person invoiced}
-#'   \item{reason}{reason for the invoice}
-#'   \item{status}{status of the invoice}
-#'   \item{created}{created at timestamp}
-#'   \item{updated}{updated at timestamp}
+#'   \item{\code{id}}{the primary key}
+#'   \item{\code{service_identifier}}{either a redcap project ID, or redcap username}
+#'   \item{\code{service_type_code}}{a numeric code that uniquely identifies the service_type}
+#'   \item{\code{service_instance_id}}{a numeric code that uniquely identifies the service_instance}
+#'   \item{\code{ctsi_study_id}}{CSBT's unique identifier for a service}
+#'   \item{\code{name_of_service}}{name of the service}
+#'   \item{\code{other_system_invoicing_comments}}{additional invoice information, either project url, or sponsor and pi}
+#'   \item{\code{price_of_service}}{price of the service, in US dollars}
+#'   \item{\code{qty_provided}}{quantity provided}
+#'   \item{\code{amount_due}}{amount due, in US dollars}
+#'   \item{\code{fiscal_year}}{fiscal year of the invoice}
+#'   \item{\code{month_invoiced}}{month of the invoice}
+#'   \item{\code{pi_last_name}}{last name of the person invoiced}
+#'   \item{\code{pi_first_name}}{first name of the person invoiced}
+#'   \item{\code{pi_email}}{email of the person invoiced}
+#'   \item{\code{gatorlink}}{gatorlink of the person invoiced}
+#'   \item{\code{reason}}{reason for the invoice}
+#'   \item{\code{status}}{status of the invoice}
+#'   \item{\code{sender}}{character: message sender, typically an email address}
+#'   \item{\code{recipient}}{character: message recipient, typically an email address}
+#'   \item{\code{date_sent}}{POSIXct: date CTSI sent the message}
+#'   \item{\code{date_received}}{POSIXct: date CTSIT received the email}
+#'   \item{\code{script_name}}{character: the script that created this record}
+#'   \item{\code{created}}{created at timestamp}
+#'   \item{\code{updated}}{updated at timestamp}
 #' }
 #'
 #' @source \url{https://github.com/ctsit/rcc.billing/issues/3}
@@ -108,7 +113,7 @@
 "ctsit_staff"
 
 #' @title redcap_projects_test_data
-#' @description A redcap_projects suitablew for billing tests
+#' @description A redcap_projects suitable for billing tests
 #' @format A data frame with 5 rows and 149 variables:
 #' \describe{
 #'   \item{\code{project_id}}{double Project ID}
@@ -421,9 +426,13 @@
 
 #' @title projects_table_fragment
 #' @description a portion of a REDCap project table used to make test datasets
-#' @format A data frame with 4 rows and 142 variables:
+#' @format A data frame with 4 rows and 149 variables:
 #' \describe{
+#'   \item{\code{project_id}}{double}
+#'   \item{\code{project_name}}{character}
+#'   \item{\code{app_title}}{character}
 #'   \item{\code{status}}{integer}
+#'   \item{\code{creation_time}}{double}
 #'   \item{\code{production_time}}{double}
 #'   \item{\code{inactive_time}}{double}
 #'   \item{\code{completed_time}}{double}
@@ -465,7 +474,10 @@
 #'   \item{\code{google_translate_default}}{character}
 #'   \item{\code{require_change_reason}}{integer}
 #'   \item{\code{dts_enabled}}{integer}
+#'   \item{\code{project_pi_firstname}}{character}
 #'   \item{\code{project_pi_mi}}{character}
+#'   \item{\code{project_pi_lastname}}{character}
+#'   \item{\code{project_pi_email}}{character}
 #'   \item{\code{project_pi_alias}}{character}
 #'   \item{\code{project_pi_username}}{character}
 #'   \item{\code{project_pi_pub_exclude}}{integer}
