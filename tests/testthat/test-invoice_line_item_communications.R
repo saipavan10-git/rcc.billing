@@ -10,7 +10,8 @@ test_that("service_type sqlite schema is created and correct test data is return
   )
   results <- populate_table(
     conn = conn,
-    table_name = table_name
+    table_name = table_name,
+    use_test_data = T
   ) %>%
     dplyr::mutate(dplyr::across(c(created, updated, je_posting_date, date_sent, date_received), ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz="UTC")))
 
