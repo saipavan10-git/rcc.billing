@@ -11,8 +11,8 @@ create_table(
 )
 results <- populate_table(
     conn = conn,
-    table_name = table_name
+    table_name = table_name,
+    use_test_data = TRUE
 )
 
-test_data <- get0(paste0(table_name, "_test_data"))
 DBI::dbDisconnect(conn)
