@@ -10,7 +10,8 @@ test_that("service_type sqlite schema is created and correct test data is return
   )
   results <- populate_table(
     conn = conn,
-    table_name = table_name
+    table_name = table_name,
+    use_test_data = TRUE
   )
 
   DBI::dbDisconnect(conn)
