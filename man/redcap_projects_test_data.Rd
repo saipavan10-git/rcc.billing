@@ -162,6 +162,6 @@ A data frame with 5 rows and 149 variables:
 redcap_projects_test_data
 }
 \description{
-A redcap_projects suitablew for billing tests
+A redcap_projects suitable for billing tests
 }
 \keyword{datasets}

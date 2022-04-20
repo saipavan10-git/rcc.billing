@@ -113,7 +113,7 @@
 "ctsit_staff"
 
 #' @title redcap_projects_test_data
-#' @description A redcap_projects suitablew for billing tests
+#' @description A redcap_projects suitable for billing tests
 #' @format A data frame with 5 rows and 149 variables:
 #' \describe{
 #'   \item{\code{project_id}}{double Project ID}
@@ -426,9 +426,13 @@
 
 #' @title projects_table_fragment
 #' @description a portion of a REDCap project table used to make test datasets
-#' @format A data frame with 4 rows and 142 variables:
+#' @format A data frame with 4 rows and 149 variables:
 #' \describe{
+#'   \item{\code{project_id}}{double}
+#'   \item{\code{project_name}}{character}
+#'   \item{\code{app_title}}{character}
 #'   \item{\code{status}}{integer}
+#'   \item{\code{creation_time}}{double}
 #'   \item{\code{production_time}}{double}
 #'   \item{\code{inactive_time}}{double}
 #'   \item{\code{completed_time}}{double}
@@ -470,7 +474,10 @@
 #'   \item{\code{google_translate_default}}{character}
 #'   \item{\code{require_change_reason}}{integer}
 #'   \item{\code{dts_enabled}}{integer}
+#'   \item{\code{project_pi_firstname}}{character}
 #'   \item{\code{project_pi_mi}}{character}
+#'   \item{\code{project_pi_lastname}}{character}
+#'   \item{\code{project_pi_email}}{character}
 #'   \item{\code{project_pi_alias}}{character}
 #'   \item{\code{project_pi_username}}{character}
 #'   \item{\code{project_pi_pub_exclude}}{integer}
