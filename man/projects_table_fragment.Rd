@@ -5,9 +5,13 @@
 \alias{projects_table_fragment}
 \title{projects_table_fragment}
 \format{
-A data frame with 4 rows and 142 variables:
+A data frame with 4 rows and 149 variables:
 \describe{
+  \item{\code{project_id}}{double}
+  \item{\code{project_name}}{character}
+  \item{\code{app_title}}{character}
   \item{\code{status}}{integer}
+  \item{\code{creation_time}}{double}
   \item{\code{production_time}}{double}
   \item{\code{inactive_time}}{double}
   \item{\code{completed_time}}{double}
@@ -49,7 +53,10 @@ A data frame with 4 rows and 142 variables:
   \item{\code{google_translate_default}}{character}
   \item{\code{require_change_reason}}{integer}
   \item{\code{dts_enabled}}{integer}
+  \item{\code{project_pi_firstname}}{character}
   \item{\code{project_pi_mi}}{character}
+  \item{\code{project_pi_lastname}}{character}
+  \item{\code{project_pi_email}}{character}
   \item{\code{project_pi_alias}}{character}
   \item{\code{project_pi_username}}{character}
   \item{\code{project_pi_pub_exclude}}{integer}
