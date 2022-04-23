@@ -19,5 +19,14 @@ while (<>){
     s/\\\\/\\/g;               # Convert escaped \ to literal
     s/ auto_increment=?\d*//gi;      # Remove auto_increment
     s/^[UN]*?LOCK TABLES.*//g; # Remove locking statements
-    print;
+    if (m/^\s*KEY /) { next }; # Remove indented KEY
+    if (m/^\s*UNIQUE KEY /) { next };   # Remove indented KEY
+    if (m/^\s*PRIMARY KEY /) { next };  # Remove indented KEY
+    $lines .= $_;
 }
+
+# remove the comma from the last param before the close paren
+local $/ = undef;
+$lines =~ s/,\n\)/\n\)/;
+
+print $lines;
