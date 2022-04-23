@@ -579,3 +579,21 @@
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
 #'}
 "projects_table_fragment"
+
+#' @title redcap_entity_project_ownership_test_data
+#' @description A test dataset for the redcap_entity_project_ownership table
+#' @format A data frame with 5 rows and 10 variables:
+#' \describe{
+#'   \item{\code{id}}{integer Primary key}
+#'   \item{\code{created}}{double Date the record was created as a unix timestamp}
+#'   \item{\code{updated}}{double Date the record was last updated as a unix timestamp}
+#'   \item{\code{pid}}{double REDCap project_id of the project}
+#'   \item{\code{username}}{character Username of the project owner if it exists}
+#'   \item{\code{email}}{character Email address of the project owner if username does not exist}
+#'   \item{\code{firstname}}{character Firstname of the project owner if username does not exist}
+#'   \item{\code{lastname}}{character Lastname of the project owner if username does not exist}
+#'   \item{\code{billable}}{integer A boolean to indicate if the project should be billed}
+#'   \item{\code{sequestered}}{integer A boolean to indicate if the project is sequestered}
+#'}
+#' @details DETAILS
+"redcap_entity_project_ownership_test_data"
