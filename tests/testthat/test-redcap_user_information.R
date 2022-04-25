@@ -13,19 +13,7 @@ test_that("redcap_user_information sqlite schema is created and correct test dat
     table_name = table_name,
     use_test_data = T
   ) %>%
-    dplyr::mutate(dplyr::across(c(
-      user_creation,
-      user_firstvisit,
-      user_firstactivity,
-      user_lastactivity,
-      user_lastlogin,
-      user_suspended_time,
-      user_expiration,
-      user_access_dashboard_view,
-      messaging_email_ts,
-      messaging_email_queue_time
-    ),
-                                ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz="UTC")))
+    fix_data_in_redcap_user_information
 
   DBI::dbDisconnect(conn)
   testthat::expect_equal(dplyr::as_tibble(results), test_data)

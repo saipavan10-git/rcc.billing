@@ -5,6 +5,7 @@ while (<>){
     s/ENGINE=\S+ *//;          # remove ENGINE
     s/DEFAULT CHARSET=\S+ *//; # remove DEFAULT CHARSET
     s/COLLATE [^, ]+//;         # remove COLLATE on column
+    s/ UNSIGNED//i;            # remove unsigned on column
     s/COLLATE=\S+ *//;         # remove COLLATE on table
     s/COMMENT '.+'//;          # remove COMMENT on column
     s/COMMENT='.+'//;          # remove COMMENT on table 

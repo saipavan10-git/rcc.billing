@@ -35,3 +35,42 @@ invoice_line_item_df_from <- function(invoice_line_item_communications) {
     return(invoice_line_item)
 }
 
+#' fix_data_in_redcap_user_information
+#'
+#' Fixes column data types that can vary between MySQL/MariaDB and SQLite3. This allows testing in SQLite while production is MariaDB
+#'
+#' @param data - a dataframe
+#'
+#' @return The input dataframe with revised data types
+#' @export
+#'
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' invoice_line_item_df_from(invoice_line_item_communications_test_data)
+#' }
+#' @export
+fix_data_in_redcap_user_information <- function(data) {
+    time_columns <- c(
+        "user_creation",
+        "user_firstvisit",
+        "user_firstactivity",
+        "user_lastactivity",
+        "user_lastlogin",
+        "user_suspended_time",
+        "user_expiration",
+        "user_access_dashboard_view",
+        "messaging_email_ts",
+        "messaging_email_queue_time"
+    )
+
+    result <- data %>%
+        dplyr::mutate(dplyr::across(
+            dplyr::any_of(time_columns),
+            ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz = "UTC")
+        ))
+
+    return(result)
+}
