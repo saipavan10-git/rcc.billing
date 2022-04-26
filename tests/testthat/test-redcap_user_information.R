@@ -13,7 +13,7 @@ test_that("redcap_user_information sqlite schema is created and correct test dat
     table_name = table_name,
     use_test_data = T
   ) %>%
-    fix_data_in_redcap_user_information
+    fix_data_in_redcap_user_information()
 
   DBI::dbDisconnect(conn)
   testthat::expect_equal(dplyr::as_tibble(results), test_data)
