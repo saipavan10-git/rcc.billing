@@ -95,9 +95,17 @@ fix_data_in_redcap_user_information <- function(data) {
 #' }
 #' @export
 fix_data_in_redcap_log_event <- function(data) {
+  integer64_columns <- c(
+    "ts"
+  )
   if (nrow(data) == 0) { # zero-row SQLite3 tables get the wrong data type on ts
     result <- data %>%
-      dplyr::mutate(ts = bit64::as.integer64.character(.data$ts))
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(integer64_columns),
+          bit64::as.integer64.character
+        )
+      )
   } else {
     result <- data
   }
