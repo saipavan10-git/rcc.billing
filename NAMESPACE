@@ -2,6 +2,7 @@
 
 export(convert_schema_to_sqlite)
 export(create_table)
+export(fix_data_in_redcap_log_event)
 export(fix_data_in_redcap_user_information)
 export(invoice_line_item_df_from)
 export(populate_table)
