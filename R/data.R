@@ -94,7 +94,7 @@
 #'   \item{\code{date_sent}}{POSIXct: date CTSI sent the message}
 #'   \item{\code{date_received}}{POSIXct: date CTSIT received the email}
 #'   \item{\code{script_name}}{character: the script that created this record}
-#'}
+#' }
 #'
 #' @source \url{https://github.com/ctsit/rcc.billing/issues/7}
 "invoice_line_item_communications_test_data"
@@ -109,7 +109,7 @@
 #'   \item{\code{employment_intervals}}{character: a JSON array of date intervals that defines
 #'     the CTS-IT employee's employment periods in the form
 #'     `[ {start: "2011-05-01", end : "2022-01-14"} ]`}
-#'}
+#' }
 "ctsit_staff"
 
 #' @title redcap_projects_test_data
@@ -265,7 +265,7 @@
 #'   \item{\code{protected_email_mode_logo}}{integer}
 #'   \item{\code{hide_filled_forms}}{integer}
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
-#'}
+#' }
 "redcap_projects_test_data"
 
 #' @title one_deleted_project_record
@@ -421,7 +421,7 @@
 #'   \item{\code{protected_email_mode_logo}}{integer}
 #'   \item{\code{hide_filled_forms}}{integer}
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
-#'}
+#' }
 "one_deleted_project_record"
 
 #' @title projects_table_fragment
@@ -577,5 +577,104 @@
 #'   \item{\code{protected_email_mode_logo}}{integer}
 #'   \item{\code{hide_filled_forms}}{integer}
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
-#'}
+#' }
 "projects_table_fragment"
+
+#' @title redcap_entity_project_ownership_test_data
+#' @description A test dataset for the redcap_entity_project_ownership table
+#' @format A data frame with 5 rows and 10 variables:
+#' \describe{
+#'   \item{\code{id}}{integer Primary key}
+#'   \item{\code{created}}{double Date the record was created as a unix timestamp}
+#'   \item{\code{updated}}{double Date the record was last updated as a unix timestamp}
+#'   \item{\code{pid}}{double REDCap project_id of the project}
+#'   \item{\code{username}}{character Username of the project owner if it exists}
+#'   \item{\code{email}}{character Email address of the project owner if username does not exist}
+#'   \item{\code{firstname}}{character Firstname of the project owner if username does not exist}
+#'   \item{\code{lastname}}{character Lastname of the project owner if username does not exist}
+#'   \item{\code{billable}}{integer A boolean to indicate if the project should be billed}
+#'   \item{\code{sequestered}}{integer A boolean to indicate if the project is sequestered}
+#' }
+#' @details DETAILS
+"redcap_entity_project_ownership_test_data"
+
+#' @title redcap_user_information_test_data
+#' @description Test dataset for redcap_user_information
+#' @format A data frame with 5 rows and 49 variables:
+#' \describe{
+#'   \item{\code{ui_id}}{integer primary key}
+#'   \item{\code{username}}{character redcap username}
+#'   \item{\code{user_email}}{character primary email address}
+#'   \item{\code{user_email2}}{character}
+#'   \item{\code{user_email3}}{character}
+#'   \item{\code{user_phone}}{character}
+#'   \item{\code{user_phone_sms}}{character}
+#'   \item{\code{user_firstname}}{character}
+#'   \item{\code{user_lastname}}{character}
+#'   \item{\code{user_inst_id}}{character}
+#'   \item{\code{super_user}}{integer}
+#'   \item{\code{account_manager}}{integer}
+#'   \item{\code{access_system_config}}{integer}
+#'   \item{\code{access_system_upgrade}}{integer}
+#'   \item{\code{access_external_module_install}}{integer}
+#'   \item{\code{admin_rights}}{integer}
+#'   \item{\code{access_admin_dashboards}}{integer}
+#'   \item{\code{user_creation}}{double}
+#'   \item{\code{user_firstvisit}}{double}
+#'   \item{\code{user_firstactivity}}{double}
+#'   \item{\code{user_lastactivity}}{double}
+#'   \item{\code{user_lastlogin}}{double}
+#'   \item{\code{user_suspended_time}}{double}
+#'   \item{\code{user_expiration}}{double}
+#'   \item{\code{user_access_dashboard_view}}{double}
+#'   \item{\code{user_access_dashboard_email_queued}}{character}
+#'   \item{\code{user_sponsor}}{character}
+#'   \item{\code{user_comments}}{character}
+#'   \item{\code{allow_create_db}}{integer}
+#'   \item{\code{email_verify_code}}{character}
+#'   \item{\code{email2_verify_code}}{character}
+#'   \item{\code{email3_verify_code}}{character}
+#'   \item{\code{datetime_format}}{character}
+#'   \item{\code{number_format_decimal}}{character}
+#'   \item{\code{number_format_thousands_sep}}{character}
+#'   \item{\code{csv_delimiter}}{character}
+#'   \item{\code{two_factor_auth_secret}}{character}
+#'   \item{\code{display_on_email_users}}{integer}
+#'   \item{\code{two_factor_auth_twilio_prompt_phone}}{integer}
+#'   \item{\code{two_factor_auth_code_expiration}}{integer}
+#'   \item{\code{api_token}}{character}
+#'   \item{\code{messaging_email_preference}}{character}
+#'   \item{\code{messaging_email_urgent_all}}{integer}
+#'   \item{\code{messaging_email_ts}}{double}
+#'   \item{\code{messaging_email_general_system}}{integer}
+#'   \item{\code{messaging_email_queue_time}}{double}
+#'   \item{\code{ui_state}}{character}
+#'   \item{\code{api_token_auto_request}}{integer}
+#'   \item{\code{fhir_data_mart_create_project}}{integer}
+#' }
+#' @details DETAILS
+"redcap_user_information_test_data"
+
+#' @title redcap_log_event_test_data
+#' @description a named list of redcap_log_event tables with project lifecycle test data
+#' @format A named list of 10 dataframes each with a 0 or more rows of 15 variables.
+#'   Each dataframe is structured as described here.
+#' \describe{
+#'   \item{\code{log_event_id}}{integer primary key}
+#'   \item{\code{project_id}}{integer REDCap project_id}
+#'   \item{\code{ts}}{double a timestamp in the format YYYYMMDDHHMMSS in local time}
+#'   \item{\code{user}}{character the REDCap username who initiated this event}
+#'   \item{\code{ip}}{character IP address of that REDCap user}
+#'   \item{\code{page}}{character relative REDCap URL that initiated this event}
+#'   \item{\code{event}}{character the type of event. e.g DATA_EXPORT, DELETE, ERROR, INSERT, MANAGE, OTHER, UPDATE}
+#'   \item{\code{object_type}}{character a REDCap object type e.g., NA, redcap_arms, redcap_auth, redcap_data, redcap_docs, redcap_event_forms, redcap_events, redcap_events_metadata, redcap_metadata, redcap_metadata_temp, redcap_projects, redcap_user_rights}
+#'   \item{\code{sql_log}}{character the SQL code executed during this event}
+#'   \item{\code{pk}}{character the primary key of the effected object}
+#'   \item{\code{event_id}}{integer the REDCap event_id if relevant}
+#'   \item{\code{data_values}}{character}
+#'   \item{\code{description}}{character description of the event}
+#'   \item{\code{legacy}}{integer}
+#'   \item{\code{change_reason}}{character}
+#' }
+#' @details DETAILS
+"redcap_log_event_test_data"

@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' \dontrun{
-#'  convert_schema_to_sqlite(table_name = "service_type")
+#' convert_schema_to_sqlite(table_name = "service_type")
 #' }
 #' @export
 convert_schema_to_sqlite <- function(table_name) {
@@ -16,7 +16,7 @@ convert_schema_to_sqlite <- function(table_name) {
   pl_to_sqlite <- system.file("", "to_sqlite.pl", package = "rcc.billing")
 
   # read original
-  original_schema_file = system.file("schema", schema_file_name, package = "rcc.billing")
+  original_schema_file <- system.file("schema", schema_file_name, package = "rcc.billing")
 
   if (original_schema_file == "") {
     stop(paste("Schema file does not exist for", table_name))
@@ -36,11 +36,11 @@ convert_schema_to_sqlite <- function(table_name) {
 #'
 #' @examples
 #' \dontrun{
-#'  table_name <- "service_type"
-#'  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+#' table_name <- "service_type"
+#' conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 #'
-#'  schema <- convert_schema_to_sqlite(table_name)
-#'  create_table(conn = conn, schema = schema)
+#' schema <- convert_schema_to_sqlite(table_name)
+#' create_table(conn = conn, schema = schema)
 #' }
 #' @export
 create_table <- function(conn, schema) {
@@ -59,15 +59,15 @@ create_table <- function(conn, schema) {
 #'
 #' @examples
 #' \dontrun{
-#'  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
-#'  populate_table(conn = conn, table_name = "service_type")
+#' conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+#' populate_table(conn = conn, table_name = "service_type")
 #' }
 #' @export
 populate_table <- function(conn, table_name, use_test_data = FALSE) {
   data_ref <- table_name
 
   if (isTRUE(use_test_data)) {
-    data_ref <-  paste0(data_ref, "_test_data")
+    data_ref <- paste0(data_ref, "_test_data")
   }
 
   # get test data
