@@ -94,7 +94,7 @@
 #'   \item{\code{date_sent}}{POSIXct: date CTSI sent the message}
 #'   \item{\code{date_received}}{POSIXct: date CTSIT received the email}
 #'   \item{\code{script_name}}{character: the script that created this record}
-#'}
+#' }
 #'
 #' @source \url{https://github.com/ctsit/rcc.billing/issues/7}
 "invoice_line_item_communications_test_data"
@@ -109,7 +109,7 @@
 #'   \item{\code{employment_intervals}}{character: a JSON array of date intervals that defines
 #'     the CTS-IT employee's employment periods in the form
 #'     `[ {start: "2011-05-01", end : "2022-01-14"} ]`}
-#'}
+#' }
 "ctsit_staff"
 
 #' @title redcap_projects_test_data
@@ -265,7 +265,7 @@
 #'   \item{\code{protected_email_mode_logo}}{integer}
 #'   \item{\code{hide_filled_forms}}{integer}
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
-#'}
+#' }
 "redcap_projects_test_data"
 
 #' @title one_deleted_project_record
@@ -421,7 +421,7 @@
 #'   \item{\code{protected_email_mode_logo}}{integer}
 #'   \item{\code{hide_filled_forms}}{integer}
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
-#'}
+#' }
 "one_deleted_project_record"
 
 #' @title projects_table_fragment
@@ -577,7 +577,7 @@
 #'   \item{\code{protected_email_mode_logo}}{integer}
 #'   \item{\code{hide_filled_forms}}{integer}
 #'   \item{\code{form_activation_survey_autocontinue}}{integer}
-#'}
+#' }
 "projects_table_fragment"
 
 #' @title redcap_entity_project_ownership_test_data
@@ -594,7 +594,7 @@
 #'   \item{\code{lastname}}{character Lastname of the project owner if username does not exist}
 #'   \item{\code{billable}}{integer A boolean to indicate if the project should be billed}
 #'   \item{\code{sequestered}}{integer A boolean to indicate if the project is sequestered}
-#'}
+#' }
 #' @details DETAILS
 "redcap_entity_project_ownership_test_data"
 
@@ -651,7 +651,7 @@
 #'   \item{\code{ui_state}}{character}
 #'   \item{\code{api_token_auto_request}}{integer}
 #'   \item{\code{fhir_data_mart_create_project}}{integer}
-#'}
+#' }
 #' @details DETAILS
 "redcap_user_information_test_data"
 
@@ -675,6 +675,6 @@
 #'   \item{\code{description}}{character description of the event}
 #'   \item{\code{legacy}}{integer}
 #'   \item{\code{change_reason}}{character}
-#'}
+#' }
 #' @details DETAILS
 "redcap_log_event_test_data"

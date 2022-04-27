@@ -12,27 +12,27 @@
 #' }
 #' @export
 invoice_line_item_df_from <- function(invoice_line_item_communications) {
-    excluded_columns <- "created"
+  excluded_columns <- "created"
 
-    id_columns <- c(
-        "service_identifier", "fiscal_year", "month_invoiced"
-    )
+  id_columns <- c(
+    "service_identifier", "fiscal_year", "month_invoiced"
+  )
 
-    created <- invoice_line_item_communications %>%
-        dplyr::arrange(created) %>%
-        dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) %>%
-        dplyr::select(dplyr::any_of(id_columns), created)
+  created <- invoice_line_item_communications %>%
+    dplyr::arrange(created) %>%
+    dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) %>%
+    dplyr::select(dplyr::any_of(id_columns), created)
 
-    invoice_line_item <- invoice_line_item_communications %>%
-        dplyr::arrange(dplyr::desc(created)) %>%
-        dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) %>%
-        dplyr::select(-dplyr::any_of(excluded_columns)) %>%
-        dplyr::inner_join(created, by = id_columns) %>%
-        dplyr::relocate(.data$updated, .after = created) %>%
-        dplyr::arrange((.data$je_number)) %>%
-        dplyr::mutate(id = as.double(dplyr::row_number()))
+  invoice_line_item <- invoice_line_item_communications %>%
+    dplyr::arrange(dplyr::desc(created)) %>%
+    dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) %>%
+    dplyr::select(-dplyr::any_of(excluded_columns)) %>%
+    dplyr::inner_join(created, by = id_columns) %>%
+    dplyr::relocate(.data$updated, .after = created) %>%
+    dplyr::arrange((.data$je_number)) %>%
+    dplyr::mutate(id = as.double(dplyr::row_number()))
 
-    return(invoice_line_item)
+  return(invoice_line_item)
 }
 
 #' fix_data_in_redcap_user_information

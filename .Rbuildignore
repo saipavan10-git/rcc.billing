@@ -21,3 +21,4 @@
 .vscode
 ^data-raw$
 wip.*
+.lintr
