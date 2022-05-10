@@ -19,6 +19,6 @@ and returns that schema.
 }
 \examples{
 \dontrun{
- convert_schema_to_sqlite(table_name = "service_type")
+convert_schema_to_sqlite(table_name = "service_type")
 }
 }

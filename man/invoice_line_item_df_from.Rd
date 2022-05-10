@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{invoice_line_item_df_from}
 \alias{invoice_line_item_df_from}
-\title{Creates a invoice_line_item df from invoice_line_item_communications_df}
+\title{Creates a invoice_line_item data from invoice_line_item_communications_data}
 \usage{
 invoice_line_item_df_from(invoice_line_item_communications)
 }
@@ -13,7 +13,7 @@ invoice_line_item_df_from(invoice_line_item_communications)
 invoice_line_item dataframe
 }
 \description{
-Creates a invoice_line_item df from invoice_line_item_communications_df
+Creates a invoice_line_item data from invoice_line_item_communications_data
 }
 \examples{
 \dontrun{

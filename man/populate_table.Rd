@@ -18,7 +18,7 @@ Populates table_name with the corresponding test data found in /data.
 }
 \examples{
 \dontrun{
- conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
- populate_table(conn = conn, table_name = "service_type")
+conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+populate_table(conn = conn, table_name = "service_type")
 }
 }

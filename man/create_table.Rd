@@ -16,10 +16,10 @@ Creates a table based on a schema.
 }
 \examples{
 \dontrun{
- table_name <- "service_type"
- conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+table_name <- "service_type"
+conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 
- schema <- convert_schema_to_sqlite(table_name)
- create_table(conn = conn, schema = schema)
+schema <- convert_schema_to_sqlite(table_name)
+create_table(conn = conn, schema = schema)
 }
 }
