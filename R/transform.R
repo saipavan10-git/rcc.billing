@@ -1,4 +1,33 @@
-#' Creates a invoice_line_item df from invoice_line_item_communications_df
+#' mutate_columns_to_posixct
+#'
+#' Mutates column data types to POSIXct
+#'
+#' @param data - a dataframe to mutate
+#' @param column_names - a vector of column names to mutate
+#'
+#' @return The input dataframe with revised data types
+#' @export
+#'
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' time_columns <- c("created", "updated")
+#' mutate_columns_to_posixct(data, time_columns)
+#' }
+#' @export
+mutate_columns_to_posixct <- function(data, column_names) {
+  result <- data %>%
+    dplyr::mutate(dplyr::across(
+      dplyr::any_of(column_names),
+      ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz = "UTC")
+    ))
+
+  return(result)
+}
+
+#' Creates a invoice_line_item data from invoice_line_item_communications_data
 #'
 #' @param invoice_line_item_communications, data that follows the format of invoice_line_item_communications_test_data located in R/data.R
 #'
@@ -35,6 +64,99 @@ invoice_line_item_df_from <- function(invoice_line_item_communications) {
   return(invoice_line_item)
 }
 
+#' fix_data_in_invoice_line_item
+#'
+#' Fixes column data types that can vary between MySQL/MariaDB and SQLite3.
+#' This allows testing in SQLite3 while production is MariaDB
+#'
+#' @param data - a dataframe with data from the invoice_line_item table
+#'
+#' @return The input dataframe with revised data types
+#' @export
+#'
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' fix_data_in_invoice_line_item(invoice_line_item_test_data)
+#' }
+#' @export
+fix_data_in_invoice_line_item <- function(data) {
+  time_columns <- c(
+    "created",
+    "updated",
+    "je_posting_date",
+    "date_sent",
+    "date_received"
+  )
+
+  return(mutate_columns_to_posixct(data, time_columns))
+}
+
+#' fix_data_in_invoice_line_item_communication
+#'
+#' Fixes column data types that can vary between MySQL/MariaDB and SQLite3.
+#' This allows testing in SQLite3 while production is MariaDB
+#'
+#' @param data - a dataframe with data from the invoice_line_item_communication table
+#'
+#' @return The input dataframe with revised data types
+#' @export
+#'
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' fix_data_in_invoice_line_item_communication(invoice_line_item_communication_test_data)
+#' }
+#' @export
+fix_data_in_invoice_line_item_communication <- function(data) {
+  time_columns <- c(
+    "created",
+    "updated",
+    "je_posting_date",
+    "date_sent",
+    "date_received"
+  )
+
+  return(mutate_columns_to_posixct(data, time_columns))
+}
+
+#' fix_data_in_redcap_projects
+#'
+#' Fixes column data types that can vary between MySQL/MariaDB and SQLite3.
+#' This allows testing in SQLite3 while production is MariaDB
+#'
+#' @param data - a dataframe with data from the redcap_projects table
+#'
+#' @return The input dataframe with revised data types
+#' @export
+#'
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' fix_data_in_redcap_projects(redcap_projects_test_data)
+#' }
+#' @export
+fix_data_in_redcap_projects <- function(data) {
+  time_columns <- c(
+    "creation_time",
+    "production_time",
+    "inactive_time",
+    "completed_time",
+    "date_deleted",
+    "last_logged_event",
+    "datamart_cron_end_date",
+    "twilio_request_inspector_checked"
+  )
+
+  return(mutate_columns_to_posixct(data, time_columns))
+}
+
 #' fix_data_in_redcap_user_information
 #'
 #' Fixes column data types that can vary between MySQL/MariaDB and SQLite3.
@@ -67,13 +189,7 @@ fix_data_in_redcap_user_information <- function(data) {
     "messaging_email_queue_time"
   )
 
-  result <- data %>%
-    dplyr::mutate(dplyr::across(
-      dplyr::any_of(time_columns),
-      ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz = "UTC")
-    ))
-
-  return(result)
+  return(mutate_columns_to_posixct(data, time_columns))
 }
 
 #' fix_data_in_redcap_log_event

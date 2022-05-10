@@ -12,8 +12,7 @@ test_that("service_type sqlite schema is created and correct test data is return
     conn = conn,
     table_name = table_name,
     use_test_data = T
-  ) %>%
-    dplyr::mutate(dplyr::across(c(created, updated, je_posting_date, date_sent, date_received), ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz="UTC")))
+  ) %>% fix_data_in_invoice_line_item_communication()
 
   DBI::dbDisconnect(conn)
   expect_identical(test_data, dplyr::as_tibble(results))

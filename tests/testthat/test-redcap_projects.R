@@ -12,20 +12,7 @@ test_that("service_type sqlite schema is created and correct test data is return
         conn = conn,
         table_name = table_name,
         use_test_data = T
-    ) %>%
-        dplyr::mutate(dplyr::across(c(creation_time,
-                                      production_time,
-                                      inactive_time,
-                                      completed_time,
-                                      date_deleted,
-                                      last_logged_event,
-                                      datamart_cron_end_date,
-                                      twilio_request_inspector_checked),
-                                    ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz = "UTC"))) %>%
-        dplyr::mutate(
-            project_id = as.double(project_id),
-            protected_email_mode_custom_trigger = as.null.default(protected_email_mode_custom_trigger)
-        )
+    ) %>% fix_data_in_redcap_projects()
 
     DBI::dbDisconnect(conn)
     expect_equal(dplyr::as_tibble(results), test_data)

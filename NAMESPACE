@@ -2,9 +2,13 @@
 
 export(convert_schema_to_sqlite)
 export(create_table)
+export(fix_data_in_invoice_line_item)
+export(fix_data_in_invoice_line_item_communication)
 export(fix_data_in_redcap_log_event)
+export(fix_data_in_redcap_projects)
 export(fix_data_in_redcap_user_information)
 export(invoice_line_item_df_from)
+export(mutate_columns_to_posixct)
 export(populate_table)
 importFrom(magrittr,"%>%")
 importFrom(rlang,.data)
