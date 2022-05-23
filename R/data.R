@@ -687,3 +687,12 @@
 #'   \item{\code{csbt}}{character: Billing invoice database column names}
 #'}
 "csbt_column_names"
+
+#' @title invoice_line_item_reasons
+#' @description Provides text for new invoice line items
+#' @format A data frame with 3 rows and 2 variables:
+#' \describe{
+#'   \item{\code{code}}{character: A short, static name for the string}
+#'   \item{\code{label}}{character: A friendly human-readable string}
+#'}
+"invoice_line_item_reasons"
