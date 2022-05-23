@@ -696,3 +696,13 @@
 #'   \item{\code{label}}{character: A friendly human-readable string}
 #'}
 "invoice_line_item_reasons"
+
+#' @title invoice_line_item_statuses
+#' @description Describes valid invoice line item statuses
+#' @format A data frame with 5 rows and 2 variables:
+#' \describe{
+#'   \item{\code{status}}{character: A short, static name for the status code}
+#'   \item{\code{description}}{character: A human-readable description of the status}
+#'}
+#' @details DETAILS
+"invoice_line_item_statuses"
