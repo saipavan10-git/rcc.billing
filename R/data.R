@@ -678,3 +678,12 @@
 #' }
 #' @details DETAILS
 "redcap_log_event_test_data"
+
+#' @title csbt_column_names
+#' @description Column names useful for CTSI-IT billing
+#' @format A data frame with 12 rows and 2 variables:
+#' \describe{
+#'   \item{\code{ctsit}}{character: Internal database columns}
+#'   \item{\code{csbt}}{character: Billing invoice database column names}
+#'}
+"csbt_column_names"
