@@ -678,3 +678,31 @@
 #' }
 #' @details DETAILS
 "redcap_log_event_test_data"
+
+#' @title csbt_column_names
+#' @description Column names useful for CTSI-IT billing
+#' @format A data frame with 12 rows and 2 variables:
+#' \describe{
+#'   \item{\code{ctsit}}{character: Internal database columns}
+#'   \item{\code{csbt}}{character: Billing invoice database column names}
+#'}
+"csbt_column_names"
+
+#' @title invoice_line_item_reasons
+#' @description Provides text for new invoice line items
+#' @format A data frame with 3 rows and 2 variables:
+#' \describe{
+#'   \item{\code{code}}{character: A short, static name for the string}
+#'   \item{\code{label}}{character: A friendly human-readable string}
+#'}
+"invoice_line_item_reasons"
+
+#' @title invoice_line_item_statuses
+#' @description Describes valid invoice line item statuses
+#' @format A data frame with 5 rows and 2 variables:
+#' \describe{
+#'   \item{\code{status}}{character: A short, static name for the status code}
+#'   \item{\code{description}}{character: A human-readable description of the status}
+#'}
+#' @details DETAILS
+"invoice_line_item_statuses"
