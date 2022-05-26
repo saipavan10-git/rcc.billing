@@ -10,10 +10,10 @@ transform_invoice_line_items_for_csbt(invoice_line_items)
 \item{invoice_line_items}{A dataframe with the CTSIT column names}
 }
 \value{
-The input dataframe with coluimns adjusted to match CSBT format
+The input dataframe with columns adjusted to match CSBT format
 }
 \description{
-Renames columns of a dataframe from CTSIT format to CSBT format
+Excludes non-CSBT columns and renames CTSIT column names to the corresponding CSBT names.
 }
 \details{
 DETAILS
