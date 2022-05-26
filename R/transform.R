@@ -228,3 +228,33 @@ fix_data_in_redcap_log_event <- function(data) {
 
   return(result)
 }
+
+#' Renames columns of a dataframe from CTSIT format to CSBT format
+#'
+#' Excludes non-CSBT columns and renames CTSIT column names to the corresponding CSBT names.
+
+#' @param invoice_line_items A dataframe with the CTSIT column names
+#' @return The input dataframe with columns adjusted to match CSBT format
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' tbl(conn, "invoice_line_item") %>%
+#'   collect() %>%
+#'   transform_invoice_line_items_for_csbt()
+#' }
+#' @export
+#' @seealso \code{\link{csbt_column_names}}
+transform_invoice_line_items_for_csbt <- function(invoice_line_items) {
+
+  new_names <- function(old_column_names) {
+    rcc.billing::csbt_column_names %>%
+      dplyr::filter(.data$ctsit %in% old_column_names) %>%
+      dplyr::pull(.data$csbt)
+  }
+
+  result <- invoice_line_items %>%
+    dplyr::select(dplyr::any_of(rcc.billing::csbt_column_names$ctsit)) %>%
+    dplyr::rename_with(.fn = ~ new_names(.), .cols = dplyr::any_of(rcc.billing::csbt_column_names$ctsit))
+
+  return(result)
+}
