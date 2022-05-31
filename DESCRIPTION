@@ -19,7 +19,8 @@ Imports:
   bit64,
   dplyr,
   magrittr,
-  rlang
+  rlang,
+  redcapcustodian
 Suggests:
   testthat (>= 3.0.0),
   RSQLite
