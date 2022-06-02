@@ -2,6 +2,7 @@
 
 export(convert_schema_to_sqlite)
 export(create_table)
+export(draft_communication_record_from_line_item)
 export(fix_data_in_invoice_line_item)
 export(fix_data_in_invoice_line_item_communication)
 export(fix_data_in_redcap_log_event)
