@@ -18,9 +18,12 @@ Imports:
   DBI,
   bit64,
   dplyr,
+  lubridate,
   magrittr,
   rlang,
-  redcapcustodian
+  redcapcustodian,
+  stringr,
+  tibble
 Suggests:
   testthat (>= 3.0.0),
   RSQLite
