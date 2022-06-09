@@ -706,3 +706,13 @@
 #'}
 #' @details DETAILS
 "invoice_line_item_statuses"
+
+#' @title fiscal_years
+#' @description A dataframe of fiscal years and labels from 2019-2020 to 2039-2040
+#' @format A data frame with 21 rows and 2 variables:
+#' \describe{
+#'   \item{\code{csbt_label}}{character A string representing the fiscal year range, in the format YYYY-YYYY}
+#'   \item{\code{fy_interval}}{double A lubridate interval object from the start of the UF fiscal year (July 1) to the end}
+#'}
+#' @details DETAILS
+"fiscal_years"
