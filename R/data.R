@@ -707,33 +707,12 @@
 #' @details DETAILS
 "invoice_line_item_statuses"
 
-
-#' Generates a dataframe of fiscal years
-#'
-#' @return A dataframe of fiscal years from 2019-2020 to 2039-2040
-#' \itemize{
-#'   \item csbt_label - A string representing the fiscal year range, in the format YYYY-YYYY
-#'   \item fy_interval - A lubridate interval object from the start of the UF fiscal year (July 1) to the end
-#' }
-#' @examples
-#' \dontrun{
-#' fiscal_years <- get_fiscal_years()
-#' }
-#' @export
-get_fiscal_years <- function() {
-  START_YEAR <- 2019
-  END_YEAR <- 2040
-
-  starts_of_years <- START_YEAR:(END_YEAR - 1)
-  ends_of_years <- (START_YEAR + 1):END_YEAR
-
-  fy_start <- lubridate::ymd(paste0(starts_of_years, "-07-01"), tz="America/New_York")
-  fy_end <- lubridate::ymd(paste0(ends_of_years, "-07-01"), tz="America/New_York")
-
-  fiscal_years <- tibble::tibble(
-    "csbt_label" = paste0(starts_of_years, "-", ends_of_years),
-    "fy_interval" = lubridate::interval(fy_start, fy_end)
-  )
-
-  return(fiscal_years)
-}
+#' @title fiscal_years
+#' @description A dataframe of fiscal years and labels from 2019-2020 to 2039-2040
+#' @format A data frame with 21 rows and 2 variables:
+#' \describe{
+#'   \item{\code{csbt_label}}{character A string representing the fiscal year range, in the format YYYY-YYYY}
+#'   \item{\code{fy_interval}}{double A lubridate interval object from the start of the UF fiscal year (July 1) to the end}
+#'}
+#' @details DETAILS
+"fiscal_years"
