@@ -4,3 +4,5 @@
 .Ruserdata
 .env
 output/
+*.env
+!examples/testing.env
