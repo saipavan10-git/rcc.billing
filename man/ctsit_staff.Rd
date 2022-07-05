@@ -5,20 +5,15 @@
 \alias{ctsit_staff}
 \title{CTS-IT Staff}
 \format{
-A data frame with 5 rows and 2 variables:
+A data frame with 6 rows and 1 variable:
 \describe{
   \item{\code{redcap_username}}{character: a REDCap username. Typically this is Gatorlink ID.}
-  \item{\code{employment_intervals}}{character: a JSON array of date intervals that defines
-    the CTS-IT employee's employment periods in the form
-    `[ {start: "2011-05-01", end : "2022-01-14"} ]`}
 }
 }
 \usage{
 ctsit_staff
 }
 \description{
-A limited set of facts about a limited number of CTS-IT staff. This
-dataset will be used to inform default data ownership and setting billable flags
-in the REDCap Entity / Project Ownership table.
+usernames of CTS-IT staff
 }
 \keyword{datasets}
