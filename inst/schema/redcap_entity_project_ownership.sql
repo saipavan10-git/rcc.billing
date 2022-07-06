@@ -7,7 +7,7 @@ CREATE TABLE `redcap_entity_project_ownership` (
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `firstname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `billable` int(10) unsigned NOT NULL,
-  `sequestered` int(10) unsigned NOT NULL,
+  `billable` int(10) unsigned DEFAULT NULL,
+  `sequestered` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
