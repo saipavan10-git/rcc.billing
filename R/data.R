@@ -723,3 +723,16 @@
 #'}
 #' @details DETAILS
 "fiscal_years"
+
+#' @title cleanup_project_ownership_test_data
+#' @description A named list of dataframes used to test the functions written for cleanup_project_ownership.R
+#' @format A named list of 5 dataframes:
+#' \describe{
+#'   \item{\code{redcap_user_information}}{REDCap Core table}
+#'   \item{\code{redcap_projects}}{REDCap Core table}
+#'   \item{\code{redcap_user_rights}}{REDCap Core table}
+#'   \item{\code{redcap_user_roles}}{REDCap Core table}
+#'   \item{\code{redcap_project_last_users}}{local table}
+#' }
+#' @details DETAILS
+"cleanup_project_ownership_test_data"
