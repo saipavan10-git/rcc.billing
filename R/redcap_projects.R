@@ -306,3 +306,61 @@ get_privileged_user <- function(redcap_projects,
 
   return(result)
 }
+
+#' Get a dataframe of updated billable status for project ownership projects,
+#' set all projects as billable except those created by CTS-IT staff
+#'
+#' @param conn - A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
+#'
+#' @importFrom magrittr "%>%"
+#' @importFrom lubridate "%within%"
+#' @importFrom rlang .data
+#'
+#' @return A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' conn <- redcapcustodian::connect_to_redcap_db()
+#' billable_updates <- update_billable_by_ownership(conn)
+#' dbx::dbxUpdate(conn,
+#'   table = "redcap_entity_project_ownership",
+#'   records = billable_updates$update_records,
+#'   where_cols = c("id")
+#' )
+#' }
+update_billable_by_ownership <- function(conn) {
+  actionable_projects <- dplyr::tbl(conn, "redcap_entity_project_ownership") %>%
+    dplyr::filter(is.na(.data$billable)) %>%
+    # filter out projects created less than 1 month ago
+    dplyr::inner_join(
+      dplyr::tbl(conn, "redcap_projects") %>%
+        dplyr::select(.data$project_id, .data$creation_time),
+      by = c("pid" = "project_id")
+    ) %>%
+    dplyr::collect() %>%
+    dplyr::filter(.data$creation_time < redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %>%
+    dplyr::select(-.data$creation_time)
+
+  billable_update <- actionable_projects %>%
+    dplyr::full_join(rcc.billing::ctsit_staff_employment_periods, by = c("username" = "redcap_username" )) %>%
+    dplyr::mutate(billable = dplyr::if_else(
+      as.Date.POSIXct(.data$created) %within% .data$employment_interval, 0, 1)
+      ) %>%
+    # correct non-staff NA values
+    dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) %>%
+    dplyr::select(-c(.data$employment_interval)) %>%
+    # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
+    dplyr::arrange(.data$pid, .data$billable) %>%
+    dplyr::distinct(.data$pid, .keep_all = TRUE) %>%
+    dplyr::mutate(updated = as.integer(redcapcustodian::get_script_run_time()))
+
+  billable_update_diff <- redcapcustodian::dataset_diff(
+    source = billable_update,
+    source_pk = "id",
+    target = actionable_projects,
+    target_pk = "id"
+  )
+
+  return(billable_update_diff)
+}

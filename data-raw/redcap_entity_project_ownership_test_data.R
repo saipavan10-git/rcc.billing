@@ -32,6 +32,10 @@ redcap_entity_project_ownership_test_data <-
   # ToDo we need to add a sequestered project to lots of test datasets. That is a large project that
   #   SHOULD NOT BE DONE UNTIL AFTER NORMAL BILLING IS IN PRODUCTION. --pbc
   mutate(sequestered = 0) %>%
+  # HACK make a project suitable for testing update_billable_by_ownerhip
+  mutate(username = if_else(pid == 6490, gsub("@.*", "", email), username)) %>%
+  mutate(billable = if_else(pid == 6490, NA_real_, billable)) %>%
+  mutate(billable = if_else(pid == 2345, NA_real_, billable)) %>%
   select(id, created, updated, pid, username, email, firstname, lastname, billable, sequestered)
 
 usethis::use_data(redcap_entity_project_ownership_test_data, overwrite = T)
