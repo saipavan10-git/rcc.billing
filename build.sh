@@ -40,8 +40,8 @@ if [ $deploy ]; then
   fi
 
   # Deploy environment files
-  # Specify the target folder for environment files
-  ENV_FILES_FOLDER=/rcc
+  ENV_FILES_FOLDER=/rcc/${image_name}
+  # Allow the project to override the default target folder for environment files
   if [ -e $sitepath/.env ]; then
     . $sitepath/.env
   fi
