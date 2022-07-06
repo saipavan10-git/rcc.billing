@@ -332,18 +332,26 @@ get_privileged_user <- function(redcap_projects,
 update_billable_by_ownership <- function(conn) {
   actionable_projects <- dplyr::tbl(conn, "redcap_entity_project_ownership") %>%
     dplyr::filter(is.na(.data$billable)) %>%
-    dplyr::collect()
+    # filter out projects created less than 1 month ago
+    dplyr::inner_join(
+      dplyr::tbl(conn, "redcap_projects") %>%
+        dplyr::select(.data$project_id, .data$creation_time),
+      by = c("pid" = "project_id")
+    ) %>%
+    dplyr::collect() %>%
+    dplyr::filter(.data$creation_time < redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %>%
+    dplyr::select(-.data$creation_time)
 
   billable_update <- actionable_projects %>%
     dplyr::full_join(rcc.billing::ctsit_staff_employment_periods, by = c("username" = "redcap_username" )) %>%
     dplyr::mutate(billable = dplyr::if_else(
       as.Date.POSIXct(.data$created) %within% .data$employment_interval, 0, 1)
       ) %>%
-    # correct non-staff values
+    # correct non-staff NA values
     dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) %>%
     dplyr::select(-c(.data$employment_interval)) %>%
     # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
-    dplyr::arrange(.data$pid, dplyr::desc(.data$billable)) %>%
+    dplyr::arrange(.data$pid, .data$billable) %>%
     dplyr::distinct(.data$pid, .keep_all = TRUE) %>%
     dplyr::mutate(updated = as.integer(redcapcustodian::get_script_run_time()))
 

@@ -152,18 +152,32 @@ test_that("update_billable_by_ownership", {
     2345, NA, 1,
     6490, "tls", 0
   )
-  table_name <- "redcap_entity_project_ownership"
-  test_data <- get0(paste0(table_name, "_test_data"))
   conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 
-  sqlite_schema <- convert_schema_to_sqlite(table_name = table_name)
+  # populate project ownership table
+  po_table_name <- "redcap_entity_project_ownership"
+  po_test_data <- get0(paste0(po_table_name, "_test_data"))
+  po_sqlite_schema <- convert_schema_to_sqlite(table_name = po_table_name)
   create_table(
     conn = conn,
-    schema = sqlite_schema
+    schema = po_sqlite_schema
   )
   populate_table(
     conn = conn,
-    table_name = table_name,
+    table_name = po_table_name,
+    use_test_data = T
+  )
+
+  rcp_table_name <- "redcap_projects"
+  rcp_test_data <- get0(paste0(rcp_table_name, "_test_data"))
+  rcp_sqlite_schema <- convert_schema_to_sqlite(table_name = rcp_table_name)
+  create_table(
+    conn = conn,
+    schema = rcp_sqlite_schema
+  )
+  populate_table(
+    conn = conn,
+    table_name = rcp_table_name,
     use_test_data = T
   )
 
