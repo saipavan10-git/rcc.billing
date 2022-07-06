@@ -20,5 +20,6 @@
 .github
 .vscode
 ^data-raw$
+^cron$
 wip.*
 .lintr
