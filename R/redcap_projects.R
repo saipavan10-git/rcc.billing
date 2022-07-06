@@ -344,7 +344,8 @@ update_billable_by_ownership <- function(conn) {
     dplyr::select(-c(.data$employment_interval)) %>%
     # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
     dplyr::arrange(.data$pid, dplyr::desc(.data$billable)) %>%
-    dplyr::distinct(.data$pid, .keep_all = TRUE)
+    dplyr::distinct(.data$pid, .keep_all = TRUE) %>%
+    dplyr::mutate(updated = as.integer(redcapcustodian::get_script_run_time()))
 
   billable_update_diff <- redcapcustodian::dataset_diff(
     source = billable_update,
