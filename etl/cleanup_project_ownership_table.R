@@ -132,7 +132,7 @@ project_ownership_updates <- bind_rows(
   any_low_privilege_user
 ) %>%
   left_join(redcap_entity_project_ownership %>% select(pid, created), by = "pid") %>%
-  mutate(updated = as.numeric(get_script_run_time())) %>%
+  mutate(updated = as.integer(get_script_run_time())) %>%
   mutate(created = coalesce(created, updated)) %>%
   arrange(priority) %>%
   group_by(pid) %>%
