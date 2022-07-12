@@ -16,7 +16,8 @@ rc_conn <- connect_to_redcap_db()
 suspend_users_inactive_days <- tbl(rc_conn, "redcap_config") %>%
   filter(field_name == "suspend_users_inactive_days") %>%
   collect() %>%
-  pull(value)
+  pull(value) %>%
+  as.integer()
 
 # get the data
 redcap_user_information <- tbl(rc_conn, "redcap_user_information") %>%
@@ -81,7 +82,7 @@ update_n <- sync_table(
   data_diff_output = all_dataset_diff
 )
 
-if (nrow(all_dataset_diff$update_records) == update_n) {
+if (nrow(all_dataset_diff$update_records) == update_n$updates) {
   redcapcustodian::log_job_success(jsonlite::toJSON(all_dataset_diff))
 } else {
   redcapcustodian::log_job_failure(jsonlite::toJSON(all_dataset_diff))
