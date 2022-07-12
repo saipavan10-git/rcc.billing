@@ -51,6 +51,6 @@ ALTER TABLE `invoice_line_item_communications`
   ADD KEY `status` (`status`),
   ADD KEY `created` (`created`),
   ADD KEY `updated` (`updated`),
-  ADD KEY `reason` (`reason`);
-  ADD KEY `sender` (`sender`);
+  ADD KEY `reason` (`reason`),
+  ADD KEY `sender` (`sender`),
   ADD KEY `recipient` (`recipient`);
