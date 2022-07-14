@@ -177,7 +177,16 @@ new_invoice_line_items_for_csbt %>%
 # TODO: consider if IDs need to be generated due to mismatch between invoice_line_item ID col
 new_invoice_line_item_communications <- draft_communication_record_from_line_item(new_invoice_line_items)
 
-# TODO: email recipients
+# Email CSBT
+email_subject <- paste("New invoice line items for REDCap Project billing")
+attachment_object <- mime_part(tmp_invoice_file, "new_invoice_line_item_communications.csv")
+body <- "The attached file has new invoice line items for REDCap Project billing. Please load these into the CSBT invoicing system."
+email_body <- list(body, attachment_object)
+send_email(
+  email_body = email_body,
+  email_subject = email_subject,
+  email_to = Sys.getenv("CSBT_EMAIL")
+)
 
 redcapcustodian::write_to_sql_db(
   conn = rcc_billing_conn,
