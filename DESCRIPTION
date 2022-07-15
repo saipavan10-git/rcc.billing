@@ -20,6 +20,7 @@ Imports:
   dplyr,
   lubridate,
   magrittr,
+  readr,
   rlang,
   redcapcustodian,
   stringr
