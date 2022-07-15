@@ -11,6 +11,14 @@ init_etl("create_and_send_new_redcap_prod_per_project_line_items")
 rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
+redcap_version <- tbl(rc_conn, "redcap_config") %>%
+  filter(field_name == "redcap_version") %>%
+  collect(value) %>%
+  pull()
+
+redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
+  paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
+
 current_month_name <- month(get_script_run_time(), label = T)
 current_fiscal_year <- fiscal_years %>%
   filter(get_script_run_time() %within% fy_interval) %>%
@@ -101,7 +109,7 @@ new_invoice_line_item_writes <- target_projects %>%
     ctsi_study_id = as.numeric(NA),
     name_of_service = app_title,
     ## TODO: find a way to manufacture the URL for this project
-    ## other_system_invoicing_comments = url,
+    other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
     month_invoiced = current_month_name,
     pi_last_name = project_pi_lastname,
@@ -131,7 +139,7 @@ new_invoice_line_item_writes <- target_projects %>%
     service_instance_id,
     ctsi_study_id,
     name_of_service,
-    ## other_system_invoicing_comments,
+    other_system_invoicing_comments,
     price_of_service,
     qty_provided,
     amount_due,
