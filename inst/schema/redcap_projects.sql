@@ -174,12 +174,3 @@ ALTER TABLE `redcap_projects`
 
 ALTER TABLE `redcap_projects`
   MODIFY `project_id` int(10) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `redcap_projects`
-  ADD CONSTRAINT `redcap_projects_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `redcap_user_information` (`ui_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `redcap_projects_ibfk_2` FOREIGN KEY (`protected_email_mode_logo`) REFERENCES `redcap_edocs_metadata` (`doc_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `redcap_projects_ibfk_3` FOREIGN KEY (`survey_auth_event_id1`) REFERENCES `redcap_events_metadata` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `redcap_projects_ibfk_4` FOREIGN KEY (`survey_auth_event_id2`) REFERENCES `redcap_events_metadata` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `redcap_projects_ibfk_5` FOREIGN KEY (`survey_auth_event_id3`) REFERENCES `redcap_events_metadata` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `redcap_projects_ibfk_6` FOREIGN KEY (`template_id`) REFERENCES `redcap_projects` (`project_id`) ON DELETE SET NULL ON UPDATE CASCADE;
