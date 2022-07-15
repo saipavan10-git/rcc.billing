@@ -25,16 +25,17 @@ table_names <- c(
   "invoice_line_item_communications"
 )
 
-# # run these lines to test in MySQL
+# # run these lines to test in MySQL (but not REDCap)
 # for (table_name in table_names) {
 #   create_and_load_test_table(
 #     table_name = table_name,
 #     conn = rcc_billing_conn,
-#     load_test_data = F,
+#     load_test_data = T,
 #     is_sqllite = F
 #   )
 # }
 # dbListTables(rcc_billing_conn)
+# rc_conn <- rcc_billing_conn
 #
 # # run these lines to test in an in-memory database
 # conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
@@ -42,7 +43,7 @@ table_names <- c(
 #   create_and_load_test_table(
 #     table_name = table_name,
 #     conn = conn,
-#     load_test_data = F,
+#     load_test_data = T,
 #     is_sqllite = T
 #   )
 # }
@@ -215,17 +216,18 @@ new_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
 
 new_invoice_line_items_for_csbt <- transform_invoice_line_items_for_csbt(new_invoice_line_items)
 
-tmp_invoice_file <- paste0(tempdir(), "new_invoice_line_item_communications.csv")
+new_invoice_line_items_filename = "new_invoice_line_item_communications.xlsx"
+tmp_invoice_file <- paste0(tempdir(), new_invoice_line_items_filename)
 
 new_invoice_line_items_for_csbt %>%
-  write_csv(tmp_invoice_file)
+  writexl::write_xlsx(tmp_invoice_file)
 
 # TODO: consider if IDs need to be generated due to mismatch between invoice_line_item ID col
 new_invoice_line_item_communications <- draft_communication_record_from_line_item(new_invoice_line_items)
 
 # Email CSBT
 email_subject <- paste("New invoice line items for REDCap Project billing")
-attachment_object <- sendmailR::mime_part(tmp_invoice_file, "new_invoice_line_item_communications.csv")
+attachment_object <- sendmailR::mime_part(tmp_invoice_file, new_invoice_line_items_filename)
 body <- "The attached file has new invoice line items for REDCap Project billing. Please load these into the CSBT invoicing system."
 email_body <- list(body, attachment_object)
 send_email(
