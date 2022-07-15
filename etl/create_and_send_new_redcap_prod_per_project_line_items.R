@@ -16,6 +16,42 @@ redcap_version <- tbl(rc_conn, "redcap_config") %>%
   collect(value) %>%
   pull()
 
+table_names <- c(
+  "redcap_entity_project_ownership",
+  "redcap_projects",
+  "service_instance",
+  "invoice_line_item",
+  "service_type",
+  "invoice_line_item_communications"
+)
+
+# # run these lines to test in MySQL
+# for (table_name in table_names) {
+#   create_and_load_test_table(
+#     table_name = table_name,
+#     conn = rcc_billing_conn,
+#     load_test_data = F,
+#     is_sqllite = F
+#   )
+# }
+# dbListTables(rcc_billing_conn)
+#
+# # run these lines to test in an in-memory database
+# conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+# for (table_name in table_names) {
+#   create_and_load_test_table(
+#     table_name = table_name,
+#     conn = conn,
+#     load_test_data = F,
+#     is_sqllite = T
+#   )
+# }
+#
+# rc_conn <- conn
+# rcc_billing_conn <- conn
+#
+# dbListTables(conn)
+
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
 
@@ -28,10 +64,7 @@ current_fiscal_year <- fiscal_years %>%
 initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   collect() %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-  mutate(
-    created = as_datetime(created),
-    updated = as_datetime(updated)
-  )
+  mutate_columns_to_posixct(c("created", "updated"))
 
 initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
   collect()
@@ -48,7 +81,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   filter(creation_time <= local(get_script_run_time() - dyears(1))) %>%
   collect() %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-  mutate(creation_time = as_datetime(creation_time)) %>%
+  mutate_columns_to_posixct("creation_time") %>%
   # not have an entry for the same month in the invoice_line_item table
   anti_join(
     initial_invoice_line_item %>%
@@ -99,28 +132,33 @@ service_instance_sync_activity <- redcapcustodian::sync_table(
   delete = F
 )
 
+updated_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
+  collect()
+
 # Create invoice_line_item rows ###############################################
 
 new_invoice_line_item_writes <- target_projects %>%
   mutate(
     service_type_code = 1,
     service_identifier = as.character(project_id),
-    service_instance_id = paste(service_type_code, service_identifier, sep="-"),
-    ctsi_study_id = as.numeric(NA),
     name_of_service = app_title,
     ## TODO: find a way to manufacture the URL for this project
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
     month_invoiced = current_month_name,
-    pi_last_name = project_pi_lastname,
-    pi_first_name = project_pi_firstname,
-    pi_email = project_pi_email,
+    pi_last_name = lastname,
+    pi_first_name = firstname,
+    pi_email = email,
     # TODO: should this be stripped from the PI email instead?
     gatorlink = username,
     reason = "new_item",
     status = "draft",
     created = get_script_run_time(),
     updated = get_script_run_time()
+  ) %>%
+  inner_join(
+    updated_service_instance,
+    by = c("service_type_code", "service_identifier")
   ) %>%
   inner_join(
     service_type, by = "service_type_code"
@@ -187,7 +225,7 @@ new_invoice_line_item_communications <- draft_communication_record_from_line_ite
 
 # Email CSBT
 email_subject <- paste("New invoice line items for REDCap Project billing")
-attachment_object <- mime_part(tmp_invoice_file, "new_invoice_line_item_communications.csv")
+attachment_object <- sendmailR::mime_part(tmp_invoice_file, "new_invoice_line_item_communications.csv")
 body <- "The attached file has new invoice line items for REDCap Project billing. Please load these into the CSBT invoicing system."
 email_body <- list(body, attachment_object)
 send_email(
@@ -222,10 +260,7 @@ invoice_line_items_sent <- new_invoice_line_items %>%
 
 current_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   collect() %>%
-  mutate(
-    created = as_datetime(created),
-    updated = as_datetime(updated)
-  )
+  mutate_columns_to_posixct(c("created", "updated"))
 
 invoice_line_item_sent_diff <- redcapcustodian::dataset_diff(
   source = invoice_line_items_sent,
@@ -246,12 +281,17 @@ invoice_line_item_sync_activity <- redcapcustodian::sync_table(
   delete = F
 )
 
-activity_log <- bind_rows(
-  new_service_instances_diff$insert_records %>% mutate(diff_type = "insert"),
-  new_invoice_line_item_communications %>% mutate(diff_type = "insert"),
-  invoice_line_item_sent_diff$update_records %>% mutate(diff_type = "update")
-) %>%
-  select(diff_type, everything())
+activity_log <- list(
+  service_instance = new_service_instances_diff$insert_records %>%
+    mutate(diff_type = "insert") %>%
+    select(diff_type, everything()),
+  invoice_line_item = new_invoice_line_item_communications %>%
+    mutate(diff_type = "insert") %>%
+    select(diff_type, everything()),
+  invoice_line_item_communications = invoice_line_item_sent_diff$update_records %>%
+    mutate(diff_type = "update") %>%
+    select(diff_type, everything())
+)
 
 log_job_success(jsonlite::toJSON(activity_log))
 
