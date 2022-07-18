@@ -2,6 +2,7 @@
 
 export(connect_to_rcc_billing_db)
 export(convert_schema_to_sqlite)
+export(create_and_load_test_table)
 export(create_table)
 export(draft_communication_record_from_line_item)
 export(fix_data_in_invoice_line_item)
