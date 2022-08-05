@@ -32,7 +32,9 @@ projects_with_ownership_issues <- unique(
 )
 
 redcap_projects_needing_correction <- redcap_projects %>%
-  filter(project_id %in% projects_with_ownership_issues)
+  filter(project_id %in% projects_with_ownership_issues) %>%
+  filter(get_script_run_time() - creation_time > years(1)) %>%
+  filter(month(get_script_run_time()) == month(creation_time))
 
 project_pis <- get_project_pis(
   redcap_projects = redcap_projects_needing_correction,
