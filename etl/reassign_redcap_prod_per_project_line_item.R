@@ -23,6 +23,7 @@ sent_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
 redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
   filter(pid %in% !!sent_line_items$project_id) %>%
   mutate_at("pid", as.character) %>%
+  select(-c(id, created, updated)) %>%
   collect()
 
 reassigned_line_items <- sent_line_items %>%
@@ -39,10 +40,10 @@ reassigned_line_items <- sent_line_items %>%
     pi_first_name = firstname,
     pi_last_name = lastname,
     reason = "PI reassigned",
-    created = get_script_run_time(),
     updated = get_script_run_time()
   ) %>%
   select(
+    id,
     service_type_code,
     any_of(csbt_column_names$ctsit),
     gatorlink,
@@ -51,6 +52,8 @@ reassigned_line_items <- sent_line_items %>%
     created,
     updated
   )
+
+# Prepare datasets for email and communications table -------------------
 
 reassigned_line_items_for_csbt <- transform_invoice_line_items_for_csbt(reassigned_line_items)
 updates_reassigned_line_item_communications <- draft_communication_record_from_line_item(reassigned_line_items)
@@ -61,9 +64,18 @@ tmp_invoice_file <- paste0(tempdir(), reassigned_line_items_for_csbt_filename)
 reassigned_line_items_for_csbt %>%
   writexl::write_xlsx(tmp_invoice_file)
 
+# Update invoice_line_items ----------------------------------------------
+
+invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
+  conn = rcc_billing_conn,
+  table_name = "invoice_line_item",
+  source = reassigned_line_items,
+  source_pk = "id",
+  target = sent_line_items,
+  target_pk = "id"
+)
 
 # Send Email --------------------------------------------------------------
-
 
 email_subject <- paste("Updates to invoice line items for REDCap Project billing")
 attachment_object <- sendmailR::mime_part(tmp_invoice_file, reassigned_line_items_for_csbt_filename)
@@ -80,17 +92,6 @@ send_email(
 
 # Update SQL Tables -------------------------------------------------------
 
-
-redcapcustodian::write_to_sql_db(
-  conn = rcc_billing_conn,
-  table_name = "invoice_line_item",
-  df_to_write = reassigned_line_items,
-  schema = NA,
-  overwrite = F,
-  db_name = "rcc_billing",
-  append = T
-)
-
 redcapcustodian::write_to_sql_db(
   conn = rcc_billing_conn,
   table_name = "invoice_line_item_communications",
@@ -101,54 +102,11 @@ redcapcustodian::write_to_sql_db(
   append = T
 )
 
-
 # Log Job -----------------------------------------------------------------
 
-
-invoice_line_items_sent <- sent_line_items %>%
-  mutate(
-    status = "sent",
-    updated = get_script_run_time()
-  ) %>%
-  select(
-    id,
-    service_instance_id,
-    fiscal_year,
-    month_invoiced,
-    status,
-    updated
-  )
-
-current_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-  collect() %>%
-  mutate_columns_to_posixct(c("created", "updated"))
-
-invoice_line_item_sent_diff <- redcapcustodian::dataset_diff(
-  source = invoice_line_items_sent,
-  source_pk = "id",
-  target = current_invoice_line_item,
-  target_pk = "id",
-  insert = F,
-  delete = F
-)
-
-invoice_line_item_sync_activity <- redcapcustodian::sync_table(
-  conn = rcc_billing_conn,
-  table_name = "invoice_line_item",
-  primary_key = "id",
-  data_diff_output = invoice_line_item_sent_diff,
-  insert = F,
-  update = T,
-  delete = F
-)
-
 activity_log <- list(
-  invoice_line_item = updates_reassigned_line_item_communications %>%
-    mutate(diff_type = "insert") %>%
-    select(diff_type, everything()),
-  invoice_line_item_communications = invoice_line_item_sent_diff$update_records %>%
-    mutate(diff_type = "update") %>%
-    select(diff_type, everything())
+  invoice_line_item_updates = invoice_line_item_sync_activity$update_records,
+  invoice_line_item_communications_inserts = updates_reassigned_line_item_communications
 )
 
 log_job_success(jsonlite::toJSON(activity_log))
