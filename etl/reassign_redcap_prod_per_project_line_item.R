@@ -3,55 +3,18 @@ library(rcc.billing)
 library(redcapcustodian)
 library(RMariaDB)
 library(DBI)
-library(tidyverse)
 library(lubridate)
 library(dotenv)
 
-init_etl("reassign_redcap_prod_per_project_line_item")
 
 # TODO: Uncomment for prod
+# init_etl("reassign_redcap_prod_per_project_line_item")
 # rc_conn <- connect_to_redcap_db()
 # rcc_billing_conn <- connect_to_rcc_billing_db()
 
-sent_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-  filter(service_type_code == 1 & status == "sent") %>%
-  collect() %>%
-  mutate(project_id = str_replace(service_instance_id, "1-", "")) %>%
-  # TODO: remove dummy data creation
-  mutate(pi_email = if_else(pi_email == "tls@ufl.edu", "test@ufl.edu", pi_email))
+sent_line_items <- get_unpaid_redcap_prod_per_project_line_items(rcc_billing_conn)
 
-redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
-  filter(pid %in% !!sent_line_items$project_id) %>%
-  mutate_at("pid", as.character) %>%
-  select(-c(id, created, updated)) %>%
-  collect()
-
-reassigned_line_items <- sent_line_items %>%
-  left_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) %>%
-  filter(
-    gatorlink  != username |
-      pi_email != email |
-      pi_first_name != firstname |
-      pi_last_name != lastname
-  ) %>%
-  mutate(
-    gatorlink  = username,
-    pi_email = email,
-    pi_first_name = firstname,
-    pi_last_name = lastname,
-    reason = "PI reassigned",
-    updated = get_script_run_time()
-  ) %>%
-  select(
-    id,
-    service_type_code,
-    any_of(csbt_column_names$ctsit),
-    gatorlink,
-    reason,
-    status,
-    created,
-    updated
-  )
+reassigned_line_items <- get_reassigned_line_items(sent_line_items, rc_conn)
 
 # Prepare datasets for email and communications table -------------------
 
@@ -79,8 +42,6 @@ invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
 
 email_subject <- paste("Updates to invoice line items for REDCap Project billing")
 attachment_object <- sendmailR::mime_part(tmp_invoice_file, reassigned_line_items_for_csbt_filename)
-
-# TODO: Confirm message
 body <- "The attached file has updates to invoice line items for REDCap Project billing. Please load these into the CSBT invoicing system."
 email_body <- list(body, attachment_object)
 send_email(
