@@ -381,6 +381,7 @@ get_unpaid_redcap_prod_per_project_line_items <- function(rcc_billing_conn) {
 }
 
 #' Get a dataframe of reassigned line items
+#'
 #' After invoices are sent, investigators will report that some projects do
 #' not belong to them. CTS-IT will change the ownership of these projects to a
 #' new owner. In other cases, the customer will change the ownership of a project themselves.
@@ -393,12 +394,15 @@ get_unpaid_redcap_prod_per_project_line_items <- function(rcc_billing_conn) {
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
 #'
-#' @return A list containing sent_line_items and reassigned_line_items
+#' @return A dataframe of revised redcap project invoice_line_items reassigned to new owners
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' sent_line_items <- get_unpaid_redcap_prod_per_project_line_items()
+#' rc_conn <- connect_to_redcap_db()
+#' rcc_billing_conn <- connect_to_rcc_billing_db()
+#'
+#' sent_line_items <- get_unpaid_redcap_prod_per_project_line_items(rcc_billing_conn)
 #' reassigned_line_items <- get_reassigned_line_items(sent_line_items, rc_conn)
 #' }
 #' @seealso \code{\link{csbt_column_names}}

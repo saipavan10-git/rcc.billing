@@ -2,12 +2,7 @@
 % Please edit documentation in R/redcap_projects.R
 \name{get_reassigned_line_items}
 \alias{get_reassigned_line_items}
-\title{Get a dataframe of reassigned line items
-After invoices are sent, investigators will report that some projects do
-not belong to them. CTS-IT will change the ownership of these projects to a
-new owner. In other cases, the customer will change the ownership of a project themselves.
-CTS-IT will create a report of differences in project ownership and investigators of each unpaid,
-invoiced project. CTS-IT will update its tables and tell CSBT about the change.}
+\title{Get a dataframe of reassigned line items}
 \usage{
 get_reassigned_line_items(sent_line_items, rc_conn)
 }
@@ -17,10 +12,9 @@ get_reassigned_line_items(sent_line_items, rc_conn)
 \item{rc_conn}{- A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}}
 }
 \value{
-A list containing sent_line_items and reassigned_line_items
+A dataframe of revised redcap project invoice_line_items reassigned to new owners
 }
 \description{
-Get a dataframe of reassigned line items
 After invoices are sent, investigators will report that some projects do
 not belong to them. CTS-IT will change the ownership of these projects to a
 new owner. In other cases, the customer will change the ownership of a project themselves.
@@ -29,7 +23,10 @@ invoiced project. CTS-IT will update its tables and tell CSBT about the change.
 }
 \examples{
 \dontrun{
-sent_line_items <- get_unpaid_redcap_prod_per_project_line_items()
+rc_conn <- connect_to_redcap_db()
+rcc_billing_conn <- connect_to_rcc_billing_db()
+
+sent_line_items <- get_unpaid_redcap_prod_per_project_line_items(rcc_billing_conn)
 reassigned_line_items <- get_reassigned_line_items(sent_line_items, rc_conn)
 }
 }
