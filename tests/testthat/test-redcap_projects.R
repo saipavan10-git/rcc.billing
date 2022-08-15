@@ -188,3 +188,70 @@ test_that("update_billable_by_ownership", {
   DBI::dbDisconnect(conn)
   expect_equal(dplyr::as_tibble(results), expected_result)
 })
+
+
+testthat::test_that(
+  "get_reassigned_line_items returns a df with project ownership data from redcap_entity_project_ownership",
+  {
+    table_names <-
+      c("redcap_entity_project_ownership", "invoice_line_item")
+
+    conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+
+    for (table_name in table_names) {
+      create_and_load_test_table(
+        table_name = table_name,
+        conn = conn,
+        load_test_data = T,
+        is_sqllite = T
+      )
+    }
+
+    sent_line_items <-
+      get_unpaid_redcap_prod_per_project_line_items(conn) %>%
+      dplyr::mutate(
+        pi_last_name = dplyr::if_else(
+          pi_last_name == "Chase",
+          "reassign_project_ownership",
+          pi_last_name
+        ),
+        pi_first_name = dplyr::if_else(
+          pi_first_name == "Joyce",
+          "reassign_project_ownership",
+          pi_first_name
+        ),
+        pi_email = dplyr::if_else(
+          pi_email == "tls@ufl.edu",
+          "reassign_project_ownership",
+          pi_email
+        ),
+        gatorlink = dplyr::if_else(
+          gatorlink == "estoffs",
+          "reassign_project_ownership",
+          gatorlink
+        )
+      )
+
+    reassigned_line_items <-
+      get_reassigned_line_items(sent_line_items, conn) %>%
+      dplyr::select(pi_last_name, pi_first_name, pi_email, gatorlink) %>%
+      dplyr::arrange(dplyr::desc(pi_last_name))
+
+    expected_result <-
+      dplyr::tbl(conn, "redcap_entity_project_ownership") %>%
+      dplyr::filter(pid %in% !!sent_line_items$project_id) %>%
+      dplyr::mutate_at("pid", as.character) %>%
+      dplyr::select(
+        pi_last_name = lastname,
+        pi_first_name = firstname,
+        pi_email = email,
+        gatorlink = username
+      ) %>%
+      dplyr::arrange(dplyr::desc(pi_last_name)) %>%
+      dplyr::collect()
+
+    DBI::dbDisconnect(conn)
+
+    testthat::expect_equal(reassigned_line_items, expected_result)
+  }
+)
