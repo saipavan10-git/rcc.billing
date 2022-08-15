@@ -1,5 +1,5 @@
-test_that(
-  "get_reassingned_line_items retruns a df with project ownership data from redcap_entity_project_ownership",
+testthat::test_that(
+  "get_reassigned_line_items retuirns a df with project ownership data from redcap_entity_project_ownership",
   {
     table_names <-
       c("redcap_entity_project_ownership", "invoice_line_item")
@@ -61,6 +61,6 @@ test_that(
       arrange(desc(pi_last_name)) %>%
       collect()
 
-    expect_equal(reassigned_line_items, redcap_entity_project_ownership)
+    testthat::expect_equal(reassigned_line_items, redcap_entity_project_ownership)
   }
 )
