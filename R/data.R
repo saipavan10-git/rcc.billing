@@ -62,7 +62,7 @@
 
 #' @title invoice_line_item_communications_test_data
 #' @description A test dataset for testing functions that write or read invoice_line_item_communications
-#' @format A data frame with 26 rows and 31 variables:
+#' @format A data frame with 26 rows and 32 variables:
 #' \describe{
 #'   \item{\code{id}}{double: the primary key}
 #'   \item{\code{service_identifier}}{character: either a redcap project ID, or redcap username}
@@ -70,6 +70,7 @@
 #'   \item{\code{service_instance_id}}{character: a numeric code that uniquely identifies the service_instance}
 #'   \item{\code{ctsi_study_id}}{double: CSBT's unique identifier for a service}
 #'   \item{\code{name_of_service}}{character: name of the service}
+#'   \item{\code{name_of_service_instance}}{character: name of the study}
 #'   \item{\code{other_system_invoicing_comments}}{character: additional invoice information, either project url, or sponsor and pi}
 #'   \item{\code{price_of_service}}{double: price of the service, in US dollars}
 #'   \item{\code{qty_provided}}{double: quantity provided}
