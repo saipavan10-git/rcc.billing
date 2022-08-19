@@ -8,6 +8,7 @@ CREATE TABLE `invoice_line_item` (
   `service_instance_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `ctsi_study_id` double DEFAULT NULL,
   `name_of_service` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `name_of_service_instance` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `other_system_invoicing_comments` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `price_of_service` double DEFAULT NULL,
   `qty_provided` double DEFAULT NULL,
