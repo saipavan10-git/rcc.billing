@@ -142,8 +142,7 @@ new_invoice_line_item_writes <- target_projects %>%
   mutate(
     service_type_code = 1,
     service_identifier = as.character(project_id),
-    name_of_service = app_title,
-    ## TODO: find a way to manufacture the URL for this project
+    name_of_service_instance = app_title,
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
     month_invoiced = current_month_name,
@@ -177,7 +176,8 @@ new_invoice_line_item_writes <- target_projects %>%
     service_type_code,
     service_instance_id,
     ctsi_study_id,
-    name_of_service,
+    name_of_service = service_type,
+    name_of_service_instance,
     other_system_invoicing_comments,
     price_of_service,
     qty_provided,
