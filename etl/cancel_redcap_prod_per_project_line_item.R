@@ -92,35 +92,26 @@ invoice_line_item_sync_activity <- redcapcustodian::sync_table(
   delete = F
 )
 
-updates_to_invoice_line_item_communications <- draft_communication_record_from_line_item(updates_to_invoice_line_item)
+n_communication_records <- dbGetQuery(rcc_billing_conn, "SELECT count(*) FROM invoice_line_item_communications") %>%
+  pull()
 
-current_invoice_line_item_communications <- tbl(rcc_billing_conn, "invoice_line_item_communications") %>%
-  filter(service_instance_id %in% local(updates_to_invoice_line_item_communications$service_instance_id)) %>%
-  collect() %>%
-  mutate_columns_to_posixct(c("created", "updated", "date_sent", "date_received"))
+new_invoice_line_item_communications <- draft_communication_record_from_line_item(updates_to_invoice_line_item) %>%
+  mutate(id = n_communication_records + row_number()) %>%
+  select(id, everything())
 
-invoice_line_item_communications_diff <- redcapcustodian::dataset_diff(
-  source = updates_to_invoice_line_item_communications,
-  source_pk = "service_instance_id",
-  target = current_invoice_line_item_communications,
-  target_pk = "service_instance_id",
-  insert = F,
-  delete = F
-)
-
-invoice_line_item_communications_sync_activity <- redcapcustodian::sync_table(
+redcapcustodian::write_to_sql_db(
   conn = rcc_billing_conn,
   table_name = "invoice_line_item_communications",
-  primary_key = "service_instance_id",
-  data_diff_output = invoice_line_item_communications_diff,
-  insert = F,
-  update = T,
-  delete = F
+  df_to_write = new_invoice_line_item_communications,
+  schema = NA,
+  overwrite = F,
+  db_name = "rcc_billing",
+  append = T
 )
 
 activity_log <- list(
-  invoice_line_item_communications = invoice_line_item_communications_diff$update_records %>%
-    mutate(diff_type = "update") %>%
+  invoice_line_item_communications = new_invoice_line_item_communications %>%
+    mutate(diff_type = "insert") %>%
     select(diff_type, everything()),
   invoice_line_item = invoice_line_item_diff$update_records %>%
     mutate(diff_type = "update") %>%
