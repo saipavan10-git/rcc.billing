@@ -12,6 +12,7 @@
   \item{\code{service_instance_id}}{a numeric code that uniquely identifies the service_instance}
   \item{\code{ctsi_study_id}}{CSBT's unique identifier for a service}
   \item{\code{name_of_service}}{name of the service}
+  \item{\code{name_of_service_instance}}{name of the study}
   \item{\code{other_system_invoicing_comments}}{additional invoice information, either project url, or sponsor and pi}
   \item{\code{price_of_service}}{price of the service, in US dollars}
   \item{\code{qty_provided}}{quantity provided}
