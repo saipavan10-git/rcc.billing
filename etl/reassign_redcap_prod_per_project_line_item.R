@@ -6,11 +6,9 @@ library(DBI)
 library(lubridate)
 library(dotenv)
 
-
-# TODO: Uncomment for prod
-# init_etl("reassign_redcap_prod_per_project_line_item")
-# rc_conn <- connect_to_redcap_db()
-# rcc_billing_conn <- connect_to_rcc_billing_db()
+init_etl("reassign_redcap_prod_per_project_line_item")
+rc_conn <- connect_to_redcap_db()
+rcc_billing_conn <- connect_to_rcc_billing_db()
 
 sent_line_items <- get_unpaid_redcap_prod_per_project_line_items(rcc_billing_conn)
 
