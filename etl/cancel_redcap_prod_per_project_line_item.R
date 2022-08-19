@@ -45,6 +45,7 @@ updates_to_invoice_line_item <- sent_line_items %>%
     reason = "Project deleted"
   ) %>%
   select(
+    id,
     service_instance_id,
     fiscal_year,
     month_invoiced,
@@ -58,7 +59,7 @@ updates_to_invoice_line_item_filename = "updates_to_invoice_line_item.csv"
 tmp_invoice_file <- paste0(tempdir(), updates_to_invoice_line_item_filename)
 
 updates_to_invoice_line_item %>%
-  select(-status) %>%
+  select(-id, -status) %>%
   write_csv(tmp_invoice_file)
 
 # Email CSBT
@@ -72,24 +73,13 @@ send_email(
   email_to = Sys.getenv("CSBT_EMAIL")
 )
 
-# Update rcc_billing tables
-invoice_line_item_diff <- redcapcustodian::dataset_diff(
-  source = updates_to_invoice_line_item,
-  source_pk = "service_instance_id",
-  target = sent_line_items,
-  target_pk = "service_instance_id",
-  insert = F,
-  delete = F
-)
-
-invoice_line_item_sync_activity <- redcapcustodian::sync_table(
+invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
   conn = rcc_billing_conn,
   table_name = "invoice_line_item",
-  primary_key = "service_instance_id",
-  data_diff_output = invoice_line_item_diff,
-  insert = F,
-  update = T,
-  delete = F
+  source = updates_to_invoice_line_item,
+  source_pk = "id",
+  target = sent_line_items,
+  target_pk = "id"
 )
 
 n_communication_records <- dbGetQuery(rcc_billing_conn, "SELECT count(*) FROM invoice_line_item_communications") %>%
@@ -113,7 +103,7 @@ activity_log <- list(
   invoice_line_item_communications = new_invoice_line_item_communications %>%
     mutate(diff_type = "insert") %>%
     select(diff_type, everything()),
-  invoice_line_item = invoice_line_item_diff$update_records %>%
+  invoice_line_item = invoice_line_item_sync_activity$update_records %>%
     mutate(diff_type = "update") %>%
     select(diff_type, everything())
 )
