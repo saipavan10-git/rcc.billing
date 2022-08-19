@@ -15,7 +15,7 @@ project_table_cols <-
   head(4) %>%
   select(
     project_id = service_instance_id,
-    app_title = name_of_service,
+    app_title = name_of_service_instance,
     project_pi_firstname = pi_first_name,
     project_pi_lastname = pi_last_name,
     project_pi_email = pi_email
