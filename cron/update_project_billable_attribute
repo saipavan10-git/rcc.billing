@@ -1,2 +1,2 @@
 # Update project billable attribute every day at 1:05 AM
-# 5 1 * * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript rcc.billing/etl/update_project_billable_attribute.R
+5 1 * * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript rcc.billing/etl/update_project_billable_attribute.R
