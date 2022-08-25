@@ -66,29 +66,28 @@ email_info <- target_projects %>%
   select(project_pi_email, project_pi_full_name, project_id, app_title, project_hyperlink)
 
 # TODO: get newlines to appear properly in gmail, may require refactoring to use htmltools
-email_template_text <- str_replace( "<owner_name>,</br>
-</br>
-The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $100 for the past year of service for <b>each</b> of the projects listed here:</br>
-</br>
-<table_of_owned_projects_due_to_be_billed></br>
-</br>
-If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf.\">Deleting a Project in REDCap</a></br>
-</br>
-Alternatively, if a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</br>
-</br>
-The projects listed above are the ones scheduled to be invoiced <i>this</i> month. You can see all of the projects you own at <a href=\"<redcap_project_ownership_page>\">REDCap Project Ownership</a>.</br>
-</br>
-Invoiced projects that remain unpaid after 90-days will be automatically sequestered. This will take the project offline, denying access to project users and taking any open surveys offline. Any project not brought out of sequestration is assumed abandoned and will be automatically deleted a year after the original invoice.</br>
-</br>
-If your project is sequestered while you still need access to the project, please contact the REDCap support team by opening a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a> so we can briefly restore your access. This will give you an opportunity to complete your business with the REDCap project and optionally pay the annual fee to maintain your access. Unpaid projects will be re-sequestered at the end of each month. Sequestered projects will be deleted one year after the original invoice.</br>
-</br>
-If you want more information about these changes, please review our <a href=\"https://redcap.ctsi.ufl.edu/ctsit/redcap_project_billing_faq.pdf\">FAQ</a> about the billing policy.</br>
-</br>
-Regards,</br>
-REDCap Support</br>
-</br>
-This message was sent from an unmonitored mailbox. If you have questions, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a>.",
-"<project_ownership_page>", redcap_project_ownership_page) %>%
+email_template_text <- str_replace( "<p><owner_name>,<p>
+<p>The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $100 for the past year of service for <b>each</b> of the projects listed here:</p>
+
+<table_of_owned_projects_due_to_be_billed>
+
+<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf.\">Deleting a Project in REDCap</a>.</p>
+
+<p>Alternatively, if a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
+
+<p>The projects listed above are the ones scheduled to be invoiced <i>this</i> month. You can see all of the projects you own at <a href=\"<redcap_project_ownership_page>\">REDCap Project Ownership</a>.</p>
+
+<p>Invoiced projects that remain unpaid after 90-days will be automatically sequestered. This will take the project offline, denying access to project users and taking any open surveys offline. Any project not brought out of sequestration is assumed abandoned and will be automatically deleted a year after the original invoice.</p>
+
+<p>If your project is sequestered while you still need access to the project, please contact the REDCap support team by opening a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a> so we can briefly restore your access. This will give you an opportunity to complete your business with the REDCap project and optionally pay the annual fee to maintain your access. Unpaid projects will be re-sequestered at the end of each month. Sequestered projects will be deleted one year after the original invoice.</p>
+
+<p>If you want more information about these changes, please review our <a href=\"https://redcap.ctsi.ufl.edu/ctsit/redcap_project_billing_faq.pdf\">FAQ</a> about the billing policy.</p>
+
+<p>Regards,</p>
+<p>REDCap Support</p>
+
+<p>This message was sent from an unmonitored mailbox. If you have questions, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a>.</p>",
+"<redcap_project_ownership_page>", redcap_project_ownership_page) %>%
   str_replace("<next_month>", next_month_name)
 
 email_tables <- email_info %>%
@@ -127,6 +126,7 @@ send_billing_alert_email <- function(row) {
   ## Override content type.
   msg[["headers"]][["Content-Type"]] <- "text/html"
 
+  # TODO: implement error handling here or in send_email itself
   redcapcustodian::send_email(
     email_body = list(msg),
     email_subject = "Expected charges for REDCap services",
