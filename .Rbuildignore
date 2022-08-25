@@ -17,3 +17,9 @@
 ^warrior/*
 ^rcc\.billing\.Rproj$
 ^LICENSE\.md$
+.github
+.vscode
+^data-raw$
+^cron$
+wip.*
+.lintr
