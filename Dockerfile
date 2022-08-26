@@ -23,10 +23,10 @@ WORKDIR /home/rocker
 
 
 # build and install this package
-ADD . /home/rocker/rcc.ctsit
-RUN R CMD build rcc.ctsit
-RUN R CMD INSTALL rcc.ctsit_*.tar.gz
-RUN rm -rf rcc.ctsit
+ADD . /home/rocker/rcc.billing
+RUN R CMD build rcc.billing
+RUN R CMD INSTALL rcc.billing_*.tar.gz
+RUN rm -rf rcc.billing
 
 # Add non-package things
 ADD . /home/rocker
