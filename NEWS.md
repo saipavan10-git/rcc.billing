@@ -3,6 +3,12 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.1.2] - 2022-08-26
+### Changed
+- Fix paths in cron files (Philip Chase)
+- Load rcc.billing in update_project_billable_attribute.R (Philip Chase)
+
+
 ## [0.1.1] - 2022-08-26
 ### Changed
 - Build rcc.billing in Dockerfile (Philip Chase)
