@@ -2,6 +2,7 @@ library(tidyverse)
 library(redcapcustodian)
 library(DBI)
 library(dotenv)
+library(rcc.billing)
 
 init_etl("update_project_billable_attribute")
 
