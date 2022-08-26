@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.1.1] - 2022-08-26
+### Changed
+- Build rcc.billing in Dockerfile (Philip Chase)
+
+
 ## [0.1.0] - 2022-08-25
 ### Added
  - Add function connect_to_rcc_billing_db
