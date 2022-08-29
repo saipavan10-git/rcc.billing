@@ -2,6 +2,7 @@ library(tidyverse)
 library(rcc.billing)
 library(lubridate)
 library(REDCapR)
+library(DBI)
 library(dotenv)
 library(redcapcustodian)
 library(sendmailR)
@@ -9,7 +10,7 @@ library(tableHTML)
 
 init_etl("warn_owners_of_impending_bill")
 
-conn <- connect_to_redcap_db()
+rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
 redcap_version <- tbl(rc_conn, "redcap_config") %>%
@@ -65,13 +66,12 @@ email_info <- target_projects %>%
   mutate(project_pi_full_name = paste(project_pi_firstname, project_pi_lastname)) %>%
   select(project_pi_email, project_pi_full_name, project_id, app_title, project_hyperlink)
 
-# TODO: get newlines to appear properly in gmail, may require refactoring to use htmltools
 email_template_text <- str_replace( "<p><owner_name>,<p>
 <p>The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $100 for the past year of service for <b>each</b> of the projects listed here:</p>
 
 <table_of_owned_projects_due_to_be_billed>
 
-<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf.\">Deleting a Project in REDCap</a>.</p>
+<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf\">Deleting a Project in REDCap</a>.</p>
 
 <p>Alternatively, if a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
 
@@ -132,6 +132,7 @@ send_billing_alert_email <- function(row) {
     email_subject = "Expected charges for REDCap services",
     email_to = row["project_pi_email"],
     email_cc = "redcap-billing-l@lists.ufl.edu",
+    email_cc = paste("redcap-billing-l@lists.ufl.edu", Sys.getenv("CSBT_EMAIL")),
     email_from = "ctsit-redcap-reply@ad.ufl.edu"
   )
 }
