@@ -40,7 +40,6 @@ initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
 
 target_projects <- tbl(rc_conn, "redcap_projects") %>%
   inner_join(
-    # TODO: join with users to ensure correct email
     tbl(rc_conn, "redcap_entity_project_ownership") %>%
       filter(billable == 1),
     by = c("project_id" = "pid")
@@ -52,19 +51,31 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   collect() %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct("creation_time")
-  # uncomment for local testing
-  ## mutate( project_pi_email = case_when(
-  ##   !is.na(project_pi_email) ~ "your_primary_email",
-  ##   T ~ project_pi_email
-  ## )
-  ## )
 
 email_info <- target_projects %>%
+  # join with user to ensure correct email
+  left_join(
+    tbl(rc_conn, "redcap_user_information") %>%
+      select(username, user_firstname, user_lastname, user_email, user_email2, user_email3) %>%
+      collect(),
+    by = "username"
+  ) %>%
+  mutate(
+    project_owner_firstname = coalesce(firstname, user_firstname),
+    project_owner_lastname = coalesce(lastname, user_lastname),
+    project_owner_full_name = paste(project_owner_firstname, project_owner_lastname),
+    project_owner_email = coalesce(email, user_email, user_email2, user_email3)
+  ) %>%
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
   mutate(project_hyperlink = paste0("<a href=\"", link_to_project, "\">", app_title, "</a>")) %>%
-  # TODO? address owner, not PI
-  mutate(project_pi_full_name = paste(project_pi_firstname, project_pi_lastname)) %>%
-  select(project_pi_email, project_pi_full_name, project_id, app_title, project_hyperlink)
+  select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink)
+  # uncomment for local testing
+  ## mutate( project_owner_email = case_when(
+  ##   !is.na(project_owner_email) ~ "your_primary_email",
+  ##   is.na(project_owner_email) ~ "your_secondary_email",
+  ##   T ~ project_owner_email
+  ## )
+  ## )
 
 email_template_text <- str_replace( "<p><owner_name>,<p>
 <p>The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $100 for the past year of service for <b>each</b> of the projects listed here:</p>
@@ -91,7 +102,7 @@ email_template_text <- str_replace( "<p><owner_name>,<p>
   str_replace("<next_month>", next_month_name)
 
 email_tables <- email_info %>%
-  group_by(project_pi_email) %>%
+  group_by(project_owner_email) %>%
   mutate(projects = paste(project_id, collapse = ", ")) %>%
   nest() %>%
   mutate(detail_table = map(data, function(df) {
@@ -105,21 +116,15 @@ email_tables <- email_info %>%
   )) %>%
   unnest(cols = c(data, detail_table)) %>%
   ungroup() %>%
-  distinct(project_pi_email, detail_table, .keep_all = T)
+  distinct(project_owner_email, detail_table, .keep_all = T)
 
 email_df <- email_tables %>%
   rowwise() %>%
   mutate(email_text =
-           str_replace(email_template_text, "<owner_name>", project_pi_full_name) %>%
+           str_replace(email_template_text, "<owner_name>", project_owner_full_name) %>%
            str_replace("<table_of_owned_projects_due_to_be_billed>", detail_table) %>%
            htmltools::HTML()
          )
-  # uncomment for local testing
-  ## mutate(project_pi_email = case_when(
-  ##   is.na(project_pi_email) ~ "your_secondary_email",
-  ##   T ~ project_pi_email
-  ## )
-  ## )
 
 send_billing_alert_email <- function(row) {
   msg <- mime_part(paste(row["email_text"]))
@@ -130,8 +135,7 @@ send_billing_alert_email <- function(row) {
   redcapcustodian::send_email(
     email_body = list(msg),
     email_subject = "Expected charges for REDCap services",
-    email_to = row["project_pi_email"],
-    email_cc = "redcap-billing-l@lists.ufl.edu",
+    email_to = row["project_owner_email"],
     email_cc = paste("redcap-billing-l@lists.ufl.edu", Sys.getenv("CSBT_EMAIL")),
     email_from = "ctsit-redcap-reply@ad.ufl.edu"
   )
@@ -143,6 +147,6 @@ apply(email_df,
       )
 
 activity_log <- email_df %>%
-  select(project_pi_email, projects)
+  select(project_owner_email, projects)
 
 log_job_success(jsonlite::toJSON(activity_log))
