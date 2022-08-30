@@ -24,7 +24,7 @@ redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
 
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
-  paste0("redcap_v", redcap_version, "/index.php?action=project_ownership")
+  paste0("index.php?action=project_ownership")
 
 current_month_name <- month(get_script_run_time(), label = T) %>% as.character()
 next_month_name <- month(get_script_run_time() + dmonths(1), label = T, abbr = F) %>% as.character()
@@ -124,7 +124,11 @@ email_df <- email_tables %>%
            str_replace(email_template_text, "<owner_name>", project_owner_full_name) %>%
            str_replace("<table_of_owned_projects_due_to_be_billed>", detail_table) %>%
            htmltools::HTML()
-         )
+         ) %>%
+  ungroup()
+  # TEST_METHOD_B: uncomment to test.
+  # Set the email address to your own
+  # %>% mutate(project_owner_email = "YOUR_EMAIL_ADDRESS_HERE") %>% slice_sample(n=3)
 
 send_billing_alert_email <- function(row) {
   msg <- mime_part(paste(row["email_text"]))
@@ -136,6 +140,7 @@ send_billing_alert_email <- function(row) {
     email_body = list(msg),
     email_subject = "Expected charges for REDCap services",
     email_to = row["project_owner_email"],
+    # TEST_METHOD_B: comment the CC line below to test.
     email_cc = paste("redcap-billing-l@lists.ufl.edu", Sys.getenv("CSBT_EMAIL")),
     email_from = "ctsit-redcap-reply@ad.ufl.edu"
   )
