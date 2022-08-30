@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.2.0] - 2022-08-30
+### Added
+- Add warn_owners_of_impending_bill.R (Kyle Chesney)
+
+
 ## [0.1.2] - 2022-08-26
 ### Changed
 - Fix paths in cron files (Philip Chase)
