@@ -7,8 +7,7 @@ WORKDIR /home/rocker
 # RUN apt update -y && apt install -y openssh-client
 
 ## install additional R libraries not included in redcapcustodian if necessary
-## e.g. install a package:
-# RUN R -e "install.packages(c('redcapAPI'))"
+RUN R -e "install.packages(c('tableHTML'))"
 
 ## e.g. private packages
 ## see: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
