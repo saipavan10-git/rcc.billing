@@ -68,6 +68,7 @@ email_info <- target_projects %>%
     project_owner_email = coalesce(email, user_email, user_email2, user_email3)
   ) %>%
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
+  mutate(app_title = str_replace_all(app_title, '"', "")) %>%
   mutate(project_hyperlink = paste0("<a href=\"", link_to_project, "\">", app_title, "</a>")) %>%
   filter(!is.na(project_owner_email)) %>%
   select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink, creation_time)
