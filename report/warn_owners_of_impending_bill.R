@@ -44,6 +44,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
       filter(billable == 1),
     by = c("project_id" = "pid")
   ) %>%
+  filter(is.na(date_deleted)) %>%
   # project at least 1 year old
   filter(creation_time <= local(get_script_run_time() - dyears(1))) %>%
   # birthday this month, comment this line out for consistent local testing
@@ -68,6 +69,7 @@ email_info <- target_projects %>%
   ) %>%
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
   mutate(project_hyperlink = paste0("<a href=\"", link_to_project, "\">", app_title, "</a>")) %>%
+  filter(!is.na(project_owner_email)) %>%
   select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink)
   # uncomment for local testing
   ## mutate( project_owner_email = case_when(
@@ -76,6 +78,25 @@ email_info <- target_projects %>%
   ##   T ~ project_owner_email
   ## )
   ## )
+
+next_projects_to_be_billed <- email_info %>%
+  mutate(app_title = writexl::xl_hyperlink(paste0(redcap_project_uri_base, project_id), app_title)) %>%
+  mutate(billable = 1) %>%
+  select(project_owner_email, project_owner_full_name, project_id, billable, app_title)
+basename = "next_projects_to_be_billed"
+next_projects_to_be_billed_filename <- paste0(basename, "_", format(get_script_run_time(), "%Y%m%d%H%M%S"), ".xlsx")
+next_projects_to_be_billed_full_path <- here::here("output", next_projects_to_be_billed_filename)
+next_projects_to_be_billed %>% writexl::write_xlsx(next_projects_to_be_billed_full_path)
+
+message = "The attached file describes the REDCap project invoice line items we expect to be sent out on the first of next month."
+redcapcustodian::send_email(
+  email_body = list(message, sendmailR::mime_part(next_projects_to_be_billed_full_path, name = next_projects_to_be_billed_filename)),
+  email_subject = "Impending REDCap project invoice line items",
+  email_to = Sys.getenv("EMAIL_TO"),
+  email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
+  email_from = "ctsit-redcap-reply@ad.ufl.edu"
+)
+
 
 email_template_text <- str_replace( "<p><owner_name>,<p>
 <p>The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $100 for the past year of service for <b>each</b> of the projects listed here:</p>
@@ -140,8 +161,7 @@ send_billing_alert_email <- function(row) {
     email_body = list(msg),
     email_subject = "Expected charges for REDCap services",
     email_to = row["project_owner_email"],
-    # TEST_METHOD_B: comment the CC line below to test.
-    email_cc = paste("redcap-billing-l@lists.ufl.edu", Sys.getenv("CSBT_EMAIL")),
+    email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
     email_from = "ctsit-redcap-reply@ad.ufl.edu"
   )
 }
