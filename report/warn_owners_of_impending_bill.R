@@ -60,7 +60,7 @@ email_info <- target_projects %>%
   # join with user to ensure correct email
   left_join(
     tbl(rc_conn, "redcap_user_information") %>%
-      select(username, user_firstname, user_lastname, user_email, user_email2, user_email3) %>%
+      select(username, user_firstname, user_lastname, user_email, user_email2, user_email3, user_suspended_time) %>%
       collect(),
     by = "username"
   ) %>%
@@ -74,7 +74,7 @@ email_info <- target_projects %>%
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
   mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_base, project_id), "\">", app_title, "</a>")) %>%
   filter(!is.na(project_owner_email)) %>%
-  select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink, creation_time, last_logged_event)
+  select(project_owner_email, project_owner_full_name, user_suspended_time, project_id, app_title, project_hyperlink, creation_time, last_logged_event)
   # uncomment for local testing
   ## mutate( project_owner_email = case_when(
   ##   !is.na(project_owner_email) ~ "your_primary_email",
@@ -91,7 +91,7 @@ project_record_counts <- tbl(rc_conn, "redcap_record_counts") %>%
 next_projects_to_be_billed <- email_info %>%
   mutate(app_title = writexl::xl_hyperlink(paste0(redcap_project_uri_home_base, project_id), app_title)) %>%
   left_join(project_record_counts, by = "project_id") %>%
-  select(project_owner_email, project_owner_full_name, project_id, creation_time, app_title, last_logged_event, record_count)
+  select(project_owner_email, project_owner_full_name, user_suspended_time, project_id, creation_time, record_count, last_logged_event, app_title)
 basename = "next_projects_to_be_billed"
 next_projects_to_be_billed_filename <- paste0(basename, "_", format(get_script_run_time(), "%Y%m%d%H%M%S"), ".xlsx")
 next_projects_to_be_billed_full_path <- here::here("output", next_projects_to_be_billed_filename)
@@ -132,7 +132,7 @@ email_template_text <- str_replace( "<p><owner_name>,<p>
   str_replace("<next_month>", next_month_name)
 
 email_tables <- email_info %>%
-  select(-creation_time, -last_logged_event) %>%
+  select(-c(creation_time, last_logged_event, user_suspended_time)) %>%
   group_by(project_owner_email) %>%
   mutate(projects = paste(project_id, collapse = ", ")) %>%
   nest() %>%
