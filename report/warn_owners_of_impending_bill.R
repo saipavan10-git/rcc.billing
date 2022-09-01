@@ -72,7 +72,7 @@ email_info <- target_projects %>%
   ) %>%
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
-  mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_home_base, project_id), "\">", app_title, "</a>")) %>%
+  mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_base, project_id), "\">", app_title, "</a>")) %>%
   filter(!is.na(project_owner_email)) %>%
   select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink, creation_time, last_logged_event)
   # uncomment for local testing
@@ -84,7 +84,7 @@ email_info <- target_projects %>%
   ## )
 
 next_projects_to_be_billed <- email_info %>%
-  mutate(app_title = writexl::xl_hyperlink(paste0(redcap_project_uri_base, project_id), app_title)) %>%
+  mutate(app_title = writexl::xl_hyperlink(paste0(redcap_project_uri_home_base, project_id), app_title)) %>%
   select(project_owner_email, project_owner_full_name, project_id, creation_time, app_title)
 basename = "next_projects_to_be_billed"
 next_projects_to_be_billed_filename <- paste0(basename, "_", format(get_script_run_time(), "%Y%m%d%H%M%S"), ".xlsx")
