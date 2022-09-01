@@ -83,9 +83,15 @@ email_info <- target_projects %>%
   ## )
   ## )
 
+project_record_counts <- tbl(rc_conn, "redcap_record_counts") %>%
+  filter(project_id %in% local(target_projects$project_id)) %>%
+  select(project_id, record_count) %>%
+  collect()
+
 next_projects_to_be_billed <- email_info %>%
   mutate(app_title = writexl::xl_hyperlink(paste0(redcap_project_uri_home_base, project_id), app_title)) %>%
-  select(project_owner_email, project_owner_full_name, project_id, creation_time, app_title)
+  left_join(project_record_counts, by = "project_id") %>%
+  select(project_owner_email, project_owner_full_name, project_id, creation_time, app_title, last_logged_event, record_count)
 basename = "next_projects_to_be_billed"
 next_projects_to_be_billed_filename <- paste0(basename, "_", format(get_script_run_time(), "%Y%m%d%H%M%S"), ".xlsx")
 next_projects_to_be_billed_full_path <- here::here("output", next_projects_to_be_billed_filename)
