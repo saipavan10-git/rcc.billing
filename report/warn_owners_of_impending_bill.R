@@ -23,6 +23,9 @@ redcap_version <- tbl(rc_conn, "redcap_config") %>%
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
 
+redcap_project_uri_home_base <- str_remove(Sys.getenv("URI"), "/api") %>%
+  paste0("redcap_v", redcap_version, "/index.php?pid=")
+
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
@@ -69,9 +72,9 @@ email_info <- target_projects %>%
   ) %>%
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
-  mutate(project_hyperlink = paste0("<a href=\"", link_to_project, "\">", app_title, "</a>")) %>%
+  mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_home_base, project_id), "\">", app_title, "</a>")) %>%
   filter(!is.na(project_owner_email)) %>%
-  select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink, creation_time)
+  select(project_owner_email, project_owner_full_name, project_id, app_title, project_hyperlink, creation_time, last_logged_event)
   # uncomment for local testing
   ## mutate( project_owner_email = case_when(
   ##   !is.na(project_owner_email) ~ "your_primary_email",
@@ -123,7 +126,7 @@ email_template_text <- str_replace( "<p><owner_name>,<p>
   str_replace("<next_month>", next_month_name)
 
 email_tables <- email_info %>%
-  select(-creation_time) %>%
+  select(-creation_time, -last_logged_event) %>%
   group_by(project_owner_email) %>%
   mutate(projects = paste(project_id, collapse = ", ")) %>%
   nest() %>%
