@@ -165,7 +165,8 @@ send_billing_alert_email <- function(row) {
   msg <- mime_part(paste(row["email_text"]))
   ## Override content type.
   msg[["headers"]][["Content-Type"]] <- "text/html"
-
+  # Sleep in case there is an email/s rate limiter
+  Sys.sleep(1)
   result <- tryCatch(
     expr = {
       redcapcustodian::send_email(
@@ -175,29 +176,36 @@ send_billing_alert_email <- function(row) {
         email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
         email_from = "ctsit-redcap-reply@ad.ufl.edu"
       )
-      return(NA)
+      my_response <- data.frame(
+        recipient = row["project_owner_email"],
+        projects = row["projects"],
+        error_message = "",
+        row.names = NULL
+      )
+      return(my_response)
     },
     error = function(error_message) {
-      bad_recipient <- row["project_owner_email"]
-      return(bad_recipient)
+    my_error <- data.frame(
+        recipient = row["project_owner_email"],
+        projects = row["projects"],
+        error_message = as.character(error_message),
+        row.names = NULL
+      )
+      return(my_error)
     }
   )
-
   return(result)
 }
 
-bad_recipients <- apply(email_df,
-      MARGIN = 1,
-      FUN = send_billing_alert_email
-      )
+billing_alert_log_list <- apply(email_df,
+  MARGIN = 1,
+  FUN = send_billing_alert_email
+)
+
+billing_alert_log <- do.call("rbind", billing_alert_log_list)
 
 activity_log <- list(
-  sent_warnings = email_df %>%
-    select(project_owner_email, projects) %>%
-    filter(!project_owner_email %in% bad_recipients),
-  failed_warnings = email_df %>%
-    select(project_owner_email, projects) %>%
-    filter(project_owner_email %in% bad_recipients)
+  billing_alert_log = billing_alert_log
 )
 
 log_job_success(jsonlite::toJSON(activity_log))
