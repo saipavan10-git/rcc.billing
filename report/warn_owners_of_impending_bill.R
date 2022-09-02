@@ -161,18 +161,26 @@ email_df <- email_tables %>%
   # Set the email address to your own
   # %>% mutate(project_owner_email = "YOUR_EMAIL_ADDRESS_HERE") %>% slice_sample(n=3)
 
+bad_recipients <- c()
+
 send_billing_alert_email <- function(row) {
   msg <- mime_part(paste(row["email_text"]))
   ## Override content type.
   msg[["headers"]][["Content-Type"]] <- "text/html"
 
-  # TODO: implement error handling here or in send_email itself
-  redcapcustodian::send_email(
-    email_body = list(msg),
-    email_subject = "Expected charges for REDCap services",
-    email_to = row["project_owner_email"],
-    email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
-    email_from = "ctsit-redcap-reply@ad.ufl.edu"
+  tryCatch(
+    expr = {
+      redcapcustodian::send_email(
+        email_body = list(msg),
+        email_subject = "Expected charges for REDCap services",
+        email_to = row["project_owner_email"],
+        email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
+        email_from = "ctsit-redcap-reply@ad.ufl.edu"
+      )
+    },
+    error = function(error_message) {
+      bad_recipients <- append(bad_recipients, row["project_owner_email"])
+    }
   )
 }
 
@@ -181,7 +189,13 @@ apply(email_df,
       FUN = send_billing_alert_email
       )
 
-activity_log <- email_df %>%
-  select(project_owner_email, projects)
+activity_log <- list(
+  sent_warnings = email_df %>%
+    select(project_owner_email, projects) %>%
+    filter(!project_owner_email %in% bad_recipients),
+  failed_warnings = email_df %>%
+    select(project_owner_email, projects) %>%
+    filter(project_owner_email %in% bad_recipients)
+)
 
 log_job_success(jsonlite::toJSON(activity_log))
