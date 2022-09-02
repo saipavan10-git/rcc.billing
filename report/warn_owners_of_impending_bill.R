@@ -161,14 +161,12 @@ email_df <- email_tables %>%
   # Set the email address to your own
   # %>% mutate(project_owner_email = "YOUR_EMAIL_ADDRESS_HERE") %>% slice_sample(n=3)
 
-bad_recipients <- c()
-
 send_billing_alert_email <- function(row) {
   msg <- mime_part(paste(row["email_text"]))
   ## Override content type.
   msg[["headers"]][["Content-Type"]] <- "text/html"
 
-  tryCatch(
+  result <- tryCatch(
     expr = {
       redcapcustodian::send_email(
         email_body = list(msg),
@@ -177,14 +175,18 @@ send_billing_alert_email <- function(row) {
         email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
         email_from = "ctsit-redcap-reply@ad.ufl.edu"
       )
+      return(NA)
     },
     error = function(error_message) {
-      bad_recipients <- append(bad_recipients, row["project_owner_email"])
+      bad_recipient <- row["project_owner_email"]
+      return(bad_recipient)
     }
   )
+
+  return(result)
 }
 
-apply(email_df,
+bad_recipients <- apply(email_df,
       MARGIN = 1,
       FUN = send_billing_alert_email
       )
