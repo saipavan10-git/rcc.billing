@@ -165,23 +165,47 @@ send_billing_alert_email <- function(row) {
   msg <- mime_part(paste(row["email_text"]))
   ## Override content type.
   msg[["headers"]][["Content-Type"]] <- "text/html"
-
-  # TODO: implement error handling here or in send_email itself
-  redcapcustodian::send_email(
-    email_body = list(msg),
-    email_subject = "Expected charges for REDCap services",
-    email_to = row["project_owner_email"],
-    email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
-    email_from = "ctsit-redcap-reply@ad.ufl.edu"
+  # Sleep in case there is an email/s rate limiter
+  Sys.sleep(1)
+  result <- tryCatch(
+    expr = {
+      redcapcustodian::send_email(
+        email_body = list(msg),
+        email_subject = "Expected charges for REDCap services",
+        email_to = row["project_owner_email"],
+        email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
+        email_from = "ctsit-redcap-reply@ad.ufl.edu"
+      )
+      my_response <- data.frame(
+        recipient = row["project_owner_email"],
+        projects = row["projects"],
+        error_message = "",
+        row.names = NULL
+      )
+      return(my_response)
+    },
+    error = function(error_message) {
+    my_error <- data.frame(
+        recipient = row["project_owner_email"],
+        projects = row["projects"],
+        error_message = as.character(error_message),
+        row.names = NULL
+      )
+      return(my_error)
+    }
   )
+  return(result)
 }
 
-apply(email_df,
-      MARGIN = 1,
-      FUN = send_billing_alert_email
-      )
+billing_alert_log_list <- apply(email_df,
+  MARGIN = 1,
+  FUN = send_billing_alert_email
+)
 
-activity_log <- email_df %>%
-  select(project_owner_email, projects)
+billing_alert_log <- do.call("rbind", billing_alert_log_list)
+
+activity_log <- list(
+  billing_alert_log = billing_alert_log
+)
 
 log_job_success(jsonlite::toJSON(activity_log))
