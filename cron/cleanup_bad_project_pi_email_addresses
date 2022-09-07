@@ -1,0 +1,2 @@
+# Clean bad PI email addresses every Tuesday at 10:03 am
+3 10 * * 2 root /usr/bin/docker run --rm --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/cleanup_bad_project_pi_email_addresses.R
