@@ -78,6 +78,8 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
       filter(billable == 1),
     by = c("project_id" = "pid")
   ) %>%
+  # project is not deleted
+  filter(is.na(date_deleted)) %>%
   # project at least 1 year old
   filter(creation_time <= local(get_script_run_time() - dyears(1))) %>%
   collect() %>%
@@ -94,7 +96,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
     by = c("project_id" = "ctsi_study_id")
   ) %>%
   # birthday in past month
-  filter(1 <= abs(month(get_script_run_time()) - month(creation_time)))
+  filter(previous_month(month(get_script_run_time())) == month(creation_time))
 
 # Make new service_instance rows ##############################################
 
