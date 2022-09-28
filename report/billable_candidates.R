@@ -105,13 +105,13 @@ billable_candidates_filename <- paste0(basename, "_", format(get_script_run_time
 billable_candidates_full_path <- here::here("output", billable_candidates_filename)
 billable_candidates %>% writexl::write_xlsx(billable_candidates_full_path)
 
-message = "The attached file describes the REDCap project invoice line items we expect to be sent out on the first of next month."
+message = "The attached file provides about every** REDCap project in existence on REDCap Prod. \n\n\n**That's a lie. It does not show projects CTS-IT considers 'non-billable'. These are our own projects and those owned by customers with other CTS-IT contracts that cover the annual project cost."
 redcapcustodian::send_email(
   email_body = list(message, sendmailR::mime_part(billable_candidates_full_path, name = billable_candidates_filename)),
-  email_subject = "Impending REDCap project invoice line items",
+  email_subject = "Billable candidates report",
   email_to = Sys.getenv("EMAIL_TO"),
   email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
-  email_from = "ctsit-redcap-reply@ad.ufl.edu"
+  email_from = "please-do-not-reply@ufl.edu"
 )
 
 log_job_success("Sent billing candidates")
