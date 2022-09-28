@@ -3,6 +3,14 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.6.1] - 2022-09-28
+### Added
+- Run billable_candidates.R weekly (Philip Chase)
+
+### Changed
+- Fix subject, body, and from in billable_candidates.R (Philip Chase)
+
+
 ## [0.6.0] - 2022-09-28
 ### Added
 - Create billable_candidates report (Kyle Chesney)
