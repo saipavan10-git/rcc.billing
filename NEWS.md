@@ -3,6 +3,12 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.6.0] - 2022-09-28
+### Added
+- Create billable_candidates report (Kyle Chesney)
+- Add deleted projects filter and fix birthday_in_previous_month filter when creating invoice line items(Philip Chase)
+
+
 ## [0.5.0] - 2022-09-22
 ### Added
 - Run warn_owners_of_impending_bill.R on 1st and 23rd of the month (Philip Chase)
