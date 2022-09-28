@@ -71,13 +71,6 @@ email_info <- target_projects %>%
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
   mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_base, project_id), "\">", app_title, "</a>")) %>%
   filter(!is.na(project_owner_email))
-  # uncomment for local testing
-  ## mutate( project_owner_email = case_when(
-  ##   !is.na(project_owner_email) ~ "your_primary_email",
-  ##   is.na(project_owner_email) ~ "your_secondary_email",
-  ##   T ~ project_owner_email
-  ## )
-  ## )
 
 project_record_counts <- tbl(rc_conn, "redcap_record_counts") %>%
   filter(project_id %in% local(target_projects$project_id)) %>%
