@@ -1,0 +1,2 @@
+# Send billable_candidates report each monday morning
+3 07 * * 1 root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript report/billable_candidates.R
