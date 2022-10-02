@@ -15,17 +15,18 @@ License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true
 Imports:
-  DBI,
-  bit64,
-  dplyr,
-  lubridate,
-  magrittr,
-  readr,
-  rlang,
-  redcapcustodian,
-  stringr
+    DBI,
+    bit64,
+    dplyr,
+    lubridate,
+    magrittr,
+    readr,
+    rlang,
+    redcapcustodian,
+    stringr
 Suggests:
   RSQLite,
+  purrr,
   testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.2.1
