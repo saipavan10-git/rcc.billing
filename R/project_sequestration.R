@@ -30,7 +30,7 @@ sequester_projects <- function(conn,
 
   project_ownership <- dplyr::tbl(conn, "redcap_entity_project_ownership")
   projects <- dplyr::tbl(conn, "redcap_projects") %>%
-    dplyr::filter(is.na(date_deleted)) %>%
+    dplyr::filter(is.na(.data$date_deleted)) %>%
     dplyr::select(
       .data$project_id,
       .data$completed_time,
