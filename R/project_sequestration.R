@@ -25,7 +25,8 @@ sequester_projects <- function(conn,
                                project_ids = as.numeric(NA)) {
   # exit if there is nothing to do
   if (length(project_ids) == 1 && is.na(project_ids)) {
-    result <- project_ids
+    result <- list(project_ids_updated = as.numeric(NA))
+    return(result)
   }
 
   project_ownership <- dplyr::tbl(conn, "redcap_entity_project_ownership")
@@ -44,6 +45,11 @@ sequester_projects <- function(conn,
     dplyr::collect() %>%
     dplyr::mutate(completed_time = as.POSIXct(.data$completed_time, tz = Sys.getenv("TIME_ZONE"))) %>%
     dplyr::filter(is.na(.data$completed_time) | is.na(.data$sequestered) | .data$sequestered == 0)
+
+  if(nrow(partial_project_state) == 0) {
+    result <- list(project_ids_updated = as.numeric(NA))
+    return(result)
+  }
 
   log_event_tables_to_query <- partial_project_state %>%
     dplyr::distinct(.data$log_event_table) %>%
@@ -172,8 +178,8 @@ sequester_projects <- function(conn,
 #'
 #' @param conn - a connection to a redcap database
 #' @param months_previous - the nth month previous today to consider
-#' @importFrom dplyr %>% filter inner_join left_join select bind_rows mutate collect tbl
-#' @importFrom lubridate add_with_rollback ceiling_date years month days
+#' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate select tbl
+#' @importFrom lubridate add_with_rollback ceiling_date days month years
 #' @importFrom redcapcustodian get_script_run_time
 #'
 #' @return a dataframe describing orphaned projects
@@ -185,6 +191,12 @@ sequester_projects <- function(conn,
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' get_orphaned_projects(
+#'   conn = rc_conn,
+#'   months_previous = 0
+#' )
+#' }
 get_orphaned_projects <- function(conn, months_previous = 0) {
   redcap_projects <- tbl(conn, "redcap_projects")
   redcap_record_counts <- tbl(conn, "redcap_record_counts")
@@ -222,8 +234,8 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects
   ) %>%
-    arrange(priority) %>%
-    distinct(project_id, .keep_all = T) %>%
+    arrange(.data$priority) %>%
+    distinct(.data$project_id, .keep_all = T) %>%
     # project has an anniversary months_previous months ago
     filter(previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
   select(

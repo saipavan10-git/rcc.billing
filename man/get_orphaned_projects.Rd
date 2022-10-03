@@ -22,3 +22,11 @@ a dataframe describing orphaned projects
 \description{
 Return a dataframe of projects that have been orphaned
 }
+\examples{
+\dontrun{
+get_orphaned_projects(
+  conn = rc_conn,
+  months_previous = 0
+)
+}
+}
