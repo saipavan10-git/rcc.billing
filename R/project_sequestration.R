@@ -165,3 +165,72 @@ sequester_projects <- function(conn,
 
   return(result)
 }
+
+#' get_orphaned_projects
+#'
+#' Return a dataframe of projects that have been orphaned
+#'
+#' @param conn - a connection to a redcap database
+#' @param months_previous - the nth month previous today to consider
+#' @importFrom dplyr %>% filter inner_join left_join select bind_rows mutate collect tbl
+#' @importFrom lubridate add_with_rollback ceiling_date years month days
+#' @importFrom redcapcustodian get_script_run_time
+#'
+#' @return a dataframe describing orphaned projects
+#' \itemize{
+#'   \item project_id - project_id of the orphaned project
+#'   \item reason - why this project was selected
+#'   \item priority - the priority of the reason
+#' }
+#' @export
+#'
+#' @examples
+get_orphaned_projects <- function(conn, months_previous = 0) {
+  redcap_projects <- tbl(conn, "redcap_projects")
+  redcap_record_counts <- tbl(conn, "redcap_record_counts")
+  project_ownership <- tbl(conn, "redcap_entity_project_ownership")
+
+  target_projects <-
+    redcap_projects %>%
+    # project is not deleted
+    filter(is.na(.data$date_deleted)) %>%
+    # project at least 1 year old
+    filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -years(1)))) %>%
+    # project has an anniversary months_previous months ago
+    # filter(previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
+    left_join(project_ownership, by = c("project_id" = "pid")) %>%
+    filter(.data$billable == 1) %>%
+    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    left_join(redcap_record_counts, by = "project_id") %>%
+    collect() %>%
+    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+    mutate_columns_to_posixct("creation_time")
+
+  # empty and inactive projects
+  empty_and_inactive_projects <- target_projects %>%
+    # the record count was recorded after the last update
+    filter(.data$time_of_count > .data$last_logged_event + days(1)) %>%
+    # no records saved
+    filter(.data$record_count == 0) %>%
+    # no activity in a year
+    filter(.data$last_logged_event <= get_script_run_time() - years(1)) %>%
+    mutate(
+      reason = "empty_and_inactive",
+      priority = 1
+    )
+
+  orphaned_projects <- bind_rows(
+    empty_and_inactive_projects
+  ) %>%
+    arrange(priority) %>%
+    distinct(project_id, .keep_all = T) %>%
+    # project has an anniversary months_previous months ago
+    filter(previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
+  select(
+    .data$project_id,
+    .data$reason,
+    .data$priority
+  )
+
+  return(orphaned_projects)
+}

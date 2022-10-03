@@ -7,7 +7,7 @@
 previous_month(month)
 }
 \arguments{
-\item{month}{- and integer month number}
+\item{month}{- an integer month number}
 }
 \value{
 the previous month number
