@@ -78,7 +78,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
       filter(
         billable == 1,
         sequestered == 0 | is.na(sequestered)
-             ),
+      ),
     by = c("project_id" = "pid")
   ) %>%
   # get user info for owners who are also redcap users
