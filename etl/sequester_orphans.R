@@ -26,41 +26,13 @@ redcap_project_uri_home_base <- str_remove(Sys.getenv("URI"), "/api") %>%
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
-sandras_orphans <- c(
-  5965,
-  7395,
-  4609,
-  4622,
-  7474,
-  5945,
-  309,
-  4567,
-  4585,
-  9160,
-  9271,
-  9183,
-  10869,
-  10884,
-  9245,
-  9242,
-  7483,
-  3255,
-  9121,
-  5954,
-  9153,
-  9151,
-  9132,
-  2316,
-  10902,
-  10908,
-  7420,
-  9200,
-  9205
+# identify orphans
+orphaned_projects <- get_orphaned_projects(
+  conn = rc_conn,
+  months_previous = 1
 )
 
-orphaned_projects <- c(
-  sandras_orphans
-)
+orphaned_projects = orphaned_projects %>% filter(FALSE)
 
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%
