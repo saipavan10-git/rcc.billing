@@ -156,6 +156,7 @@ new_invoice_line_item_writes <- target_projects %>%
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
     month_invoiced = current_month_name,
+    # coerce empty strings to NA for coalesce operations
     across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
     across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
     pi_last_name = coalesce(user_lastname, project_pi_lastname, lastname),
