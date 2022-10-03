@@ -75,8 +75,16 @@ service_type <- tbl(rcc_billing_conn, "service_type") %>% collect()
 target_projects <- tbl(rc_conn, "redcap_projects") %>%
   inner_join(
     tbl(rc_conn, "redcap_entity_project_ownership") %>%
-      filter(billable == 1),
+      filter(
+        billable == 1,
+        sequestered == 0 | is.na(sequestered)
+      ),
     by = c("project_id" = "pid")
+  ) %>%
+  # get user info for owners who are also redcap users
+  left_join(
+    tbl(rc_conn, "redcap_user_information") %>% select(username, user_email, user_firstname, user_lastname),
+    by = "username"
   ) %>%
   # project is not deleted
   filter(is.na(date_deleted)) %>%
@@ -148,9 +156,12 @@ new_invoice_line_item_writes <- target_projects %>%
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
     month_invoiced = current_month_name,
-    pi_last_name = lastname,
-    pi_first_name = firstname,
-    pi_email = email,
+    # coerce empty strings to NA for coalesce operations
+    across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
+    across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
+    pi_last_name = coalesce(user_lastname, project_pi_lastname, lastname),
+    pi_first_name = coalesce(user_firstname, project_pi_firstname, firstname),
+    pi_email = coalesce(user_email, project_pi_email, email),
     # TODO: should this be stripped from the PI email instead?
     gatorlink = username,
     reason = "new_item",

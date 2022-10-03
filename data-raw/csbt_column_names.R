@@ -17,7 +17,7 @@ ctsit <- c(
 )
 
 csbt <- c(
-  "CTSI IT ID",
+  "CTSIT ID",
   "CTSI Study ID",
   "Name of Service",
   "Study Name",
