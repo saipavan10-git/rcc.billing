@@ -29,6 +29,30 @@ convert_schema_to_sqlite <- function(table_name) {
   return(result)
 }
 
+#' converts an in-memory schema to a sqlite schema
+#' and returns that schema.
+#'
+#' @param schema, a MySQL/MariaDB Schema
+#'
+#' @returns sqlite schema for `schema`
+#' @importFrom magrittr "%>%"
+#'
+#' @examples
+#' \dontrun{
+#' mysql_schema_to_sqlite(schema)
+#' }
+#' @export
+mysql_schema_to_sqlite <- function(schema) {
+  # find the perl script that does the conversion
+  pl_to_sqlite <- system.file("", "to_sqlite.pl", package = "rcc.billing")
+
+  # construct conversion command
+  cmd <- paste("perl", pl_to_sqlite)
+
+  result <- system(cmd, input = schema, intern = TRUE) %>% paste(collapse = "")
+  return(result)
+}
+
 #' Creates a table based on a schema.
 #'
 #' @param conn, a DBI connection object
