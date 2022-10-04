@@ -738,3 +738,21 @@
 #' }
 #' @details DETAILS
 "cleanup_project_ownership_test_data"
+
+#' @title sequester_project_test_data
+#' @description A tibble of database tables used to test the functions written for project_sequestration.R
+#' @format A data frame with 11 rows and 3 variables:
+#' \describe{
+#'   \item{\code{name}}{character table name}
+#'   \item{\code{schema}}{list of one table containing the schema for `name`}
+#'   \item{\code{data}}{list of one tibble containing the data for `name`}
+#'}
+#' @details DETAILS
+"sequester_project_test_data"
+
+#' @title log_event_tables
+#' @description A vector of the names of the 9 redcap log event tables
+#' @format A vector with 9 elements
+#' @details DETAILS
+"log_event_tables"
+
