@@ -67,9 +67,6 @@ initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct(c("created", "updated"))
 
-initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
-  collect()
-
 service_type <- tbl(rcc_billing_conn, "service_type") %>% collect()
 
 target_projects <- tbl(rc_conn, "redcap_projects") %>%
@@ -91,6 +88,8 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   # project at least 1 year old
   filter(creation_time <= local(get_script_run_time() - dyears(1))) %>%
   collect() %>%
+  # Assure non-distinct rows in redcap_entity_project_ownership do not foment chaos
+  distinct(project_id, .keep_all = T) %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct("creation_time") %>%
   # not have an entry for the same month in the invoice_line_item table
@@ -123,6 +122,9 @@ new_service_instances <- target_projects %>%
     active,
     ctsi_study_id
   )
+
+initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
+  collect()
 
 new_service_instances_diff <- redcapcustodian::dataset_diff(
   source = new_service_instances,
@@ -239,14 +241,15 @@ new_invoice_line_items_for_csbt %>%
 new_invoice_line_item_communications <- draft_communication_record_from_line_item(new_invoice_line_items)
 
 # Email CSBT
-email_subject <- paste("New invoice line items for REDCap Project billing")
+email_subject <- paste("New invoice line items for REDCap Annual Project Maintenance")
 attachment_object <- sendmailR::mime_part(tmp_invoice_file, new_invoice_line_items_filename)
-body <- "The attached file has new invoice line items for REDCap Project billing. Please load these into the CSBT invoicing system."
+body <- "The attached file has new invoice line items for REDCap Annual Project Maintenance. Please load these into the CSBT invoicing system."
 email_body <- list(body, attachment_object)
 send_email(
   email_body = email_body,
   email_subject = email_subject,
-  email_to = Sys.getenv("CSBT_EMAIL")
+  email_to = Sys.getenv("CSBT_EMAIL"),
+  email_cc = Sys.getenv("EMAIL_TO")
 )
 
 redcapcustodian::write_to_sql_db(
