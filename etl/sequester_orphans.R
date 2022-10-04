@@ -36,7 +36,7 @@ orphaned_projects = orphaned_projects %>% filter(FALSE)
 
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%
-  filter(project_id %in% orphaned_projects) %>%
+  filter(project_id %in% local(orphaned_projects$project_id)) %>%
   inner_join(
     tbl(rc_conn, "redcap_entity_project_ownership"),
     by = c("project_id" = "pid")
