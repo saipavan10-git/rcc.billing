@@ -231,8 +231,34 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
       priority = 1
     )
 
+  ## Enumerate each user on the project that has any permission
+  target_project_user_info <- tbl(conn, "redcap_user_rights") %>%
+    filter(project_id %in% local(orphaned_pids)) %>%
+    left_join(
+      tbl(conn, "redcap_user_information") %>%
+        select(username, user_suspended_time),
+      by = "username"
+    ) %>%
+    collect()
+  # NOTE: the following before the collect would be more efficient,
+  # but the SQL produced is invalid
+  # group_by(project_id) %>%
+  # filter(all(!is.na(user_suspended_time)))
+  # ungroup()
+
+  ## Filter for projects whose users are all suspended
+  pids_with_all_users_suspended <- target_project_user_info %>%
+    group_by(project_id) %>%
+    filter(all(!is.na(user_suspended_time))) %>%
+    ungroup() %>%
+    distinct(project_id) %>%
+    pull(project_id)
+
+  empty_and_inactive_projects_with_no_viable_users <- empty_and_inactive_projects %>%
+    filter(project_id %in% pids_with_all_users_suspended)
+
   orphaned_projects <- bind_rows(
-    empty_and_inactive_projects
+    empty_and_inactive_projects_with_no_viable_users
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
