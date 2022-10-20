@@ -1,4 +1,4 @@
-test_that("service_type sqlite schema is created and correct test data is returned", {
+testthat::test_that("service_type sqlite schema is created and correct test data is returned", {
     table_name <- "redcap_projects"
     test_data <- get0(paste0(table_name, "_test_data"))
     conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
@@ -15,7 +15,7 @@ test_that("service_type sqlite schema is created and correct test data is return
     ) %>% fix_data_in_redcap_projects()
 
     DBI::dbDisconnect(conn)
-    expect_equal(dplyr::as_tibble(results), test_data)
+    testthat::expect_equal(dplyr::as_tibble(results), test_data)
 })
 
 testthat::test_that("get_projects_needing_new_owners returns the correct vector of project IDs", {
@@ -255,3 +255,35 @@ testthat::test_that(
     testthat::expect_equal(reassigned_line_items, expected_result)
   }
 )
+
+testthat::test_that("get_research_projects_not_using_viable_pi_data can detect a project with non-viable PI data", {
+  redcap_projects <-
+    cleanup_project_ownership_test_data$redcap_projects %>%
+    mutate(purpose = 2) %>%
+    mutate(project_pi_email = if_else(
+      project_id %in% c(21, 22, 25),
+      "you@example.org",
+      project_pi_email
+    ))
+
+  redcap_entity_project_ownership <-
+    cleanup_project_ownership_test_data$redcap_entity_project_ownership %>%
+    mutate(username = if_else(pid %in% c(22,25), as.character(NA), username)) %>%
+    mutate(email = if_else(pid == 22, "you@example.org", email)) %>%
+    mutate(email = if_else(pid == 25, "not_the_pi@example.org", email))
+
+  redcap_user_information <-
+    cleanup_project_ownership_test_data$redcap_user_information
+
+  project_ids_with_issues <- get_research_projects_not_using_viable_pi_data(
+    redcap_projects = redcap_projects,
+    redcap_entity_project_ownership = redcap_entity_project_ownership,
+    redcap_user_information = redcap_user_information
+  )
+
+  expected_result <- c(15, 16, 17, 25, 26, 27, 28, 29, 30, 31, 32, 33)
+
+  testthat::expect_equal(project_ids_with_issues, expected_result)
+
+})
+

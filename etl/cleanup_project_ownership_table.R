@@ -11,9 +11,14 @@ init_etl("cleanup_project_ownership_table")
 rc_con <- connect_to_redcap_db()
 
 redcap_entity_project_ownership <- tbl(rc_con, "redcap_entity_project_ownership") %>%
+  # ignore sequestered projects
+  filter(sequestered != 0 | is.na(sequestered)) %>%
   collect()
 redcap_user_information <- tbl(rc_con, "redcap_user_information") %>% collect()
-redcap_projects <- tbl(rc_con, "redcap_projects") %>% collect()
+redcap_projects <- tbl(rc_con, "redcap_projects") %>%
+  # ignore deleted projects
+  filter(is.na(date_deleted)) %>%
+  collect()
 redcap_user_rights <- tbl(rc_con, "redcap_user_rights") %>% collect()
 redcap_user_roles <- tbl(rc_con, "redcap_user_roles") %>% collect()
 
@@ -27,8 +32,14 @@ projects_without_owners <- get_projects_without_owners(
   redcap_entity_project_ownership = redcap_entity_project_ownership
 )
 
+research_projects_not_using_viable_pi_data <- get_research_projects_not_using_viable_pi_data(
+  redcap_projects = redcap_projects,
+  redcap_entity_project_ownership = redcap_entity_project_ownership,
+  redcap_user_information = redcap_user_information
+)
+
 projects_with_ownership_issues <- unique(
-  c(projects_needing_new_owners, projects_without_owners)
+  c(projects_needing_new_owners, projects_without_owners, research_projects_not_using_viable_pi_data)
 )
 
 redcap_projects_needing_correction <- redcap_projects %>%
@@ -45,14 +56,17 @@ project_pis <- get_project_pis(
     priority = 1
   )
 
-unsuspended_creators <- get_creators(
+unsuspended_high_privilege_faculty <- get_privileged_user(
   redcap_projects = redcap_projects_needing_correction,
   redcap_user_information = redcap_user_information,
   redcap_staff_employment_periods = ctsit_staff_employment_periods,
+  redcap_user_rights = redcap_user_rights,
+  redcap_user_roles = redcap_user_roles,
+  filter_for_faculty = T,
   return_project_ownership_format = T
 ) %>%
   mutate(
-    reason = "unsuspended_creators",
+    reason = "unsuspended_high_privilege_faculty",
     priority = 2
   )
 
@@ -83,55 +97,11 @@ unsuspended_low_privilege_user <- get_privileged_user(
     priority = 4
   )
 
-any_creator <- get_creators(
-  redcap_projects = redcap_projects_needing_correction,
-  redcap_user_information = redcap_user_information,
-  redcap_staff_employment_periods = ctsit_staff_employment_periods,
-  include_suspended_users = T,
-  return_project_ownership_format = T
-) %>%
-  mutate(
-    reason = "any_creator",
-    priority = 5
-  )
-
-any_high_privilege_user <- get_privileged_user(
-  redcap_projects = redcap_projects_needing_correction,
-  redcap_user_information = redcap_user_information,
-  redcap_staff_employment_periods = ctsit_staff_employment_periods,
-  redcap_user_rights = redcap_user_rights,
-  redcap_user_roles = redcap_user_roles,
-  include_suspended_users = T,
-  return_project_ownership_format = T
-) %>%
-  mutate(
-    reason = "any_high_privilege_user",
-    priority = 6
-  )
-
-any_low_privilege_user <- get_privileged_user(
-  redcap_projects = redcap_projects_needing_correction,
-  redcap_user_information = redcap_user_information,
-  redcap_staff_employment_periods = ctsit_staff_employment_periods,
-  redcap_user_rights = redcap_user_rights,
-  redcap_user_roles = redcap_user_roles,
-  include_low_privilege_users = T,
-  include_suspended_users = T,
-  return_project_ownership_format = T
-) %>%
-  mutate(
-    reason = "any_low_privilege_user",
-    priority = 7
-  )
-
 project_ownership_updates <- bind_rows(
   project_pis,
-  unsuspended_creators,
+  unsuspended_high_privilege_faculty,
   unsuspended_high_privilege_user,
-  unsuspended_low_privilege_user,
-  any_creator,
-  any_high_privilege_user,
-  any_low_privilege_user
+  unsuspended_low_privilege_user
 ) %>%
   left_join(redcap_entity_project_ownership %>% select(pid, created), by = "pid") %>%
   mutate(updated = as.integer(get_script_run_time())) %>%

@@ -23,7 +23,8 @@ Imports:
     readr,
     rlang,
     redcapcustodian,
-    stringr
+    stringr,
+    rcc.ctsit
 Suggests:
   RSQLite,
   purrr,
