@@ -233,10 +233,10 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   ## Enumerate each user on the project that has any permission
   target_project_user_info <- tbl(conn, "redcap_user_rights") %>%
-    filter(project_id %in% local(orphaned_pids)) %>%
+    filter(.data$project_id %in% local(empty_and_inactive_projects$project_id)) %>%
     left_join(
       tbl(conn, "redcap_user_information") %>%
-        select(username, user_suspended_time),
+        select(.data$username, .data$user_suspended_time),
       by = "username"
     ) %>%
     collect()
@@ -248,14 +248,14 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   ## Filter for projects whose users are all suspended
   pids_with_all_users_suspended <- target_project_user_info %>%
-    group_by(project_id) %>%
-    filter(all(!is.na(user_suspended_time))) %>%
-    ungroup() %>%
-    distinct(project_id) %>%
-    pull(project_id)
+    dplyr::group_by(.data$project_id) %>%
+    filter(all(!is.na(.data$user_suspended_time))) %>%
+    dplyr::ungroup() %>%
+    distinct(.data$project_id) %>%
+    dplyr::pull(.data$project_id)
 
   empty_and_inactive_projects_with_no_viable_users <- empty_and_inactive_projects %>%
-    filter(project_id %in% pids_with_all_users_suspended)
+    filter(.data$project_id %in% pids_with_all_users_suspended)
 
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users
@@ -272,3 +272,31 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   return(orphaned_projects)
 }
+
+
+#' scrape_logs_for_users
+#'
+#' Return a dataframe of projects that have been orphaned
+#'
+#' @param conn - a connection to a redcap database
+#' @param months_previous - the nth month previous today to consider
+#' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate select tbl
+#' @importFrom lubridate add_with_rollback ceiling_date days month years
+#' @importFrom redcapcustodian get_script_run_time
+#'
+#' @return a dataframe describing orphaned projects
+#' \itemize{
+#'   \item project_id - project_id of the orphaned project
+#'   \item reason - why this project was selected
+#'   \item priority - the priority of the reason
+#' }
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' scrape_logs_for_users(
+#'   conn = rc_conn,
+#'   months_previous = 0
+#' )
+#' }
+scrape_logs_for_users <- function(conn) { }
