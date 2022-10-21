@@ -177,8 +177,8 @@ sequester_projects <- function(conn,
 #' Return a dataframe of projects that have been orphaned
 #'
 #' @param conn - a connection to a redcap database
-#' @param months_previous - the nth month previous today to consider
-#' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate select tbl
+#' @param months_previous - the nth month previous to today to consider
+#' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate pull select tbl
 #' @importFrom lubridate add_with_rollback ceiling_date days month years
 #' @importFrom redcapcustodian get_script_run_time
 #'
@@ -233,10 +233,10 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   ## Enumerate each user on the project that has any permission ever
   redcap_user_rights = tbl(conn, "redcap_user_rights") %>%
-    filter(project_id %in% local(empty_and_inactive_projects$project_id)) %>%
+    filter(.data$project_id %in% local(empty_and_inactive_projects$project_id)) %>%
     collect()
   redcap_user_roles = tbl(conn, "redcap_user_roles") %>%
-    filter(project_id %in% local(empty_and_inactive_projects$project_id)) %>%
+    filter(.data$project_id %in% local(empty_and_inactive_projects$project_id)) %>%
     collect()
   redcap_user_information = tbl(conn, "redcap_user_information") %>%
     collect()
@@ -248,9 +248,9 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   pids_of_project_with_viable_permissions <- user_info %>%
     filter(is.na(.data$user_suspended_time)) %>%
-    filter(expiration > get_script_run_time() | is.na(expiration)) %>%
-    distinct(project_id) %>%
-    pull(project_id)
+    filter(.data$expiration > get_script_run_time() | is.na(.data$expiration)) %>%
+    distinct(.data$project_id) %>%
+    pull(.data$project_id)
 
   empty_and_inactive_projects_with_no_viable_users <- empty_and_inactive_projects %>%
     filter(!.data$project_id %in% pids_of_project_with_viable_permissions)
