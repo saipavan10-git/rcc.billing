@@ -3,6 +3,17 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.8.0] - 2022-10-21
+### Added
+- Activate sequester_orphans.R (Philip Chase)
+- Add filter for no viable users to get_orphaned_projects (Kyle Chesney)
+- Add get_user_rights_and_info (Philip Chase)
+- Install rcc.ctsit in Dockerfile using a GitHub PAT (Philip Chase)
+
+### Changed
+- Make PIs and faculty project owners (Philip Chase)
+
+
 ## [0.7.1] - 2022-10-04
 ### Changed
 - Update create_and_send_new_redcap_prod_per_project_line_items.R (Philip Chase)
