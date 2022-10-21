@@ -209,7 +209,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     # project at least 1 year old
     filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -years(1)))) %>%
     # project has an anniversary months_previous months ago
-    # filter(previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
+    filter(rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
     left_join(project_ownership, by = c("project_id" = "pid")) %>%
     filter(.data$billable == 1) %>%
     filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
@@ -231,39 +231,35 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
       priority = 1
     )
 
-  ## Enumerate each user on the project that has any permission
-  target_project_user_info <- tbl(conn, "redcap_user_rights") %>%
-    filter(.data$project_id %in% local(empty_and_inactive_projects$project_id)) %>%
-    left_join(
-      tbl(conn, "redcap_user_information") %>%
-        select(.data$username, .data$user_suspended_time),
-      by = "username"
-    ) %>%
+  ## Enumerate each user on the project that has any permission ever
+  redcap_user_rights = tbl(conn, "redcap_user_rights") %>%
+    filter(project_id %in% local(empty_and_inactive_projects$project_id)) %>%
     collect()
-  # NOTE: the following before the collect would be more efficient,
-  # but the SQL produced is invalid
-  # group_by(project_id) %>%
-  # filter(all(!is.na(user_suspended_time)))
-  # ungroup()
+  redcap_user_roles = tbl(conn, "redcap_user_roles") %>%
+    filter(project_id %in% local(empty_and_inactive_projects$project_id)) %>%
+    collect()
+  redcap_user_information = tbl(conn, "redcap_user_information") %>%
+    collect()
+  user_info <- get_user_rights_and_info(
+    redcap_user_rights = redcap_user_rights,
+    redcap_user_roles = redcap_user_roles,
+    redcap_user_information = redcap_user_information
+  )
 
-  ## Filter for projects whose users are all suspended
-  pids_with_all_users_suspended <- target_project_user_info %>%
-    dplyr::group_by(.data$project_id) %>%
-    filter(all(!is.na(.data$user_suspended_time))) %>%
-    dplyr::ungroup() %>%
-    distinct(.data$project_id) %>%
-    dplyr::pull(.data$project_id)
+  pids_of_project_with_viable_permissions <- user_info %>%
+    filter(is.na(.data$user_suspended_time)) %>%
+    filter(expiration > get_script_run_time() | is.na(expiration)) %>%
+    distinct(project_id) %>%
+    pull(project_id)
 
   empty_and_inactive_projects_with_no_viable_users <- empty_and_inactive_projects %>%
-    filter(.data$project_id %in% pids_with_all_users_suspended)
+    filter(!.data$project_id %in% pids_of_project_with_viable_permissions)
 
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
-    # project has an anniversary months_previous months ago
-    filter(previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
   select(
     .data$project_id,
     .data$reason,
@@ -272,31 +268,3 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   return(orphaned_projects)
 }
-
-
-#' scrape_logs_for_users
-#'
-#' Return a dataframe of projects that have been orphaned
-#'
-#' @param conn - a connection to a redcap database
-#' @param months_previous - the nth month previous today to consider
-#' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate select tbl
-#' @importFrom lubridate add_with_rollback ceiling_date days month years
-#' @importFrom redcapcustodian get_script_run_time
-#'
-#' @return a dataframe describing orphaned projects
-#' \itemize{
-#'   \item project_id - project_id of the orphaned project
-#'   \item reason - why this project was selected
-#'   \item priority - the priority of the reason
-#' }
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' scrape_logs_for_users(
-#'   conn = rc_conn,
-#'   months_previous = 0
-#' )
-#' }
-scrape_logs_for_users <- function(conn) { }
