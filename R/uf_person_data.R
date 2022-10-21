@@ -10,6 +10,7 @@
 #' @importFrom rlang .data
 #' @importFrom dplyr filter tibble tribble
 #' @importFrom rcc.ctsit get_uf_person_data_by_gatorlink
+#' @importFrom testthat is_testing
 #'
 #' @examples
 #' \dontrun{
@@ -20,7 +21,7 @@ is_faculty <- function(
     user_ids
     ) {
 
-  if (!exists("is_testing")) {
+  if (!is_testing()) {
     uf_person_data <- rcc.ctsit::get_uf_person_data_by_gatorlink(user_ids = user_ids)
   } else {
     uf_person_data <- tribble(

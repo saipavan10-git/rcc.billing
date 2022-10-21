@@ -24,11 +24,11 @@ Imports:
     rlang,
     redcapcustodian,
     stringr,
-    rcc.ctsit
+    rcc.ctsit,
+    testthat
 Suggests:
-  RSQLite,
-  purrr,
-  testthat (>= 3.0.0)
+    RSQLite,
+    purrr
 Config/testthat/edition: 3
 RoxygenNote: 7.2.1
 Depends: 
