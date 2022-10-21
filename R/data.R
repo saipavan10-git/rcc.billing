@@ -756,3 +756,13 @@
 #' @details DETAILS
 "log_event_tables"
 
+#' @title redcap_rights_test_data
+#' @description A named list of dataframes used to test the functions written for redcap_rights.R
+#' @format A named list of 3 dataframes:
+#' \describe{
+#'   \item{\code{redcap_user_information}}{REDCap Core table}
+#'   \item{\code{redcap_user_rights}}{REDCap Core table}
+#'   \item{\code{redcap_user_roles}}{REDCap Core table}
+#' }
+#' @details DETAILS
+"redcap_rights_test_data"

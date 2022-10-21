@@ -26,13 +26,11 @@ redcap_project_uri_home_base <- str_remove(Sys.getenv("URI"), "/api") %>%
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
-# identify orphans
+# identify orphans created in the current month
 orphaned_projects <- get_orphaned_projects(
   conn = rc_conn,
-  months_previous = 1
+  months_previous = 0
 )
-
-orphaned_projects = orphaned_projects %>% filter(FALSE)
 
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%

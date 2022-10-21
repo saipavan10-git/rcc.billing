@@ -9,7 +9,7 @@ get_orphaned_projects(conn, months_previous = 0)
 \arguments{
 \item{conn}{- a connection to a redcap database}
 
-\item{months_previous}{- the nth month previous today to consider}
+\item{months_previous}{- the nth month previous to today to consider}
 }
 \value{
 a dataframe describing orphaned projects
