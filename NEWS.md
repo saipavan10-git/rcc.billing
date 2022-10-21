@@ -3,6 +3,12 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.8.1] - 2022-10-21
+### Changed
+- Include GITHUB_PAT in docker build step (Philip Chase)
+- Pass project_id vector to sequester_projects (Philip Chase)
+
+
 ## [0.8.0] - 2022-10-21
 ### Added
 - Activate sequester_orphans.R (Philip Chase)
