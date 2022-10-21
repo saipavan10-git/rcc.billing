@@ -211,6 +211,7 @@ get_creators <- function(redcap_projects,
 #'
 #' Returns a dataframe of project IDs and usernames of users with design or user_rights
 #'  who are non-suspended, non-redcap-staff, with a primary email address.
+#'  Optionally require users be faculty.
 #'  Optionally include users with any privilege on the project.
 #'  Optionally include suspended users.
 #'
@@ -220,6 +221,7 @@ get_creators <- function(redcap_projects,
 #'        intervals with one interval per row
 #' @param redcap_user_rights, The contents of the REDCap table of the same name.
 #' @param redcap_user_roles, The contents of the REDCap table of the same name.
+#' @param filter_for_faculty, Require users be faculty
 #' @param include_low_privilege_users, Include users whose accounts have any permission on a project
 #' @param include_suspended_users, Include users whose accounts are suspended
 #' @param return_project_ownership_format, Rename the columns to match the
@@ -232,6 +234,16 @@ get_creators <- function(redcap_projects,
 #'
 #' @examples
 #' \dontrun{
+#' unsuspended_high_privilege_faculty <- get_privileged_user(
+#'   redcap_projects = redcap_projects,
+#'   redcap_user_information = redcap_user_information,
+#'   redcap_staff_employment_periods = ctsit_staff_employment_periods,
+#'   redcap_user_rights = redcap_user_rights,
+#'   redcap_user_roles = redcap_user_roles,
+#'   filter_for_faculty = T,
+#'   return_project_ownership_format = T
+#' )
+#'
 #' unsuspended_high_privilege_user <- get_privileged_user(
 #'   redcap_projects = redcap_projects,
 #'   redcap_user_information = redcap_user_information,
@@ -264,13 +276,14 @@ get_creators <- function(redcap_projects,
 #' )
 #' }
 get_privileged_user <- function(redcap_projects,
-                                                redcap_user_information,
-                                                redcap_staff_employment_periods,
-                                                redcap_user_rights,
-                                                redcap_user_roles,
-                                                include_low_privilege_users = FALSE,
-                                                include_suspended_users = FALSE,
-                                                return_project_ownership_format = FALSE) {
+                                redcap_user_information,
+                                redcap_staff_employment_periods,
+                                redcap_user_rights,
+                                redcap_user_roles,
+                                filter_for_faculty = FALSE,
+                                include_low_privilege_users = FALSE,
+                                include_suspended_users = FALSE,
+                                return_project_ownership_format = FALSE) {
   redcap_user_information_without_extra_columns <- redcap_user_information %>%
     dplyr::select(
       .data$ui_id,
@@ -287,12 +300,15 @@ get_privileged_user <- function(redcap_projects,
     # Test for high privileges. Will satisfy PID 30 in test data
     # include_low_privilege_users bypasses this test
     dplyr::filter(include_low_privilege_users |
-                  dplyr::if_any(dplyr::starts_with(c("design.", "user_rights.")), ~ .x == 1)) %>%
+      dplyr::if_any(dplyr::starts_with(c("design.", "user_rights.")), ~ .x == 1)) %>%
     dplyr::left_join(redcap_user_information_without_extra_columns, by = "username") %>%
     dplyr::filter(!is.na(.data$user_email)) %>%
+    # include_suspended_users bypasses this test
     dplyr::filter(is.na(.data$user_suspended_time) | include_suspended_users) %>%
     dplyr::left_join(redcap_staff_employment_periods, by = c("username" = "redcap_username")) %>%
     dplyr::filter(!.data$creation_time %in% .data$employment_interval) %>%
+    # filter_for_faculty adds this test
+    filter(!filter_for_faculty | is_faculty(.data$username)) %>%
     dplyr::select(
       .data$project_id,
       .data$username
@@ -441,4 +457,58 @@ get_reassigned_line_items <- function(sent_line_items, rc_conn) {
     )
 
   return(reassigned_line_items)
+}
+
+#' get_research_projects_not_using_viable_pi_data
+#'
+#' Returns the project_ids of projects that have no viable PI data
+#'
+#' @param redcap_projects, The contents of the REDCap table of the same name.
+#' @param redcap_entity_project_ownership, The contents of the REDCap Project Ownership table of the same name.
+#' @param redcap_user_information, The contents of the REDCap table of the same name.
+#'
+#' @return a vector of project IDs
+#' @export
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#' @importFrom stringr str_detect
+#' @importFrom dplyr coalesce filter inner_join left_join pull select
+#'
+#' @examples
+#' get_research_projects_not_using_viable_pi_data(
+#'   redcap_projects =
+#'     cleanup_project_ownership_test_data$redcap_projects,
+#'   redcap_entity_project_ownership =
+#'     cleanup_project_ownership_test_data$redcap_entity_project_ownership,
+#'   redcap_user_information =
+#'     cleanup_project_ownership_test_data$redcap_user_information
+#' )
+get_research_projects_not_using_viable_pi_data <- function(redcap_projects,
+                                                           redcap_entity_project_ownership,
+                                                           redcap_user_information) {
+  result <- redcap_projects %>%
+    # project purpose is coded for research
+    filter(.data$purpose == 2) %>%
+    # ... and this is not a template project
+    filter(!.data$project_id %in% seq(from = 1, to = 14)) %>%
+    inner_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) %>%
+    left_join(redcap_user_information, by = "username") %>%
+    mutate(owner_email_address = coalesce(.data$email, .data$user_email)) %>%
+    # select only the columns we care about to make this easier to test and debug
+    select(.data$project_id, .data$owner_email_address, .data$email, .data$user_email, .data$project_pi_email) %>%
+    filter(
+      # project_pi_email is missing or ...
+      is.na(.data$project_pi_email) |
+      # ... project_pi_email looks like garbage or ...
+      !str_detect(.data$project_pi_email, "^.+@.+\\..+") |
+      (
+        # ... project_pi_email looks like an email address...
+        str_detect(.data$project_pi_email, "^.+@.+\\..+") &
+        # ... but owner is not set to that project_pi_email...
+        .data$project_pi_email != .data$owner_email_address
+      )
+    ) %>%
+    pull(.data$project_id)
+
+  return(result)
 }
