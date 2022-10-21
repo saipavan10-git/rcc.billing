@@ -1,4 +1,5 @@
 testthat::test_that("is_faculty can distinguish faculty from non-faculty", {
+  is_testing = TRUE
   user_ids = c("pbc", "hoganwr", "cpb", "shapiroj", "pbc")
   expected_result = c(F, T, F, T, F)
 

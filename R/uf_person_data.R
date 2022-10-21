@@ -8,7 +8,7 @@
 #' @export
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
-#' @importFrom dplyr filter tibble
+#' @importFrom dplyr filter tibble tribble
 #' @importFrom rcc.ctsit get_uf_person_data_by_gatorlink
 #'
 #' @examples
@@ -19,9 +19,20 @@
 is_faculty <- function(
     user_ids
     ) {
-  faculty_user_ids <- rcc.ctsit::get_uf_person_data_by_gatorlink(
-    user_ids = user_ids
-  ) %>%
+
+  if (!exists("is_testing")) {
+    uf_person_data <- rcc.ctsit::get_uf_person_data_by_gatorlink(user_ids = user_ids)
+  } else {
+    uf_person_data <- tribble(
+      ~USERIDALIAS, ~UF_PRIMARY_AFFL,
+      "pbc", "T",
+      "hoganwr", "F",
+      "cpb", "T",
+      "shapiroj", "F"
+    )
+  }
+
+  faculty_user_ids <- uf_person_data %>%
     filter(.data$UF_PRIMARY_AFFL == "F") %>%
     pull(.data$USERIDALIAS)
 
