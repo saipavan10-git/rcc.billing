@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Activate sequester_orphans.R (Philip Chase)
 - Add filter for no viable users to get_orphaned_projects (Kyle Chesney)
 - Add get_user_rights_and_info (Philip Chase)
+- Install rcc.ctsit in Dockerfile using a GitHub PAT (Philip Chase)
 
 ### Changed
 - Make PIs and faculty project owners (Philip Chase)
