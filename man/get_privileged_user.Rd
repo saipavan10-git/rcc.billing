@@ -10,6 +10,7 @@ get_privileged_user(
   redcap_staff_employment_periods,
   redcap_user_rights,
   redcap_user_roles,
+  filter_for_faculty = FALSE,
   include_low_privilege_users = FALSE,
   include_suspended_users = FALSE,
   return_project_ownership_format = FALSE
@@ -27,6 +28,8 @@ intervals with one interval per row}
 
 \item{redcap_user_roles, }{The contents of the REDCap table of the same name.}
 
+\item{filter_for_faculty, }{Require users be faculty}
+
 \item{include_low_privilege_users, }{Include users whose accounts have any permission on a project}
 
 \item{include_suspended_users, }{Include users whose accounts are suspended}
@@ -40,11 +43,22 @@ a dataframe of privileged,  _user_ accounts on the projects provided
 \description{
 Returns a dataframe of project IDs and usernames of users with design or user_rights
  who are non-suspended, non-redcap-staff, with a primary email address.
+ Optionally require users be faculty.
  Optionally include users with any privilege on the project.
  Optionally include suspended users.
 }
 \examples{
 \dontrun{
+unsuspended_high_privilege_faculty <- get_privileged_user(
+  redcap_projects = redcap_projects,
+  redcap_user_information = redcap_user_information,
+  redcap_staff_employment_periods = ctsit_staff_employment_periods,
+  redcap_user_rights = redcap_user_rights,
+  redcap_user_roles = redcap_user_roles,
+  filter_for_faculty = T,
+  return_project_ownership_format = T
+)
+
 unsuspended_high_privilege_user <- get_privileged_user(
   redcap_projects = redcap_projects,
   redcap_user_information = redcap_user_information,
