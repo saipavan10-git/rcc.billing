@@ -13,17 +13,17 @@ transform_invoice_line_items_for_ctsit(invoice_line_items)
 The input dataframe with columns adjusted to match CTSIT format
 }
 \description{
-Excludes non-CSBT columns and renames CSBT column names to the corresponding CTSIT names.
-This function is the inverse of \code{\link{transform_invoice_line_items_for_csbt}}
+Renames CSBT column names to the corresponding CTSIT names.
+This function is the inverse of \code{\link{transform_invoice_line_items_for_csbt}}, however it does NOT exclude columns not in CTSIT column names.
 }
 \details{
 DETAILS
 }
 \examples{
 \dontrun{
-tbl(conn, "invoice_line_item") \%>\%
-  collect() \%>\%
-  transform_invoice_line_items_for_ctsit()
+df_from_csbt \%>\%
+  transform_invoice_line_items_for_ctsit() \%>\%
+  janitor::clean_names()
 }
 }
 \seealso{
