@@ -41,6 +41,7 @@ invoice_line_item_with_billable_details <- billable_details %>%
     suffix = c(".billable", ".line_item")
   ) %>%
   select(
+    id,
     service_instance_id,
     fiscal_year,
     month_invoiced,
@@ -54,9 +55,9 @@ invoice_line_item_with_billable_details <- billable_details %>%
 # NOTE: this is probably unnecessary due to use of sync_table_2
 invoice_line_item_diff <- redcapcustodian::dataset_diff(
   source = invoice_line_item_with_billable_details,
-  source_pk = "service_instance_id",
+  source_pk = "id",
   target = initial_invoice_line_item,
-  target_pk = "service_instance_id",
+  target_pk = "id",
   insert = F,
   delete = F
 )
@@ -65,9 +66,9 @@ invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
   conn = rcc_billing_conn,
   table_name = "invoice_line_item",
   source = invoice_line_item_diff$update_records,
-  source_pk = "service_instance_id",
+  source_pk = "id",
   target = initial_invoice_line_item,
-  target_pk = "service_instance_id",
+  target_pk = "id",
   insert = F,
   delete = F
 )
