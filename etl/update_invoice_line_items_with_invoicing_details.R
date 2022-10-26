@@ -5,14 +5,20 @@ library(DBI)
 library(tidyverse)
 library(lubridate)
 library(dotenv)
+library(fs)
 
 init_etl("update_invoice_line_items_with_invoicing_details")
 
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
-# TODO: autopath this with script run month
-billable_file <- "CTSIT_SeptBillable.xlsx"
-csbt_billable_details <- readxl::read_excel(billable_file)
+# Read the data in the latest payment file in the directory ./output/payments/
+payment_dir = here::here("output", "payments")
+latest_payment_file <- fs::dir_ls(payment_dir) %>%
+  fs::file_info() %>%
+  arrange(desc(modification_time)) %>%
+  head(n=1) %>%
+  pull(path)
+csbt_billable_details <- readxl::read_excel(latest_payment_file)
 
 billable_details <- transform_invoice_line_items_for_ctsit(csbt_billable_details) %>%
   janitor::clean_names() %>%
@@ -40,17 +46,19 @@ invoice_line_item_with_billable_details <- billable_details %>%
     month_invoiced,
     ctsi_study_id = ctsi_study_id.billable,
     invoice_number = invoice_number.billable,
-    je_number,
-    je_posting_date
+    je_number = deposit_or_je_number,
+    je_posting_date = date_of_pmt,
   ) %>%
   mutate(updated = get_script_run_time())
 
-# NOTE: this is probably unecessary due to use of sync_table_2
+# NOTE: this is probably unnecessary due to use of sync_table_2
 invoice_line_item_diff <- redcapcustodian::dataset_diff(
   source = invoice_line_item_with_billable_details,
   source_pk = "service_instance_id",
   target = initial_invoice_line_item,
-  target_pk = "service_instance_id"
+  target_pk = "service_instance_id",
+  insert = F,
+  delete = F
 )
 
 invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
@@ -59,13 +67,15 @@ invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
   source = invoice_line_item_diff$update_records,
   source_pk = "service_instance_id",
   target = initial_invoice_line_item,
-  target_pk = "service_instance_id"
+  target_pk = "service_instance_id",
+  insert = F,
+  delete = F
 )
 
 updated_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   # NOTE: you may run in to issues with type mismatch testing with SQLite
   filter(updated == redcapcustodian::get_script_run_time()) %>%
-  filter(service_instance_id %in% local(update_diff$update_records$service_instance_id)) %>%
+  filter(service_instance_id %in% local(invoice_line_item_diff$update_records$service_instance_id)) %>%
   collect()
 
 new_invoice_line_item_communications <- draft_communication_record_from_line_item(updated_invoice_line_items)
@@ -81,7 +91,7 @@ redcapcustodian::write_to_sql_db(
 )
 
 activity_log <- list(
-  invoice_line_item_updates = invoice_line_item_sync_activity,
+  invoice_line_item_updates = invoice_line_item_sync_activity$update_records,
   invoice_line_item_communications = new_invoice_line_item_communications
 )
 
