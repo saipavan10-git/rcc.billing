@@ -57,7 +57,7 @@ email_info <- target_projects %>%
   # join with user to ensure correct email
   left_join(
     tbl(rc_conn, "redcap_user_information") %>%
-      select(username, user_firstname, user_lastname, user_email, user_email2, user_email3, user_suspended_time) %>%
+      select(username, user_firstname, user_lastname, user_email, user_email2, user_email3, user_suspended_time, user_lastlogin) %>%
       collect(),
     by = "username"
   ) %>%
@@ -89,6 +89,7 @@ billable_candidates <- email_info %>%
     project_owner_email,
     project_owner_full_name,
     user_suspended_time,
+    user_lastlogin,
     project_id,
     project_creation_time = creation_time,
     creation_month,

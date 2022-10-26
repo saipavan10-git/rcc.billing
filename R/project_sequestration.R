@@ -225,18 +225,14 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     # no records saved
     filter(.data$record_count == 0) %>%
     # no activity in a year
-    filter(.data$last_logged_event <= get_script_run_time() - years(1)) %>%
-    mutate(
-      reason = "empty_and_inactive",
-      priority = 1
-    )
+    filter(.data$last_logged_event <= get_script_run_time() - years(1))
 
   ## Enumerate each user on the project that has any permission ever
   redcap_user_rights = tbl(conn, "redcap_user_rights") %>%
-    filter(.data$project_id %in% local(empty_and_inactive_projects$project_id)) %>%
+    filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
   redcap_user_roles = tbl(conn, "redcap_user_roles") %>%
-    filter(.data$project_id %in% local(empty_and_inactive_projects$project_id)) %>%
+    filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
   redcap_user_information = tbl(conn, "redcap_user_information") %>%
     collect()
@@ -247,16 +243,33 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
   )
 
   pids_of_project_with_viable_permissions <- user_info %>%
-    filter(is.na(.data$user_suspended_time)) %>%
+    filter(.data$user_lastlogin >= get_script_run_time() - years(1)) %>%
     filter(.data$expiration > get_script_run_time() | is.na(.data$expiration)) %>%
     distinct(.data$project_id) %>%
     pull(.data$project_id)
 
   empty_and_inactive_projects_with_no_viable_users <- empty_and_inactive_projects %>%
-    filter(!.data$project_id %in% pids_of_project_with_viable_permissions)
+    filter(!.data$project_id %in% pids_of_project_with_viable_permissions) %>%
+    mutate(
+      reason = "empty_and_inactive_with_no_viable_users",
+      priority = 1
+    )
+
+  # Inactive projects with no viable users
+  inactive_projects_with_no_viable_users <- target_projects %>%
+    filter(!.data$project_id %in% pids_of_project_with_viable_permissions) %>%
+    # the record count was recorded after the last update
+    filter(.data$time_of_count > .data$last_logged_event + days(1)) %>%
+    # no records saved
+    filter(.data$last_logged_event <= get_script_run_time() - years(1)) %>%
+    mutate(
+      reason = "inactive_with_no_viable_users",
+      priority = 2
+    )
 
   orphaned_projects <- bind_rows(
-    empty_and_inactive_projects_with_no_viable_users
+    empty_and_inactive_projects_with_no_viable_users,
+    inactive_projects_with_no_viable_users
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
