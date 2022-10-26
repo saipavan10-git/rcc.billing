@@ -56,7 +56,9 @@ table_names <- c(
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
 
-current_month_name <- month(get_script_run_time(), label = T)
+previous_month_name <- previous_month(month(get_script_run_time())) %>%
+  month(label = TRUE, abbr = FALSE)
+
 current_fiscal_year <- fiscal_years %>%
   filter(get_script_run_time() %within% fy_interval) %>%
   head(1) %>% # HACK: overlaps may occur on July 1, just choose the earlier year
@@ -97,7 +99,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
     initial_invoice_line_item %>%
       filter(
         fiscal_year == current_fiscal_year,
-        month_invoiced == current_month_name
+        month_invoiced == previous_month_name
       ) %>%
       select(ctsi_study_id, fiscal_year, month_invoiced),
     by = c("project_id" = "ctsi_study_id")
@@ -157,7 +159,7 @@ new_invoice_line_item_writes <- target_projects %>%
     name_of_service_instance = app_title,
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
-    month_invoiced = current_month_name,
+    month_invoiced = previous_month_name,
     # coerce empty strings to NA for coalesce operations
     across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
     across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
@@ -224,7 +226,7 @@ redcapcustodian::write_to_sql_db(
 new_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(
     status == "draft",
-    month_invoiced == current_month_name,
+    month_invoiced == previous_month_name,
     fiscal_year == current_fiscal_year
   ) %>%
   collect()
