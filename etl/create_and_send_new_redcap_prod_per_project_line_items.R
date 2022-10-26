@@ -56,7 +56,7 @@ table_names <- c(
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
 
-current_month_name <- month(get_script_run_time(), label = T)
+current_month_name <- month(get_script_run_time(), label = T, abbr = FALSE)
 current_fiscal_year <- fiscal_years %>%
   filter(get_script_run_time() %within% fy_interval) %>%
   head(1) %>% # HACK: overlaps may occur on July 1, just choose the earlier year
