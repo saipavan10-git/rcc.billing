@@ -15,6 +15,9 @@ rcc_billing_conn <- connect_to_rcc_billing_db()
 payment_dir = here::here("output", "payments")
 latest_payment_file <- fs::dir_ls(payment_dir) %>%
   fs::file_info() %>%
+  # NOTE: if more than one file is in here (especially if more than one was uploaded at the same time)
+  # behavior may be undefined
+  # TODO: check if volumes mounted in docker retain host's file metadata
   arrange(desc(modification_time)) %>%
   head(n=1) %>%
   pull(path)
@@ -99,3 +102,7 @@ activity_log <- list(
 log_job_success(jsonlite::toJSON(activity_log))
 
 DBI::dbDisconnect(rcc_billing_conn)
+
+# flush the contents of payment_dir to safeguard subsequent runs from duplicate data
+fs::fir_ls(payment_dir) %>%
+  file.remove()
