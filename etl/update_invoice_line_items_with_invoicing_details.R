@@ -25,8 +25,6 @@ csbt_billable_details <- readxl::read_excel(latest_payment_file)
 
 billable_details <- transform_invoice_line_items_for_ctsit(csbt_billable_details) %>%
   janitor::clean_names() %>%
-  # HACK: CSBT month invoiced may be inconsistent
-  mutate(month_invoiced = "Oct") %>%
   # HACK: when testing, in-memory data for dates are converted to int upon collection
   mutate_columns_to_posixct(c("creation_time", "updated"))
 
@@ -104,5 +102,5 @@ log_job_success(jsonlite::toJSON(activity_log))
 DBI::dbDisconnect(rcc_billing_conn)
 
 # flush the contents of payment_dir to safeguard subsequent runs from duplicate data
-fs::fir_ls(payment_dir) %>%
+fs::dir_ls(payment_dir) %>%
   file.remove()
