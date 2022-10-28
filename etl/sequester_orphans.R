@@ -158,8 +158,7 @@ billing_alert_log <- do.call("rbind", billing_alert_log_list)
 
 activity_log <- append(
   result,
-  list(billing_alert_log = billing_alert_log),
-  list(orphaned_projects = orphaned_projects)
+  lst(billing_alert_log, orphaned_projects)
 )
 
 log_job_success(jsonlite::toJSON(activity_log))
