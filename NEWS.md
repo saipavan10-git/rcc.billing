@@ -3,6 +3,19 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.0] - 2022-10-28
+### Added
+- Add transform_invoice_line_items_for_ctsit (Kyle Chesney)
+- Add update_invoice_line_items_with_invoicing_details (Kyle Chesney)
+- Add rule inactive_projects_with_no_viable_users to get_orphaned_projects() (Philip Chase)
+- Add orphaned_projects to logged data in sequester_orphans.R (Philip Chase)
+
+### Changed
+- Show user_lastlogin in billable_candidates.R (Philip Chase)
+- Use full month name instead of abbreviation in create_and_send_new_redcap_prod_per_project_line_items (Kyle Chesney)
+- Associate month_invoiced with project's birth month rather than script run month (Kyle Chesney)
+
+
 ## [0.8.1] - 2022-10-21
 ### Changed
 - Include GITHUB_PAT in docker build step (Philip Chase)
