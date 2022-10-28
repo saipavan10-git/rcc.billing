@@ -22,6 +22,25 @@ test_that("transform_invoice_line_items_for_csbt correctly converts all column n
   expect_false( any(transformed_colnames %in% csbt_column_names$ctsit) )
 })
 
+test_that("transform_invoice_line_items_for_ctsit correctly converts all column names in CSBT to CTSIT format", {
+
+  csbt_test_data <- invoice_line_item_test_data %>%
+    transform_invoice_line_items_for_csbt()
+
+  initial_colnames <- csbt_test_data %>%
+    colnames() %>%
+    sort()
+
+  results <- csbt_test_data %>%
+    transform_invoice_line_items_for_csbt()
+
+  transformed_colnames <- results %>%
+    colnames() %>%
+    sort()
+
+  expect_false( any(transformed_colnames %in% csbt_column_names$csbt) )
+})
+
 
 test_that("draft_communication_record_from_line_item correctly adds requisite columns", {
   csbt_line_items <- invoice_line_item_test_data %>%

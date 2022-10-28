@@ -14,6 +14,7 @@ The input dataframe with columns adjusted to match CSBT format
 }
 \description{
 Excludes non-CSBT columns and renames CTSIT column names to the corresponding CSBT names.
+This function is the inverse of \code{\link{transform_invoice_line_items_for_ctsit}}
 }
 \details{
 DETAILS
