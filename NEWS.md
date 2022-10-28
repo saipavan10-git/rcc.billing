@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.9.1] - 2022-10-28
+### Changed
+- Execute named lists construction with lst (Philip Chase)
+
+
 ## [0.9.0] - 2022-10-28
 ### Added
 - Add transform_invoice_line_items_for_ctsit (Kyle Chesney)
