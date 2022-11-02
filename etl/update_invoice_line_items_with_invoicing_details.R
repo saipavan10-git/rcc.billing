@@ -80,7 +80,14 @@ updated_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(service_instance_id %in% local(invoice_line_item_diff$update_records$service_instance_id)) %>%
   collect()
 
-new_invoice_line_item_communications <- draft_communication_record_from_line_item(updated_invoice_line_items)
+# Write the communications records
+max_invoice_line_item_communications_id = tbl(rcc_billing_conn, "invoice_line_item_communications") %>%
+  summarise(max_id = max(id)) %>%
+  collect() %>%
+  pull()
+
+new_invoice_line_item_communications <- draft_communication_record_from_line_item(updated_invoice_line_items) %>%
+  mutate(id = id + max_invoice_line_item_communications_id)
 
 redcapcustodian::write_to_sql_db(
   conn = rcc_billing_conn,

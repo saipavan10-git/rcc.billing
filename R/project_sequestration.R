@@ -221,11 +221,17 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
   # empty and inactive projects
   empty_and_inactive_projects <- target_projects %>%
     # the record count was recorded after the last update
-    filter(.data$time_of_count > .data$last_logged_event + days(1)) %>%
+    filter(.data$time_of_count > .data$last_logged_event + days(1) |
+      is.na(.data$last_logged_event)) %>%
     # no records saved
     filter(.data$record_count == 0) %>%
     # no activity in a year
-    filter(.data$last_logged_event <= get_script_run_time() - years(1))
+    filter(.data$last_logged_event <= get_script_run_time() - years(1) |
+      is.na(.data$last_logged_event)) %>%
+    mutate(
+      reason = "empty_and_inactive",
+      priority = 3
+    )
 
   ## Enumerate each user on the project that has any permission ever
   redcap_user_rights = tbl(conn, "redcap_user_rights") %>%
@@ -259,9 +265,11 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
   inactive_projects_with_no_viable_users <- target_projects %>%
     filter(!.data$project_id %in% pids_of_project_with_viable_permissions) %>%
     # the record count was recorded after the last update
-    filter(.data$time_of_count > .data$last_logged_event + days(1)) %>%
+    filter(.data$time_of_count > .data$last_logged_event + days(1) |
+      is.na(.data$last_logged_event)) %>%
     # no records saved
-    filter(.data$last_logged_event <= get_script_run_time() - years(1)) %>%
+    filter(.data$last_logged_event <= get_script_run_time() - years(1) |
+      is.na(.data$last_logged_event)) %>%
     mutate(
       reason = "inactive_with_no_viable_users",
       priority = 2
@@ -269,7 +277,8 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
 
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users,
-    inactive_projects_with_no_viable_users
+    inactive_projects_with_no_viable_users,
+    empty_and_inactive_projects
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
