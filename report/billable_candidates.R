@@ -39,6 +39,12 @@ initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct(c("created", "updated"))
 
+unpaid_invoices <- initial_invoice_line_item %>%
+  filter(service_type_code == 1) %>%
+  filter(!status %in% c("paid", "unreconciled")) %>%
+  mutate(service_identifier = as.numeric(service_identifier)) %>%
+  select(invoice_number, fiscal_year, month_invoiced, status, service_identifier)
+
 target_projects <- tbl(rc_conn, "redcap_projects") %>%
   inner_join(
     tbl(rc_conn, "redcap_entity_project_ownership") %>%
@@ -46,12 +52,17 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
     by = c("project_id" = "pid")
   ) %>%
   mutate(is_deleted = !is.na(date_deleted)) %>%
-  mutate(project_is_mature =
-           (creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -years(1))))
-         ) %>%
+  mutate(
+    project_is_mature =
+      (creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -years(1))))
+  ) %>%
   collect() %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-  mutate_columns_to_posixct("creation_time")
+  mutate_columns_to_posixct("creation_time") %>%
+  left_join(unpaid_invoices,
+    by = c("project_id" = "service_identifier"),
+    suffix = c(".project", ".line_item")
+  )
 
 email_info <- target_projects %>%
   # join with user to ensure correct email
@@ -84,6 +95,11 @@ billable_candidates <- email_info %>%
   mutate(sequestered = as.numeric(sequestered)) %>%
   mutate(project_is_mature = as.numeric(project_is_mature)) %>%
   mutate(is_deleted = as.numeric(is_deleted)) %>%
+  mutate(is_deleted_but_not_paid = as.numeric(
+    is_deleted == 1 &
+      !is.na(status.line_item) &
+      status.line_item == "sent"
+  )) %>%
   mutate(sequestered = if_else(is.na(sequestered), 0, sequestered)) %>%
   select(
     project_owner_email,
@@ -98,6 +114,11 @@ billable_candidates <- email_info %>%
     is_deleted,
     record_count,
     last_logged_event,
+    is_deleted_but_not_paid,
+    invoice_number,
+    fiscal_year,
+    month_invoiced,
+    status.line_item,
     project_title = app_title
   )
 
