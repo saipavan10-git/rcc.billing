@@ -3,6 +3,16 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.10.0] - 2022-11-02
+### Added
+- Include project_irb_number in report/billable_candidates (Kyle Chesney)
+- Add invoice facts to billable candidates (Philip Chase)
+- Re-enable empty_and_inactive_projects in get_orphaned_projects (Philip Chase)
+
+### Changed
+- Adjust the id column in new_invoice_line_item_communications to avoid collisions (Philip Chase)
+
+
 ## [0.9.1] - 2022-10-28
 ### Changed
 - Execute named lists construction with lst (Philip Chase)
