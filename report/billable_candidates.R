@@ -119,6 +119,7 @@ billable_candidates <- email_info %>%
     fiscal_year,
     month_invoiced,
     status.line_item,
+    project_irb_number,
     project_title = app_title
   )
 
