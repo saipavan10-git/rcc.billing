@@ -41,6 +41,7 @@ invoice_line_item_with_billable_details <- billable_details %>%
            ),
     suffix = c(".billable", ".line_item")
   ) %>%
+  mutate(status = if_else(!is.na(date_of_pmt), "paid", "invoiced")) %>%
   select(
     id,
     service_instance_id,
@@ -50,11 +51,9 @@ invoice_line_item_with_billable_details <- billable_details %>%
     invoice_number = invoice_number.billable,
     je_number = deposit_or_je_number,
     je_posting_date = date_of_pmt,
+    status
   ) %>%
-  mutate(
-    updated = get_script_run_time(),
-    status = "paid"
-  )
+  mutate(updated = get_script_run_time())
 
 # NOTE: this is probably unnecessary due to use of sync_table_2
 invoice_line_item_diff <- redcapcustodian::dataset_diff(
