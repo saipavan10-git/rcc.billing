@@ -2,6 +2,10 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.11.0] - 2022-11-14
+### Added
+- Set invoice_line_item status conditionally based on date_of_pmt presence when loading data from CSBT (Kyle Chesney)
+
 
 ## [0.10.0] - 2022-11-02
 ### Added
