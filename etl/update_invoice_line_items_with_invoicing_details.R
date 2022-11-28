@@ -57,18 +57,20 @@ invoice_line_item_with_billable_details <- billable_details %>%
 
 # NOTE: this is probably unnecessary due to use of sync_table_2
 invoice_line_item_diff <- redcapcustodian::dataset_diff(
-  source = invoice_line_item_with_billable_details,
+  source = invoice_line_item_with_billable_details %>% select(-updated),
   source_pk = "id",
-  target = initial_invoice_line_item,
+  target = initial_invoice_line_item %>% select(-updated),
   target_pk = "id",
   insert = F,
   delete = F
 )
 
+new_updates_to_invoice_line_items <- invoice_line_item_diff$update_records %>% mutate(updated = get_script_run_time())
+
 invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
   conn = rcc_billing_conn,
   table_name = "invoice_line_item",
-  source = invoice_line_item_diff$update_records,
+  source = new_updates_to_invoice_line_items,
   source_pk = "id",
   target = initial_invoice_line_item,
   target_pk = "id",
@@ -77,9 +79,7 @@ invoice_line_item_sync_activity <- redcapcustodian::sync_table_2(
 )
 
 updated_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-  # NOTE: you may run in to issues with type mismatch testing with SQLite
-  filter(updated == redcapcustodian::get_script_run_time()) %>%
-  filter(service_instance_id %in% local(invoice_line_item_diff$update_records$service_instance_id)) %>%
+  filter(id %in% !!new_updates_to_invoice_line_items$id) %>%
   collect()
 
 # Write the communications records
@@ -102,7 +102,7 @@ redcapcustodian::write_to_sql_db(
 )
 
 activity_log <- list(
-  invoice_line_item_updates = invoice_line_item_sync_activity$update_records,
+  invoice_line_item_updates = updated_invoice_line_items,
   invoice_line_item_communications = new_invoice_line_item_communications
 )
 
