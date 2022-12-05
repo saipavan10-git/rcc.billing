@@ -1,2 +1,2 @@
 # Warn project owners of impending bills every 1st and 23rd of the month at 10:03 a.m.
-3 10 1,23 * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript report/warn_owners_of_impending_bill.R
+3 10 3,14 * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript report/warn_owners_of_impending_bill.R
