@@ -186,7 +186,7 @@ new_invoice_line_item_writes <- target_projects %>%
     amount_due = price * qty_provided
   ) %>%
   # fabricate new IDs
-  mutate(id = row_number() + nrow(initial_invoice_line_item)) %>%
+  mutate(id = row_number() + max(initial_invoice_line_item$id)) %>%
   select(
     id,
     service_identifier,
@@ -239,8 +239,14 @@ tmp_invoice_file <- paste0(tempdir(), new_invoice_line_items_filename)
 new_invoice_line_items_for_csbt %>%
   writexl::write_xlsx(tmp_invoice_file)
 
-# TODO: consider if IDs need to be generated due to mismatch between invoice_line_item ID col
-new_invoice_line_item_communications <- draft_communication_record_from_line_item(new_invoice_line_items)
+# create new rows for invoice_line_item_communications
+max_id_in_invoice_line_item_communications <- tbl(rcc_billing_conn, "invoice_line_item_communications") %>%
+  summarise(max_id = max(id)) %>%
+  collect() %>%
+  pull(max_id)
+
+new_invoice_line_item_communications <- draft_communication_record_from_line_item(new_invoice_line_items) %>%
+  mutate(id = row_number() + max_id_in_invoice_line_item_communications)
 
 # Email CSBT
 email_subject <- paste("New invoice line items for REDCap Annual Project Maintenance")

@@ -2,6 +2,13 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.11.1] - 2022-12-07
+### Changed
+- Temporarily move warn_owners_of_impending_bill to the 3rd and 14th of the month (Philip Chase)
+- Add a comment to guide manual orphan sequestration (Philip Chase)
+- Fix new row IDs in create_and_send_new_redcap_prod_per_project_line_items.R (Philip Chase)
+
+
 ## [0.11.0] - 2022-11-14
 ### Added
 - Set invoice_line_item status conditionally based on date_of_pmt presence when loading data from CSBT (Kyle Chesney)
