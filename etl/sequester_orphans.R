@@ -32,6 +32,15 @@ orphaned_projects <- get_orphaned_projects(
   months_previous = 0
 )
 
+# If you want to manually sequester a set of projects,
+#   set their project_ids in a tibble.
+# orphaned_projects <- tribble(
+#   ~project_id,
+#  9314,
+#  11039,
+#  11041
+# )
+
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%
   filter(project_id %in% local(orphaned_projects$project_id)) %>%
