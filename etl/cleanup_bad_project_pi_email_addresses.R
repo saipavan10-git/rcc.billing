@@ -19,22 +19,49 @@ pi_emails <- redcap_projects %>%
   filter(!is.na(project_pi_email)) %>%
   distinct()
 
-bounce_data_from_listserv <- get_bad_emails_from_listserv_digest(
-  username = Sys.getenv("IMAP_USERNAME"),
-  password = Sys.getenv("IMAP_PASSWORD"),
-  messages_since_date = now(tzone = "America/New_York") - ddays(7)
-)
+bounce_data_from_listserv <-
+  tryCatch(
+    expr = {
+      get_bad_emails_from_listserv_digest(
+        username = Sys.getenv("IMAP_USERNAME"),
+        password = Sys.getenv("IMAP_PASSWORD"),
+        messages_since_date = now(tzone = "America/New_York") - ddays(7)
+      )
+    },
+    error = function(error_msg) {
+      warning("get_bad_emails_from_listserv_digest failed, returning an empty dataframe")
+      return(
+        data.frame(email = c("")) %>%
+          filter(FALSE)
+      )
+    }
+  )
 
-bounce_data_from_individual_bounces <- get_bad_emails_from_individual_emails(
-  username = Sys.getenv("IMAP_USERNAME"),
-  password = Sys.getenv("IMAP_PASSWORD"),
-  messages_since_date = now(tzone = "America/New_York") - ddays(7)
-)
+bounce_data_from_individual_bounces <-
+  tryCatch(
+    expr = {
+      get_bad_emails_from_individual_emails(
+        username = Sys.getenv("IMAP_USERNAME"),
+        password = Sys.getenv("IMAP_PASSWORD"),
+        messages_since_date = now(tzone = "America/New_York") - ddays(7)
+      )
+    },
+    error = function(error_msg) {
+      warning("get_bad_emails_from_individual_emails failed, returning an empty dataframe")
+      return(
+        data.frame(email = c("")) %>%
+          filter(FALSE)
+      )
+    }
+  )
+
+bad_emails_from_log_data <- scrape_log_for_bad_emails()
 
 bounce_data <-
   bind_rows(
     bounce_data_from_listserv,
-    bounce_data_from_individual_bounces
+    bounce_data_from_individual_bounces,
+    bad_emails_from_log_data
   ) %>%
   distinct(email)
 
