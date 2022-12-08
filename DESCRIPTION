@@ -18,6 +18,7 @@ Imports:
     DBI,
     bit64,
     dplyr,
+    jsonlite,
     lubridate,
     magrittr,
     readr,
