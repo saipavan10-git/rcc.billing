@@ -55,7 +55,7 @@ bounce_data_from_individual_bounces <-
     }
   )
 
-bad_emails_from_log_data <- scrape_log_for_bad_emails()
+bad_emails_from_log_data <- get_bad_emails_from_log()
 
 bounce_data <-
   bind_rows(
