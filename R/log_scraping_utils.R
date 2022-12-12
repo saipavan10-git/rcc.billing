@@ -29,7 +29,7 @@ get_bad_emails_from_log <- function() {
     for (job in seq(1,length(job_summaries))) {
       job_summary <- jsonlite::fromJSON(job_summaries[job])$billing_alert_log
       message("converting job ", job)
-      billing_alert_logs <- bind_rows(df, job_summary)
+      billing_alert_logs <- bind_rows(billing_alert_logs, job_summary)
     }
 
     bad_recipients <- billing_alert_logs %>%
