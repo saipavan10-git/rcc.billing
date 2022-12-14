@@ -1,0 +1,2 @@
+# Clean bad email addresses every tuesday at 10 am
+0 10 * * 2 root /usr/bin/docker run --rm --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/cleanup_bad_email_addresses.R
