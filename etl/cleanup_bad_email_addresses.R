@@ -9,6 +9,7 @@ library(redcapcustodian)
 library(DBI)
 library(RMariaDB)
 library(rcc.ctsit)
+library(rcc.billing)
 
 init_etl("cleanup_bad_email_addresses")
 
