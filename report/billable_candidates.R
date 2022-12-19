@@ -39,9 +39,9 @@ initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct(c("created", "updated"))
 
-unpaid_invoices <- initial_invoice_line_item %>%
+recent_invoices <- initial_invoice_line_item %>%
   filter(service_type_code == 1) %>%
-  filter(!status %in% c("paid", "unreconciled")) %>%
+  filter(get_script_run_time() - created < dyears(1)) %>%
   mutate(service_identifier = as.numeric(service_identifier)) %>%
   select(invoice_number, fiscal_year, month_invoiced, status, service_identifier)
 
@@ -59,7 +59,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   collect() %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct("creation_time") %>%
-  left_join(unpaid_invoices,
+  left_join(recent_invoices,
     by = c("project_id" = "service_identifier"),
     suffix = c(".project", ".line_item")
   )
