@@ -2,6 +2,17 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.12.0] - 2022-12-19
+### Added
+- Port cleanup_bad_email_addresses from rcc.ctsit (Kyle Chesney)
+- Create get_bad_emails_from_log (Kyle Chesney)
+
+### Changed
+- Update billable_candidates.R (Philip Chase)
+- Ignore timestamp updates in update_invoice_line_items_with_invoicing_details.R (Philip Chase)
+
+
 ## [0.11.1] - 2022-12-07
 ### Changed
 - Temporarily move warn_owners_of_impending_bill to the 3rd and 14th of the month (Philip Chase)
