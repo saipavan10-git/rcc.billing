@@ -2,6 +2,10 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.12.1] - 2022-12-19
+### Changed
+- Load rcc.billing library in cleanup_bad_email_addresses.R (Philip Chase)
+
 
 ## [0.12.0] - 2022-12-19
 ### Added
