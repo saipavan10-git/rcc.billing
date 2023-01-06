@@ -29,7 +29,7 @@ redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
 # identify orphans created in the current month
 orphaned_projects <- get_orphaned_projects(
   conn = rc_conn,
-  months_previous = 1
+  months_previous = 0
 )
 
 # If you want to manually sequester a set of projects,
