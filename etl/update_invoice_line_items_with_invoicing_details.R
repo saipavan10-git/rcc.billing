@@ -116,7 +116,7 @@ billing_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
 rc_db_line_item_sync_activity <- redcapcustodian::sync_table_2(
   conn = rc_conn,
   table_name = "invoice_line_item",
-  source = initial_invoice_line_item,
+  source = billing_invoice_line_item,
   source_pk = "id",
   target = initial_rc_invoice_line_item,
   target_pk = "id",
