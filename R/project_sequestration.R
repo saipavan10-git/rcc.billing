@@ -207,7 +207,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     # project is not deleted
     filter(is.na(.data$date_deleted)) %>%
     # project at least 1 year old
-    filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -years(1)))) %>%
+    filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -months(11)))) %>%
     # project has an anniversary months_previous months ago
     filter(rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
     left_join(project_ownership, by = c("project_id" = "pid")) %>%
@@ -226,7 +226,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     # no records saved
     filter(.data$record_count == 0) %>%
     # no activity in a year
-    filter(.data$last_logged_event <= get_script_run_time() - years(1) |
+    filter(.data$last_logged_event <= get_script_run_time() - months(11) |
       is.na(.data$last_logged_event)) %>%
     mutate(
       reason = "empty_and_inactive",
@@ -249,7 +249,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
   )
 
   pids_of_project_with_viable_permissions <- user_info %>%
-    filter(.data$user_lastlogin >= get_script_run_time() - years(1)) %>%
+    filter(.data$user_lastlogin >= get_script_run_time() - months(11)) %>%
     filter(.data$expiration > get_script_run_time() | is.na(.data$expiration)) %>%
     distinct(.data$project_id) %>%
     pull(.data$project_id)
@@ -268,7 +268,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     filter(.data$time_of_count > .data$last_logged_event + days(1) |
       is.na(.data$last_logged_event)) %>%
     # no records saved
-    filter(.data$last_logged_event <= get_script_run_time() - years(1) |
+    filter(.data$last_logged_event <= get_script_run_time() - months(11) |
       is.na(.data$last_logged_event)) %>%
     mutate(
       reason = "inactive_with_no_viable_users",
