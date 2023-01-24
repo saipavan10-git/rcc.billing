@@ -234,13 +234,13 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     )
 
   ## Enumerate each user on the project that has any permission ever
-  redcap_user_rights = tbl(conn, "redcap_user_rights") %>%
+  redcap_user_rights <- tbl(conn, "redcap_user_rights") %>%
     filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
-  redcap_user_roles = tbl(conn, "redcap_user_roles") %>%
+  redcap_user_roles <- tbl(conn, "redcap_user_roles") %>%
     filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
-  redcap_user_information = tbl(conn, "redcap_user_information") %>%
+  redcap_user_information <- tbl(conn, "redcap_user_information") %>%
     collect()
   user_info <- get_user_rights_and_info(
     redcap_user_rights = redcap_user_rights,
@@ -275,18 +275,37 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
       priority = 2
     )
 
+  # complete but non sequestered projects
+  complete_but_non_sequestered <-
+    redcap_projects %>%
+    # project is not deleted
+    filter(is.na(.data$date_deleted)) %>%
+    # project is marked as completed, ...
+    filter(!is.na(.data$completed_time)) %>%
+    left_join(project_ownership, by = c("project_id" = "pid")) %>%
+    filter(.data$billable == 1) %>%
+    # ...but it not sequestered
+    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    left_join(redcap_record_counts, by = "project_id") %>%
+    collect() %>%
+    mutate(
+      reason = "complete_but_non_sequestered",
+      priority = 4
+    )
+
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users,
     inactive_projects_with_no_viable_users,
-    empty_and_inactive_projects
+    empty_and_inactive_projects,
+    complete_but_non_sequestered
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
-  select(
-    .data$project_id,
-    .data$reason,
-    .data$priority
-  )
+    select(
+      .data$project_id,
+      .data$reason,
+      .data$priority
+    )
 
   return(orphaned_projects)
 }
