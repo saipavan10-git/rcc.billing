@@ -2,6 +2,17 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.13.0] - 2023-01-24
+### Changed
+- Update get_orphaned_projects reducing the horizon from 12 to 11 months (Philip Chase)
+- Move warn_owners_of_impending_bill.R back to the default dates (Philip Chase)
+- Update update_invoice_line_items_with_invoicing_details.R (Philip Chase)
+- Revert error in sequester_orphans.R (Philip Chase)
+- Sync invoice_line_item table to RC DB during update_invoice_line_items_with_invoicing_details (Kyle Chesney)
+- Mark CTSIT-owned projects as non-billable in update_project_billable_attribute.R (Philip Chase)
+
+
 ## [0.12.1] - 2022-12-19
 ### Changed
 - Load rcc.billing library in cleanup_bad_email_addresses.R (Philip Chase)

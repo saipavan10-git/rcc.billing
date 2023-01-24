@@ -10,6 +10,7 @@ library(fs)
 init_etl("update_invoice_line_items_with_invoicing_details")
 
 rcc_billing_conn <- connect_to_rcc_billing_db()
+rc_conn <- connect_to_redcap_db()
 
 # Read the data in the latest payment file in the directory ./output/payments/
 payment_dir = here::here("output", "payments")
@@ -99,6 +100,28 @@ redcapcustodian::write_to_sql_db(
   overwrite = F,
   db_name = "rcc_billing",
   append = T
+)
+
+# sync RC invoice_line_item table
+initial_rc_invoice_line_item <- tbl(rc_conn, "invoice_line_item") %>%
+  collect() %>%
+  # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+  mutate_columns_to_posixct(c("created", "updated"))
+
+billing_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
+  collect() %>%
+  # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+  mutate_columns_to_posixct(c("created", "updated"))
+
+rc_db_line_item_sync_activity <- redcapcustodian::sync_table_2(
+  conn = rc_conn,
+  table_name = "invoice_line_item",
+  source = billing_invoice_line_item,
+  source_pk = "id",
+  target = initial_rc_invoice_line_item,
+  target_pk = "id",
+  insert = T,
+  delete = T
 )
 
 activity_log <- list(
