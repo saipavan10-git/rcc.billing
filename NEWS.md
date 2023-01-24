@@ -3,7 +3,7 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [0.13.0] - 2023-01-24
+## [1.13.0] - 2023-01-24
 ### Changed
 - Update get_orphaned_projects reducing the horizon from 12 to 11 months (Philip Chase)
 - Move warn_owners_of_impending_bill.R back to the default dates (Philip Chase)
@@ -13,12 +13,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Mark CTSIT-owned projects as non-billable in update_project_billable_attribute.R (Philip Chase)
 
 
-## [0.12.1] - 2022-12-19
+## [1.12.1] - 2022-12-19
 ### Changed
 - Load rcc.billing library in cleanup_bad_email_addresses.R (Philip Chase)
 
 
-## [0.12.0] - 2022-12-19
+## [1.12.0] - 2022-12-19
 ### Added
 - Port cleanup_bad_email_addresses from rcc.ctsit (Kyle Chesney)
 - Create get_bad_emails_from_log (Kyle Chesney)
