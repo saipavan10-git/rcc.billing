@@ -122,13 +122,26 @@ dataset_diff_for_rcepo <-
     delete = F
   )
 
+# erase the redcap_entity_project_ownership record for
+# every project in projects_with_ownership_issues but not in project_ownership_updates.
+project_ownership_records_with_issues_and_no_updates <- redcap_entity_project_ownership %>%
+  filter(pid %in% projects_with_ownership_issues) %>%
+  filter(!pid %in% project_ownership_updates$pid) %>%
+  mutate(reason = "unresolvable_ownership_issues") %>%
+  select(pid, reason, email, firstname, lastname, username, created, updated)
+
+dataset_diff_for_rcepo$delete_records <- project_ownership_records_with_issues_and_no_updates %>%
+  # HACK: dbxDelete is unable to match NA values which may exist in: username, email, firstname
+  select(pid, created, updated)
+
 sync_activity <- redcapcustodian::sync_table(
   conn = rc_con,
   table_name = "redcap_entity_project_ownership",
   primary_key = "pid",
   data_diff_output = dataset_diff_for_rcepo,
   insert = T,
-  update = T
+  update = T,
+  delete = T
 )
 
 # create the data we want to log
@@ -144,7 +157,8 @@ dataset_diff_for_rcepo_logging <-
 
 activity_log <- bind_rows(
   dataset_diff_for_rcepo_logging$update_records %>% mutate(diff_type = "update"),
-  dataset_diff_for_rcepo_logging$insert_records %>% mutate(diff_type = "insert")
+  dataset_diff_for_rcepo_logging$insert_records %>% mutate(diff_type = "insert"),
+  project_ownership_records_with_issues_and_no_updates %>% mutate(diff_type = "delete")
 ) %>%
   select(diff_type, reason, priority, everything())
 
