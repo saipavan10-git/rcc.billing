@@ -3,6 +3,15 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.14.0] - 2023-01-27
+### Added
+- Add complete_but_non_sequestered rule to get_orphaned_projects (Philip Chase)
+- Add warn_completers_of_impending_sequestration.R (Philip Chase)
+
+### Changed
+- Update version numbers in NEWS.md to conform to tagging error on 2022-12-19 (Philip Chase)
+
+
 ## [1.13.0] - 2023-01-24
 ### Changed
 - Update get_orphaned_projects reducing the horizon from 12 to 11 months (Philip Chase)
