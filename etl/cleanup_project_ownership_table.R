@@ -170,8 +170,14 @@ project_ownership_records_with_issues_and_no_updates <-
 
 blanked_project_ownership_records_with_issues_and_no_updates <-
   project_ownership_records_with_issues_and_no_updates %>%
-  select(-c(reason, created, updated)) %>%
-  mutate(email = NA_character_, firstname = NA_character_, lastname = NA_character_, username = NA_character_)
+  select(-c(reason, billable, sequestered)) %>%
+  mutate(
+    email = NA_character_,
+    firstname = NA_character_,
+    lastname = NA_character_,
+    username = NA_character_,
+    updated = as.integer(get_script_run_time())
+  )
 
 dataset_diff_for_rcepo$update_records <- dataset_diff_for_rcepo$update_records %>%
   rbind(blanked_project_ownership_records_with_issues_and_no_updates)
