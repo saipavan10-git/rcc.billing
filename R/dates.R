@@ -42,3 +42,27 @@ previous_n_months <- function(month, n = 1) {
 
   return(result)
 }
+
+
+#' next_n_months
+#'
+#' Return the month number that would occur n months after the integer in `month`
+#'
+#' @param month - an integer month number
+#' @param n - the number of months to add to the current month (default = 1)
+#'
+#' @importFrom dplyr if_else
+#' @importFrom lubridate add_with_rollback ceiling_date years month
+#' @return the nth next month number as in integer
+#' @export
+#'
+#' @examples
+#' next_n_months(9, 2)
+#' next_n_months(1, 1)
+next_n_months <- function(month, n = 1) {
+
+  result = month + n %% 12
+  result = if_else(result > 12, result - 12, result)
+
+  return(result)
+}
