@@ -102,7 +102,7 @@ send_alert_email <- function(row, email_subject = "") {
     expr = {
       redcapcustodian::send_email(
         email_body = list(msg),
-        email_subject = "Please Fix",
+        email_subject = email_subject,
         email_to = row["emails"],
         ## email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
         email_from = "ctsit-redcap-reply@ad.ufl.edu"
@@ -234,3 +234,5 @@ activity_log <- bind_rows(
 log_job_success(jsonlite::toJSON(activity_log))
 
 dbDisconnect(rc_conn)
+
+Create initial version of request_correction_of_bad_ownership_data report
