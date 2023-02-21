@@ -293,11 +293,38 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
       priority = 4
     )
 
+  unresolvable_ownership_issues <-
+    redcap_projects %>%
+    # project is not deleted
+    filter(is.na(.data$date_deleted)) %>%
+    # NOTE: filtering for billable before the join operation is called is significantly faster (<1s vs >30s)
+    left_join(project_ownership %>% filter(!is.na(.data$billable) & .data$billable == 1), by = c("project_id" = "pid")) %>%
+    # HACK: NA billable is not filtered in above statement so do it here
+    filter(!is.na(.data$billable) & .data$billable == 1) %>%
+    ## the project is not sequestered
+    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    ## fields email, firstname, lastname, username are NA
+    filter(
+      is.na(.data$email) &
+        is.na(.data$firstname) &
+        is.na(.data$lastname) &
+        is.na(.data$username)
+    ) %>%
+    ## the updated in the project ownership table greater than 90ish days old.
+    # NOTE: this fails if is.na(updated)
+    ## filter(updated - lubridate::ddays(90) <= get_script_run_time()) %>%
+    collect() %>%
+    mutate(
+      reason = "unresolvable_ownership_issues",
+      priority = 5
+    )
+
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users,
     inactive_projects_with_no_viable_users,
     empty_and_inactive_projects,
-    complete_but_non_sequestered
+    complete_but_non_sequestered,
+    unresolvable_ownership_issues
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
