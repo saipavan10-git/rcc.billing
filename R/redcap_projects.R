@@ -56,7 +56,7 @@ get_last_project_user <- function(con, pid) {
 get_projects_needing_new_owners <- function(redcap_entity_project_ownership,
                                             redcap_user_information) {
   projects_needing_new_owners <- redcap_entity_project_ownership %>%
-    dplyr::left_join(redcap_user_information, by = "username") %>%
+    dplyr::inner_join(redcap_user_information, by = "username") %>%
     dplyr::filter(is.na(.data$user_email)) %>%
     dplyr::pull(.data$pid)
 
@@ -568,7 +568,7 @@ get_research_projects_not_using_viable_pi_data <- function(redcap_projects,
         # ... project_pi_email looks like an email address...
         str_detect(.data$project_pi_email, "^.+@.+\\..+") &
         # ... but owner is not set to that project_pi_email...
-        .data$project_pi_email != .data$owner_email_address
+        tolower(.data$project_pi_email) != tolower(.data$owner_email_address)
       )
     ) %>%
     pull(.data$project_id)

@@ -208,15 +208,15 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     filter(is.na(.data$date_deleted)) %>%
     # project at least 1 year old
     filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -months(11)))) %>%
-    # project has an anniversary months_previous months ago
-    filter(rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
     left_join(project_ownership, by = c("project_id" = "pid")) %>%
     filter(.data$billable == 1) %>%
     filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
     left_join(redcap_record_counts, by = "project_id") %>%
     collect() %>%
     # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-    mutate_columns_to_posixct("creation_time")
+    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event")) %>%
+    # project has an anniversary months_previous months ago
+    filter(rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time))
 
   # empty and inactive projects
   empty_and_inactive_projects <- target_projects %>%
@@ -288,16 +288,49 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
     left_join(redcap_record_counts, by = "project_id") %>%
     collect() %>%
+    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event")) %>%
     mutate(
       reason = "complete_but_non_sequestered",
       priority = 4
-    )
+    )  %>%
+    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+    mutate_columns_to_posixct("creation_time")
+
+  unresolvable_ownership_issues <-
+    redcap_projects %>%
+    # project is not deleted
+    filter(is.na(.data$date_deleted)) %>%
+    # NOTE: filtering for billable before the join operation is called is significantly faster (<1s vs >30s)
+    left_join(project_ownership %>% filter(!is.na(.data$billable) & .data$billable == 1), by = c("project_id" = "pid")) %>%
+    # HACK: NA billable is not filtered in above statement so do it here
+    filter(!is.na(.data$billable) & .data$billable == 1) %>%
+    ## the project is not sequestered
+    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    ## fields email, firstname, lastname, username are NA
+    filter(
+      is.na(.data$email) &
+        is.na(.data$firstname) &
+        is.na(.data$lastname) &
+        is.na(.data$username)
+    ) %>%
+    ## the updated in the project ownership table greater than 90ish days old.
+    # NOTE: this fails if is.na(updated)
+    ## filter(updated - lubridate::ddays(90) <= get_script_run_time()) %>%
+    collect() %>%
+    mutate(
+      reason = "unresolvable_ownership_issues",
+      priority = 5
+    ) %>%
+    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
 
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users,
     inactive_projects_with_no_viable_users,
     empty_and_inactive_projects,
-    complete_but_non_sequestered
+    complete_but_non_sequestered,
+    unresolvable_ownership_issues
   ) %>%
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%

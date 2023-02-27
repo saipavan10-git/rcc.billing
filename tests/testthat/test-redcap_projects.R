@@ -19,7 +19,7 @@ testthat::test_that("service_type sqlite schema is created and correct test data
 })
 
 testthat::test_that("get_projects_needing_new_owners returns the correct vector of project IDs", {
-  expected_result <- seq(from = 28, to = 33)
+  expected_result <- seq(from = 29, to = 33)
   testthat::expect_equal(
     get_projects_needing_new_owners(
       redcap_entity_project_ownership = cleanup_project_ownership_test_data$redcap_entity_project_ownership,

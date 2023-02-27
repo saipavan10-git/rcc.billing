@@ -3,6 +3,18 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.15.0] - 2023-02-27
+### Added
+- Add unit test for get_orphaned_projects() (Philip Chase)
+- Add unresolvable_ownership_issues to get_orphans function (Kyle Chesney)
+- Add request_correction_of_bad_ownership_data report (Kyle Chesney)
+- Add erasure of project ownership identification columns to cleanup_project_ownership_table (Kyle Chesney)
+
+### Changed
+- Use variable instead of hardcoding in send_alert_email (Kyle Chesney)
+- Prevent emails RE: unresolvable_ownership_issues in sequester_orphans (Kyle Chesney)
+
+
 ## [1.14.0] - 2023-01-27
 ### Added
 - Add complete_but_non_sequestered rule to get_orphaned_projects (Philip Chase)
