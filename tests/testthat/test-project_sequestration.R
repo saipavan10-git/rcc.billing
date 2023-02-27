@@ -64,3 +64,14 @@ testthat::test_that("sequester_projects closes and sequesters projects", {
 
   dbDisconnect(conn)
 })
+
+testthat::test_that("get_orphaned_projects identifies 5 orphans in the correct sequence", {
+  # Create test tables and set the date
+  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+  purrr::walk(get_orphaned_projects_test_tables, create_a_table_from_rds_test_data, conn, "get_orphaned_projects")
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-04-01 12:00:00"))
+
+  result <- get_orphaned_projects(conn)
+  one_and_only_one_project_for_each_priority_in_order_from_1_to_5 <- seq(1,5)
+  testthat::expect_equal(result$priority, one_and_only_one_project_for_each_priority_in_order_from_1_to_5)
+})

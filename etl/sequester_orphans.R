@@ -32,6 +32,10 @@ orphaned_projects <- get_orphaned_projects(
   months_previous = 0
 )
 
+uoi_pids <- orphaned_projects %>%
+  filter(reason == "unresolvable_ownership_issues") %>%
+  pull(project_id)
+
 # If you want to manually sequester a set of projects,
 #   set their project_ids in a tibble.
 # orphaned_projects <- tribble(
@@ -43,6 +47,8 @@ orphaned_projects <- get_orphaned_projects(
 
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%
+  # NOTE: Emails for unresolvable issues are handled in request_correction_of_bad_ownership_data
+  filter(!project_id %in% local(uoi_pids)) %>%
   filter(project_id %in% local(orphaned_projects$project_id)) %>%
   inner_join(
     tbl(rc_conn, "redcap_entity_project_ownership"),
