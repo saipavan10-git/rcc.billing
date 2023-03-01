@@ -105,7 +105,18 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
     by = c("project_id" = "ctsi_study_id")
   ) %>%
   # birthday in past month
-  filter(previous_month(month(get_script_run_time())) == month(creation_time))
+  filter(previous_month(month(get_script_run_time())) == month(creation_time)) %>%
+  mutate(
+    # coerce empty strings to NA for coalesce operations
+    across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
+    across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
+    # ...and make our PI strings
+    pi_last_name = coalesce(user_lastname, project_pi_lastname, lastname),
+    pi_first_name = coalesce(user_firstname, project_pi_firstname, firstname),
+    pi_email = coalesce(user_email, project_pi_email, email)
+  ) %>%
+  ## Do not send any invoices to PIs/Owners with no email address
+  filter(!is.na(pi_email))
 
 # Make new service_instance rows ##############################################
 
@@ -160,12 +171,6 @@ new_invoice_line_item_writes <- target_projects %>%
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
     fiscal_year = current_fiscal_year,
     month_invoiced = previous_month_name,
-    # coerce empty strings to NA for coalesce operations
-    across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
-    across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
-    pi_last_name = coalesce(user_lastname, project_pi_lastname, lastname),
-    pi_first_name = coalesce(user_firstname, project_pi_firstname, firstname),
-    pi_email = coalesce(user_email, project_pi_email, email),
     # TODO: should this be stripped from the PI email instead?
     gatorlink = username,
     reason = "new_item",
