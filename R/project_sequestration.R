@@ -176,7 +176,8 @@ sequester_projects <- function(conn,
 #'
 #' Return a dataframe of projects that have been orphaned
 #'
-#' @param conn - a connection to a redcap database
+#' @param rc_conn - a connection to a redcap database, \code{\link{connect_to_redcap_db}}
+#' @param rcc_billing_conn - a connection to an rcc_billing database, \code{\link{connect_to_rcc_billing_db}}
 #' @param months_previous - the nth month previous to today to consider
 #' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate pull select tbl
 #' @importFrom lubridate add_with_rollback ceiling_date days month years
@@ -193,19 +194,17 @@ sequester_projects <- function(conn,
 #' @examples
 #' \dontrun{
 #' get_orphaned_projects(
-#'   conn = rc_conn,
+#'   rc_conn = rc_conn,
+#'   rcc_billing_conn = rcc_billing_conn,
 #'   months_previous = 0
 #' )
 #' }
-get_orphaned_projects <- function(conn, months_previous = 0) {
-  redcap_projects <- tbl(conn, "redcap_projects")
-  redcap_record_counts <- tbl(conn, "redcap_record_counts")
-  project_ownership <- tbl(conn, "redcap_entity_project_ownership")
+get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0) {
+  redcap_projects <- tbl(rc_conn, "redcap_projects")
+  redcap_record_counts <- tbl(rc_conn, "redcap_record_counts")
+  project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership")
 
-  rcc_billing_conn <- connect_to_rcc_billing_db()
-  banned_owners_table <- tbl(rcc_billing_conn, "banned_owners") %>%
-    collect()
-  dbDisconnect(rcc_billing_conn)
+  banned_owners_table <- tbl(rcc_billing_conn, "banned_owners") %>% collect()
 
   target_projects <-
     redcap_projects %>%
@@ -239,13 +238,13 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     )
 
   ## Enumerate each user on the project that has any permission ever
-  redcap_user_rights <- tbl(conn, "redcap_user_rights") %>%
+  redcap_user_rights <- tbl(rc_conn, "redcap_user_rights") %>%
     filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
-  redcap_user_roles <- tbl(conn, "redcap_user_roles") %>%
+  redcap_user_roles <- tbl(rc_conn, "redcap_user_roles") %>%
     filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
-  redcap_user_information <- tbl(conn, "redcap_user_information") %>%
+  redcap_user_information <- tbl(rc_conn, "redcap_user_information") %>%
     collect()
   user_info <- get_user_rights_and_info(
     redcap_user_rights = redcap_user_rights,
@@ -350,7 +349,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     inactive_projects_with_no_viable_users,
     empty_and_inactive_projects,
     complete_but_non_sequestered,
-    banned_owner,
+    banned_owners,
     unresolvable_ownership_issues
   ) %>%
     arrange(.data$priority) %>%
