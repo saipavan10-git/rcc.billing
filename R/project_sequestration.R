@@ -202,6 +202,11 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
   redcap_record_counts <- tbl(conn, "redcap_record_counts")
   project_ownership <- tbl(conn, "redcap_entity_project_ownership")
 
+  rcc_billing_conn <- connect_to_rcc_billing_db()
+  banned_owners_table <- tbl(rcc_billing_conn, "banned_owners") %>%
+    collect()
+  dbDisconnect(rcc_billing_conn)
+
   target_projects <-
     redcap_projects %>%
     # project is not deleted
@@ -297,6 +302,21 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
     mutate_columns_to_posixct("creation_time")
 
+  banned_owners <-
+    target_projects %>%
+    filter(
+      ( !is.na(email) & (email %in% banned_owners_table$email) ) |
+      ( !is.na(username) & (username %in% banned_owners_table$username) )
+    ) %>%
+    collect() %>%
+    mutate(
+      reason = "banned_owner",
+      priority = 5
+    ) %>%
+    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
+
+
   unresolvable_ownership_issues <-
     redcap_projects %>%
     # project is not deleted
@@ -320,7 +340,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     collect() %>%
     mutate(
       reason = "unresolvable_ownership_issues",
-      priority = 5
+      priority = 6
     ) %>%
     # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
     mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
@@ -330,6 +350,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     inactive_projects_with_no_viable_users,
     empty_and_inactive_projects,
     complete_but_non_sequestered,
+    banned_owner,
     unresolvable_ownership_issues
   ) %>%
     arrange(.data$priority) %>%
