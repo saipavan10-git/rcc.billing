@@ -155,7 +155,7 @@ redcap_user_information <- tbl(rc_conn, "redcap_user_information") %>%
 # Write rc db tables ##########################################################
 
 write_to_testing_rds <- function(dataframe, basename) {
-  dataframe %>% saveRDS(testthat::test_path("get_orphaned_projects", paste0(basename, ".rds")))
+  dataframe %>% saveRDS(testthat::test_path("get_orphaned_projects/rc", paste0(basename, ".rds")))
 }
 
 # write all of the test inputs
