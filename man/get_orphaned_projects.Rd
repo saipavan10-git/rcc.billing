@@ -4,10 +4,12 @@
 \alias{get_orphaned_projects}
 \title{get_orphaned_projects}
 \usage{
-get_orphaned_projects(conn, months_previous = 0)
+get_orphaned_projects(rc_conn, rcc_billing_conn, months_previous = 0)
 }
 \arguments{
-\item{conn}{- a connection to a redcap database}
+\item{rc_conn}{- a connection to a redcap database, \code{\link{connect_to_redcap_db}}}
+
+\item{rcc_billing_conn}{- a connection to an rcc_billing database, \code{\link{connect_to_rcc_billing_db}}}
 
 \item{months_previous}{- the nth month previous to today to consider}
 }
@@ -25,7 +27,8 @@ Return a dataframe of projects that have been orphaned
 \examples{
 \dontrun{
 get_orphaned_projects(
-  conn = rc_conn,
+  rc_conn = rc_conn,
+  rcc_billing_conn = rcc_billing_conn,
   months_previous = 0
 )
 }
