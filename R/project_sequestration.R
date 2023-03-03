@@ -304,8 +304,8 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
   banned_owners <-
     target_projects %>%
     filter(
-      ( !is.na(email) & (email %in% banned_owners_table$email) ) |
-      ( !is.na(username) & (username %in% banned_owners_table$username) )
+      ( !is.na(.data$email) & (.data$email %in% banned_owners_table$email) ) |
+      ( !is.na(.data$username) & (.data$username %in% banned_owners_table$username) )
     ) %>%
     collect() %>%
     mutate(
