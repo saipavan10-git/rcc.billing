@@ -11,6 +11,7 @@ library(tableHTML)
 init_etl("sequester_orphans")
 
 rc_conn <- connect_to_redcap_db()
+rcc_billing_conn <- connect_to_rcc_billing_db()
 
 redcap_version <- tbl(rc_conn, "redcap_config") %>%
   filter(field_name == "redcap_version") %>%
@@ -28,7 +29,8 @@ redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
 
 # identify orphans created in the current month
 orphaned_projects <- get_orphaned_projects(
-  conn = rc_conn,
+  rc_conn = rc_conn,
+  rcc_billing_conn = rcc_billing_conn,
   months_previous = 0
 )
 
@@ -179,3 +181,4 @@ activity_log <- append(
 log_job_success(jsonlite::toJSON(activity_log))
 
 dbDisconnect(rc_conn)
+dbDisconnect(rcc_billing_conn)

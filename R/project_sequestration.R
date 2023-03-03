@@ -176,7 +176,8 @@ sequester_projects <- function(conn,
 #'
 #' Return a dataframe of projects that have been orphaned
 #'
-#' @param conn - a connection to a redcap database
+#' @param rc_conn - a connection to a redcap database, \code{\link{connect_to_redcap_db}}
+#' @param rcc_billing_conn - a connection to an rcc_billing database, \code{\link{connect_to_rcc_billing_db}}
 #' @param months_previous - the nth month previous to today to consider
 #' @importFrom dplyr %>% arrange  bind_rows collect distinct filter inner_join left_join mutate pull select tbl
 #' @importFrom lubridate add_with_rollback ceiling_date days month years
@@ -193,14 +194,17 @@ sequester_projects <- function(conn,
 #' @examples
 #' \dontrun{
 #' get_orphaned_projects(
-#'   conn = rc_conn,
+#'   rc_conn = rc_conn,
+#'   rcc_billing_conn = rcc_billing_conn,
 #'   months_previous = 0
 #' )
 #' }
-get_orphaned_projects <- function(conn, months_previous = 0) {
-  redcap_projects <- tbl(conn, "redcap_projects")
-  redcap_record_counts <- tbl(conn, "redcap_record_counts")
-  project_ownership <- tbl(conn, "redcap_entity_project_ownership")
+get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0) {
+  redcap_projects <- tbl(rc_conn, "redcap_projects")
+  redcap_record_counts <- tbl(rc_conn, "redcap_record_counts")
+  project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership")
+
+  banned_owners_table <- tbl(rcc_billing_conn, "banned_owners") %>% collect()
 
   target_projects <-
     redcap_projects %>%
@@ -234,13 +238,13 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     )
 
   ## Enumerate each user on the project that has any permission ever
-  redcap_user_rights <- tbl(conn, "redcap_user_rights") %>%
+  redcap_user_rights <- tbl(rc_conn, "redcap_user_rights") %>%
     filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
-  redcap_user_roles <- tbl(conn, "redcap_user_roles") %>%
+  redcap_user_roles <- tbl(rc_conn, "redcap_user_roles") %>%
     filter(.data$project_id %in% local(target_projects$project_id)) %>%
     collect()
-  redcap_user_information <- tbl(conn, "redcap_user_information") %>%
+  redcap_user_information <- tbl(rc_conn, "redcap_user_information") %>%
     collect()
   user_info <- get_user_rights_and_info(
     redcap_user_rights = redcap_user_rights,
@@ -297,6 +301,21 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
     mutate_columns_to_posixct("creation_time")
 
+  banned_owners <-
+    target_projects %>%
+    filter(
+      ( !is.na(.data$email) & (.data$email %in% banned_owners_table$email) ) |
+      ( !is.na(.data$username) & (.data$username %in% banned_owners_table$username) )
+    ) %>%
+    collect() %>%
+    mutate(
+      reason = "banned_owner",
+      priority = 5
+    ) %>%
+    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
+    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
+
+
   unresolvable_ownership_issues <-
     redcap_projects %>%
     # project is not deleted
@@ -320,7 +339,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     collect() %>%
     mutate(
       reason = "unresolvable_ownership_issues",
-      priority = 5
+      priority = 6
     ) %>%
     # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
     mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
@@ -330,6 +349,7 @@ get_orphaned_projects <- function(conn, months_previous = 0) {
     inactive_projects_with_no_viable_users,
     empty_and_inactive_projects,
     complete_but_non_sequestered,
+    banned_owners,
     unresolvable_ownership_issues
   ) %>%
     arrange(.data$priority) %>%
