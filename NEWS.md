@@ -3,6 +3,16 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.16.0] - 2023-03-03
+### Added
+- Add banned_owners rule to get_orphaned_projects function Add banned_owners schema (Kyle Chesney)
+
+### Changed 
+- Embrace subdirectories for db specific tables in testing data (Kyle Chesney)
+- Rename *_conn to mem_*_conn in get_orphaned_projects test (Kyle Chesney)
+- Prevent blank emails on new invoice line items (Philip Chase)
+
+
 ## [1.15.0] - 2023-02-27
 ### Added
 - Add unit test for get_orphaned_projects() (Philip Chase)
