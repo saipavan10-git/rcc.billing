@@ -28,24 +28,30 @@ redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
 # identify orphans created in the current month
-orphaned_projects <- get_orphaned_projects(
+orphaned_projects_a <- get_orphaned_projects(
   rc_conn = rc_conn,
   rcc_billing_conn = rcc_billing_conn,
   months_previous = 0
 )
 
+orphaned_projects_b <- tribble(
+  ~project_id,
+  # If you want to manually sequester a set of projects,
+  #   set their project_ids here
+  # 7974,
+  # 11478,
+  # 11483,
+  # 11564
+)
+
+orphaned_projects <- bind_rows(
+  orphaned_projects_a,
+  orphaned_projects_b
+)
+
 uoi_pids <- orphaned_projects %>%
   filter(reason == "unresolvable_ownership_issues") %>%
   pull(project_id)
-
-# If you want to manually sequester a set of projects,
-#   set their project_ids in a tibble.
-# orphaned_projects <- tribble(
-#   ~project_id,
-#  9314,
-#  11039,
-#  11041
-# )
 
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%
