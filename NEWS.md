@@ -3,6 +3,15 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.17.0] - 2023-03-17
+### Added
+- Add ETL to write to org_hierachies from VIVO Add schema for org_hierarchies (Kyle Chesney)
+
+### Changed
+- Add cron'd runs of sequester_orphans.R (Philip Chase)
+- Simplify manual sequestration in sequester_orphans.R (Philip Chase)
+
+
 ## [1.16.0] - 2023-03-03
 ### Added
 - Add banned_owners rule to get_orphaned_projects function Add banned_owners schema (Kyle Chesney)
