@@ -9,6 +9,9 @@ init_etl("write_uf_fiscal_orgs_to_org_hierarchies")
 
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
+# Make the table with the schema file
+#dbSendQuery(rcc_billing_conn, readr::read_file("inst/schema/org_hierarchies.sql"))
+
 # NOTE: to fetch vivo data, must have access to network UF VPN, not UF Health
 college_hierarchy <- get_college_hierarchy()
 normalized_uf_fiscal_orgs <- get_normalized_uf_fiscal_orgs(college_hierarchy)
@@ -16,7 +19,7 @@ normalized_uf_fiscal_orgs <- get_normalized_uf_fiscal_orgs(college_hierarchy)
 original_org_hierarchy <- tbl(rcc_billing_conn, "org_hierarchies") %>%
   collect()
 
-syn_table_result <- sync_table_2(
+sync_table_result <- sync_table_2(
   conn = rcc_billing_conn,
   table_name = "org_hierarchies",
   source = normalized_uf_fiscal_orgs,
