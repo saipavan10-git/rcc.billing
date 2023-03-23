@@ -278,6 +278,7 @@ redcapcustodian::write_to_sql_db(
 invoice_line_items_sent <- new_invoice_line_items %>%
   mutate(
     status = "sent",
+    date_sent = get_script_run_time(),
     updated = get_script_run_time()
   ) %>%
   select(
@@ -286,6 +287,7 @@ invoice_line_items_sent <- new_invoice_line_items %>%
     fiscal_year,
     month_invoiced,
     status,
+    date_sent,
     updated
   )
 
