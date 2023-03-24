@@ -10,6 +10,14 @@ library(tableHTML)
 
 init_etl("sequester_unpaid_projects")
 
+if (day(get_script_run_time()) > 7) {
+  activity_log <- list(
+    error = tribble(~message, "Exiting because this is not the 7 days of the month")
+  )
+  log_job_error(jsonlite::toJSON(activity_log))
+  quit()
+}
+
 rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
@@ -67,14 +75,29 @@ result <- sequester_projects(
 )
 
 # email every owner who had a project sequestered
-email_template_text <- str_replace( "<p><owner_name>,<p>
-<p>The REDCap projects listed here have been sequestered to help CTS-IT assess if they are still needed. These projects were sequestered because they appear to have been abandoned. We are happy to unsequester the project if that assessment is incorrect. If you still need access to them, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a> telling us which project(s) need to be unsequestered. These are your projects sequestered today:</p>
+# This template requires these variables:
+#   owner_name
+#   invoice_number
+#   month_created = month(invoice_line_item$created)
+#   project_id
+#   app_title
+#   table_of_owned_projects_due_to_be_sequestered
+
+email_template_text <- str_replace( "<p><owner_name>,</p>
+
+<p>The REDCap project listed below has been sequestered (made inaccessible) due to an outstanding invoice that is over 90 days past due. The invoice ID <invoice_number> was sent to the project’s owner: <owner_name> in early <month_created></p>
+
+<p>To pay for the project, provide the payment information, i.e., chartfields, along with the invoice ID, to CTSI-SvcCntrBilling@ad.ufl.edu.</p>
+
+<p>We are happy to unsequester the project, for one time only, if you will make a good faith effort to pay the outstanding invoice ASAP.  If you still need access to this project, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L&service_type=2&project_id=<project_id>&project_name=<app_title>\">REDCap Service/Consultation Request</a> telling us which project needs to be unsequestered. Please include this project ID and Title in your request. This the project sequestered today:</p>
 
 <table_of_owned_projects_due_to_be_sequestered>
 
-<p>If you take no action, these project(s) will remain inaccessible. If they are still sequestered one year from now, they will be deleted at that time.</p>
+<p>If the project is unsequestered by the REDCap Team and a payment has not been made by the first Tuesday of the next month, the project will become sequestered again and cannot not be unsequestered until payment has been received.</p>
 
-<p>If a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner after it is unsequestered. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
+<p>If you take no action, this project will remain inaccessible. If it is still sequestered one year from the invoice date, it will be deleted at that time.</p>
+
+<p>If this project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner AFTER it is unsequestered. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
 
 <p>If you are curious to review the other projects you own, you can see all of them at <a href=\"<redcap_project_ownership_page>\">REDCap Project Ownership</a>.</p>
 
@@ -83,8 +106,9 @@ email_template_text <- str_replace( "<p><owner_name>,<p>
 <p>Regards,</p>
 <p>REDCap Support</p>
 
-<p>This message was sent from an unmonitored mailbox. If you have questions, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a>.</p>",
+<p>This message was sent from an unmonitored mailbox. If you have questions, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L&service_type=2&project_id=<project_id>&project_name=<app_title>\">REDCap Service/Consultation Request</a>.</p>",
                                     "<redcap_project_ownership_page>", redcap_project_ownership_page)
+
 email_tables <- email_info %>%
   filter(project_id %in% result$project_ids_updated) %>%
   select(-c(creation_time, last_logged_event, user_suspended_time)) %>%
