@@ -35,10 +35,13 @@ redcap_project_uri_home_base <- str_remove(Sys.getenv("URI"), "/api") %>%
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
-project_ids_to_sequester <- tbl(rcc_billing_conn, "invoice_line_item") %>%
+projects_to_sequester_invoices <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(status == "invoiced" & !is.na(date_sent)) %>%
   collect() %>%
   filter(get_script_run_time() - date_sent > days(100)) %>%
+  mutate(project_id = as.integer(service_identifier))
+
+project_ids_to_sequester <- projects_to_sequester_invoices %>%
   pull(service_identifier)
 
 email_info <-
@@ -66,22 +69,35 @@ email_info <-
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
   mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_base, project_id), "\">", app_title, "</a>")) %>%
   filter(!is.na(project_owner_email)) %>%
-  select(project_owner_email, project_owner_full_name, user_suspended_time, project_id, app_title, project_hyperlink, creation_time, last_logged_event)
+  left_join(
+    projects_to_sequester_invoices,
+    by = "project_id"
+  ) %>%
+  select(
+    project_owner_email,
+    project_owner_full_name,
+    user_suspended_time,
+    project_id,
+    app_title,
+    project_hyperlink,
+    creation_time,
+    last_logged_event,
+    invoice_number
+    ) %>%
+  mutate(
+    month_created = as.character(month(creation_time, label = T, abbr = F))
+  )
+
+email_info <- email_info %>%
+  mutate(
+    month_created = as.character(month(creation_time, label = T, abbr = F))
+  )
 
 # sequester the projects
 result <- sequester_projects(
   conn = rc_conn,
   project_ids = project_ids_to_sequester
 )
-
-# email every owner who had a project sequestered
-# This template requires these variables:
-#   owner_name
-#   invoice_number
-#   month_created = month(invoice_line_item$created)
-#   project_id
-#   app_title
-#   table_of_owned_projects_due_to_be_sequestered
 
 email_template_text <- str_replace( "<p><owner_name>,</p>
 
@@ -131,8 +147,12 @@ email_tables <- email_info %>%
 email_df <- email_tables %>%
   rowwise() %>%
   mutate(email_text =
-           str_replace(email_template_text, "<owner_name>", project_owner_full_name) %>%
+           str_replace_all(email_template_text, "<owner_name>", project_owner_full_name) %>%
            str_replace("<table_of_owned_projects_due_to_be_sequestered>", detail_table) %>%
+           str_replace_all("<app_title>", app_title) %>%
+           str_replace_all("<project_id>", as.character(project_id)) %>%
+           str_replace_all("<invoice_number>", invoice_number) %>%
+           str_replace_all("<month_created>", month_created) %>%
            htmltools::HTML()
   ) %>%
   ungroup()
