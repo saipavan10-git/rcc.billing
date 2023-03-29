@@ -12,9 +12,9 @@ init_etl("sequester_unpaid_projects")
 
 if (day(get_script_run_time()) > 7) {
   activity_log <- list(
-    error = tribble(~message, "Exiting because this is not the 7 days of the month")
+    error = tribble(~message, "Exiting because this is not one of the first 7 days of the month")
   )
-  log_job_error(jsonlite::toJSON(activity_log))
+  redcapcustodian::log_job_failure(jsonlite::toJSON(activity_log))
   quit()
 }
 
@@ -101,15 +101,15 @@ result <- sequester_projects(
 
 email_template_text <- str_replace( "<p><owner_name>,</p>
 
-<p>The REDCap project listed below has been sequestered (made inaccessible) due to an outstanding invoice that is over 90 days past due. The invoice ID <invoice_number> was sent to the project’s owner: <owner_name> in early <month_created></p>
+<p>The REDCap project listed below has been sequestered (made inaccessible) due to an outstanding invoice that is over 90 days past due. The invoice ID <invoice_number> was sent to the project's owner, <owner_name>, in early <month_created></p>
 
-<p>To pay for the project, provide the payment information, i.e., chartfields, along with the invoice ID, to CTSI-SvcCntrBilling@ad.ufl.edu.</p>
+<p>To pay for the project, please provide the payment information, i.e., chartfields, along with the invoice ID, in an email to CTSI-SvcCntrBilling@ad.ufl.edu.</p>
 
-<p>We are happy to unsequester the project, for one time only, if you will make a good faith effort to pay the outstanding invoice ASAP.  If you still need access to this project, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L&service_type=2&project_id=<project_id>&project_name=<app_title>\">REDCap Service/Consultation Request</a> telling us which project needs to be unsequestered. Please include this project ID and Title in your request. This the project sequestered today:</p>
+<p>We are happy to unsequester the project if you will make a good faith effort to pay the outstanding invoice as soon as possible. If you still need access to this project, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L&service_type=2&project_id=<project_id>&project_name=<app_title>\">REDCap Service/Consultation Request</a> telling us which project needs to be unsequestered. Please include this project ID and project name in your request. This is the project sequestered today:</p>
 
 <table_of_owned_projects_due_to_be_sequestered>
 
-<p>If the project is unsequestered by the REDCap Team and a payment has not been made by the first Tuesday of the next month, the project will become sequestered again and cannot not be unsequestered until payment has been received.</p>
+<p>If the project is unsequestered by the REDCap Team and a payment has not been made by the first Tuesday of the next month, the project will be resequestered.</p>
 
 <p>If you take no action, this project will remain inaccessible. If it is still sequestered one year from the invoice date, it will be deleted at that time.</p>
 
@@ -168,8 +168,16 @@ send_sequester_alert_email <- function(row) {
       redcapcustodian::send_email(
         email_body = list(msg),
         email_subject = "Unpaid REDCap projects sequestered",
-        email_to = row["project_owner_email"],
-        email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
+        email_to = if_else(
+          interactive(),
+          Sys.getenv("MY_EMAIL"),
+          row["project_owner_email"]
+        ),
+        email_cc = if_else(
+          interactive(),
+          Sys.getenv("MY_EMAIL"),
+          paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL"))
+        ),
         email_from = "ctsit-redcap-reply@ad.ufl.edu"
       )
       my_response <- data.frame(
