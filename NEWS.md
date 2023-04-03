@@ -2,8 +2,12 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.18.1] - 2023-04-03
+### Added
+- Fix NEWS.md (Philip Chase)
 
-## [1.17.0] - 2023-03-17
+
+## [1.18.0] - 2023-04-03
 ### Added
 - Add sequester_unpaid_projects ETL (Kyle Chesney)
 
