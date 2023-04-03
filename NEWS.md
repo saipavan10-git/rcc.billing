@@ -5,6 +5,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.17.0] - 2023-03-17
 ### Added
+- Add sequester_unpaid_projects ETL (Kyle Chesney)
+
+### Changed
+- Set date_sent when creating invoice line items (Philip Chase)
+- Fix cron for write_uf_fiscal_orgs_to_org_hierarchies.R again (Philip Chase)
+
+
+## [1.17.0] - 2023-03-17
+### Added
 - Add ETL to write to org_hierachies from VIVO Add schema for org_hierarchies (Kyle Chesney)
 
 ### Changed
