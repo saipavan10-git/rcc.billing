@@ -35,11 +35,27 @@ redcap_project_uri_home_base <- str_remove(Sys.getenv("URI"), "/api") %>%
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
-projects_to_sequester_invoices <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-  filter(status == "invoiced" & !is.na(date_sent)) %>%
+non_deleted_projects <- tbl(rc_conn, "redcap_projects") %>%
+  filter(is.na(date_deleted)) %>%
+  select(project_id) %>%
+  collect(project_id) %>%
+  pull(project_id)
+
+non_sequestered_projects <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
+  filter(sequestered == 0 | is.na(sequestered)) %>%
+  select(pid) %>%
   collect() %>%
-  filter(get_script_run_time() - date_sent > days(100)) %>%
-  mutate(project_id = as.integer(service_identifier))
+  pull(pid)
+
+projects_to_sequester_invoices <-
+  tbl(rcc_billing_conn, "invoice_line_item") %>%
+  filter(status == "invoiced" & !is.na(date_sent) & service_type_code == 1) %>%
+  filter(service_identifier %in% non_deleted_projects) %>%
+  filter(service_identifier %in% non_sequestered_projects) %>%
+  collect() %>%
+  filter(get_script_run_time() - date_sent > days(101)) %>%
+  mutate(project_id = as.integer(service_identifier)) %>%
+  collect()
 
 project_ids_to_sequester <- projects_to_sequester_invoices %>%
   pull(service_identifier)
