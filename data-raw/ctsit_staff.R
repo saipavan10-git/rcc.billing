@@ -4,9 +4,12 @@ library(lubridate)
 
 ctsit_staff <- tribble(
   ~redcap_username,
-  "pbc",
+  "theriaqu",
   "tls",
+  "amcmurra",
+  "cabernat",
   "cpb",
+  "pbc",
   "mbentz",
   "kyle.chesney",
   "lawjames1",
@@ -29,9 +32,12 @@ usethis::use_data(ctsit_staff, overwrite = TRUE)
 ctsit_staff_employment_periods <- tribble(
   ~redcap_username,
   ~employment_interval,
-  "pbc", lubridate::interval(ymd("2013-08-28"), ymd("2100-01-01")),
-  "tls", lubridate::interval(ymd("2014-01-01"), ymd("2100-01-01")),
+  "theriaqu", lubridate::interval(ymd("2010-04-21"), ymd("2013-05-22")),
+  "tls", lubridate::interval(ymd("2012-04-11"), ymd("2100-01-01")),
+  "amcmurra", lubridate::interval(ymd("2012-05-07"), ymd("2014-03-05")),
+  "cabernat", lubridate::interval(ymd("2014-02-21"), ymd("2015-04-17")),
   "cpb", lubridate::interval(ymd("2010-05-06"), ymd("2100-01-01")),
+  "pbc", lubridate::interval(ymd("2013-08-28"), ymd("2100-01-01")),
   "mbentz", lubridate::interval(ymd("2020-12-01"), ymd("2100-01-01")),
   "kyle.chesney", lubridate::interval(ymd("2019-04-01"), ymd("2100-01-01")),
   "lawjames1", lubridate::interval(ymd("2017-11-14"), ymd("2100-01-01")),
