@@ -139,3 +139,13 @@ invoice_status %>%
   arrange(desc(`Aging Group`))
 
 ```
+
+## Report summary
+
+-   Revenue since inception: `r scales::dollar(revenue_and_projections$actual_revenue)`
+
+-   Accounts Receivable since inception: `r scales::dollar(revenue_and_projections$accounts_receivable)`
+
+-   Average historic payment rate: `r scales::percent(average_portion_paid)`
+
+-   Projected annual revenue: `r scales::dollar(revenue_and_projections$expected_annual_revenue)`
