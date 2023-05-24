@@ -41,8 +41,15 @@ non_deleted_projects <- tbl(rc_conn, "redcap_projects") %>%
   collect(project_id) %>%
   pull(project_id)
 
+non_completed_projects <- tbl(rc_conn, "redcap_projects") %>%
+  filter(is.na(completed_time)) %>%
+  select(project_id) %>%
+  collect(project_id) %>%
+  pull(project_id)
+
 non_sequestered_projects <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
-  filter(sequestered == 0 | is.na(sequestered)) %>%
+  filter((sequestered == 0 | is.na(sequestered)) |
+          (sequestered == 1 & pid %in% local(non_completed_projects))) %>%
   select(pid) %>%
   collect() %>%
   pull(pid)

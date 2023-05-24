@@ -3,6 +3,15 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.19.0] - 2023-05-24
+### Added
+- Add remind_owners_to_review_ownership.R (Philip Chase)
+
+### Changed
+- Update sequester_unpaid_projects.R (Philip Chase)
+- Add historic redcap admins to CTS-IT staff (Philip Chase)
+
+
 ## [1.18.2] - 2023-04-03
 ### Changed
 - Filter out sequestered and deleted projects in sequester_unpaid_projects.R (Philip Chase)
