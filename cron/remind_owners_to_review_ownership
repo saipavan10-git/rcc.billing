@@ -1,0 +1,2 @@
+# remind_owners_to_review_ownership.R quarterly on the first of every month at 10:05 a.m.
+13 8 10 2,5,8,11 * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript report/remind_owners_to_review_ownership.R
