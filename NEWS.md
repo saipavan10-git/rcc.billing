@@ -3,6 +3,14 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.20.0] - 2023-06-05
+### Added
+- Add revenue_status_and_projections.qmd (Philip Chase)
+
+### Changed
+- Update email templates (Philip Chase)
+
+
 ## [1.19.0] - 2023-05-24
 ### Added
 - Add remind_owners_to_review_ownership.R (Philip Chase)
