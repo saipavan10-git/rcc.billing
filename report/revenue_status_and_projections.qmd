@@ -27,7 +27,7 @@ library(dotenv)
 library(fs)
 library(scales)
 
-load_dot_env(here::here("prod.env"))
+if (Sys.getenv("RCCBILLING_DB_NAME") == "") dotenv::load_dot_env(here::here("prod.env"))
 
 init_etl("revenue_status_and_projections")
 
