@@ -5,3 +5,8 @@
 .env
 *.env
 !examples/testing.env
+
+# output files
+*.pdf
+*.html
+*_files/

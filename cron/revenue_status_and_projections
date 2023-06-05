@@ -1,0 +1,2 @@
+# Run revenue_status_and_projections every Wednesday at 8:07 a.m. 
+7 8 * * 3 root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript report/render_report.R script_name=report/revenue_status_and_projections.qmd
