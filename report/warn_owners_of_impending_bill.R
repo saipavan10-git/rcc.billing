@@ -118,9 +118,20 @@ email_template_text <- str_replace( "<p><owner_name>,<p>
 
 <p>The projects listed above are the ones scheduled to be invoiced <i>this</i> month. You can see all of the projects you own at <a href=\"<redcap_project_ownership_page>\">REDCap Project Ownership</a>.</p>
 
-<p>Invoiced projects that remain unpaid after 90-days will be automatically sequestered. This will take the project offline, denying access to project users and taking any open surveys offline. Any project not brought out of sequestration is assumed abandoned and will be automatically deleted a year after the original invoice.</p>
+<p>Invoiced projects that remain unpaid after 90-days will be automatically sequestered.
+This will take the project offline, denying access to project users and taking any open
+surveys offline. Any project not brought out of sequestration is assumed abandoned and
+will be automatically deleted a year after the original invoice. Note that neither
+sequestration nor deletion voids the invoice. Once an invoice is generated,
+the project PI is responsible for paying the invoice regardless of project status.</p>
 
-<p>If your project is sequestered while you still need access to the project, please contact the REDCap support team by opening a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a> so we can briefly restore your access. This will give you an opportunity to complete your business with the REDCap project and optionally pay the annual fee to maintain your access. Unpaid projects will be re-sequestered at the end of each month. Sequestered projects will be deleted one year after the original invoice.</p>
+<p>If your project is sequestered while you still need access to the project, please
+contact the REDCap support team by opening a
+<a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L\">REDCap Service/Consultation Request</a>
+so we can briefly restore your access. This will give you an opportunity to complete
+your business with the REDCap project. Unpaid projects will be re-sequestered at
+the end of each month. Sequestered projects will be deleted one year after the
+original invoice. None of these actions void the invoice.</p>
 
 <p>If you want more information about these changes, please review our <a href=\"https://redcap.ctsi.ufl.edu/ctsit/redcap_project_billing_faq.pdf\">FAQ</a> about the billing policy.</p>
 
