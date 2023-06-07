@@ -3,6 +3,12 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.21.0] - 2023-06-07
+### Changed
+- Update render_report.R to add Quarto support (Philip Chase)
+- Ban PIs who left UF in update_invoice_line_items_with_invoicing_details.R (Philip Chase)
+
+
 ## [1.20.0] - 2023-06-05
 ### Added
 - Add revenue_status_and_projections.qmd (Philip Chase)

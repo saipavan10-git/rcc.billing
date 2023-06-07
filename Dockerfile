@@ -7,7 +7,10 @@ WORKDIR /home/rocker
 # RUN apt update -y && apt install -y openssh-client
 
 ## install additional R libraries not included in redcapcustodian if necessary
-RUN R -e "install.packages(c('tableHTML'))"
+RUN R -e "install.packages(c( \
+    'tableHTML', \
+    'argparse' \
+))"
 
 ## Install our private rcc.ctsit package
 ## see: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
