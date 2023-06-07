@@ -6,6 +6,8 @@ format:
     code-fold: true
     code-tools: true
     df-print: kable
+  pdf:
+    df-print: kable
 editor: visual
 date: "`r Sys.Date()`"
 ---
@@ -17,6 +19,8 @@ While the original billing system started in July 2019, that system was rewritte
 ```{r}
 #| label: calcs
 #| output: false
+#| echo: false
+#| warning: false
 library(redcapcustodian)
 library(rcc.billing)
 library(RMariaDB)
@@ -65,7 +69,7 @@ average_portion_paid <- revenue %>%
 expected_revenue <- revenue %>%
   mutate(expected_revenue = case_when(
     row_number() <= nrow(revenue) - 4 ~ paid,
-    TRUE ~ round(invoices_sent * average_portion_paid)
+    TRUE ~ round(coalesce(invoices_sent, sent) * average_portion_paid)
   ))
 
 revenue_and_projections <-
