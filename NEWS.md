@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.21.1] - 2023-06-07
+### Changed
+- Update cron file for new render_report.R (Philip Chase)
+
+
 ## [1.21.0] - 2023-06-07
 ### Changed
 - Update render_report.R to add Quarto support (Philip Chase)
