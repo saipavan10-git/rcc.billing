@@ -9,6 +9,7 @@ testthat::test_that("get_billable_candidates returns the correct names", {
   expected_names <- c(
     "project_owner_email",
     "project_owner_full_name",
+    "project_owner_username",
     "user_suspended_time",
     "user_lastlogin",
     "project_id",

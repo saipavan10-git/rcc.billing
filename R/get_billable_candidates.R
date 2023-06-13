@@ -113,7 +113,8 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
       project_owner_firstname = dplyr::coalesce(.data$firstname, .data$user_firstname),
       project_owner_lastname = dplyr::coalesce(.data$lastname, .data$user_lastname),
       project_owner_full_name = paste(.data$project_owner_firstname, .data$project_owner_lastname),
-      project_owner_email = dplyr::coalesce(.data$email, .data$user_email, .data$user_email2, .data$user_email3)
+      project_owner_email = dplyr::coalesce(.data$email, .data$user_email, .data$user_email2, .data$user_email3),
+      project_owner_username = .data$username
     ) %>%
     dplyr::mutate(link_to_project = paste0(redcap_project_uri_base, .data$project_id)) %>%
     dplyr::mutate(app_title = stringr::str_replace_all(.data$app_title, '"', "")) %>%
@@ -147,6 +148,7 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
     dplyr::select(
       "project_owner_email",
       "project_owner_full_name",
+      "project_owner_username",
       "user_suspended_time",
       "user_lastlogin",
       "project_id",
