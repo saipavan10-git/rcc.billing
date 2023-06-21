@@ -24,11 +24,14 @@ Imports:
     readr,
     rlang,
     redcapcustodian,
-    stringr,
     rcc.ctsit,
-    testthat
+    stringr,
+    testthat,
+    writexl
 Suggests:
     RSQLite,
+    duckdb,
+    digest,
     purrr
 Config/testthat/edition: 3
 RoxygenNote: 7.2.1

@@ -14,8 +14,8 @@ init_etl("request_correction_of_bad_ownership_data")
 
 rc_conn <- connect_to_redcap_db()
 
-# For testing, run the script tests/testhat/request_correction_of_bad_ownership/load_test_data_for_request_correction_of_bad_ownership.R
-#   That script loads data generated and saved by tests/testhat/request_correction_of_bad_ownership/make_test_data_for_request_correction_of_bad_ownership.R
+# For testing, run the script tests/testhat/request_correction_of_bad_ownership/load_test_data.R
+#   That script loads data generated and saved by tests/testhat/request_correction_of_bad_ownership/make_test_data.R
 # Then run this line:
 # rc_conn <- conn
 # ...and the rcui line below
