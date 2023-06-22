@@ -47,6 +47,7 @@ latest_payment_file <- fs::dir_ls(payment_dir) %>%
   arrange(desc(modification_time)) %>%
   head(n=1) %>%
   pull(path)
+latest_payment_file
 csbt_billable_details <- readxl::read_excel(latest_payment_file)
 
 billable_details <- transform_invoice_line_items_for_ctsit(csbt_billable_details) %>%
