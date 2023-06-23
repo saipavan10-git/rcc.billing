@@ -3,6 +3,18 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.22.0] - 2023-06-23
+### Added
+- Add cancel_invoice_line_items.R (Philip Chase)
+- Add ban_people_from_ownership.R (Philip Chase)
+- Add report_on_projects_by_dept.R (Philip Chase)
+- Add get_billable_candidates() (Philip Chase)
+
+### Changed
+- Silence long path warnings relating to request_correction_of_bad_ownership_data.R (Philip Chase)
+- Refactor billable_candidates.R to use get_billable_candidates() (Philip Chase)
+
+
 ## [1.21.2] - 2023-06-07
 ### Changed
 - Update revenue_status_and_projections.qmd (Philip Chase)
