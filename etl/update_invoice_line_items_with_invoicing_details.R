@@ -219,11 +219,11 @@ if(nrow(billable_details) > 0) {
   )
 
   log_job_success(jsonlite::toJSON(activity_log))
-
-  DBI::dbDisconnect(rcc_billing_conn)
-  DBI::dbDisconnect(rc_conn)
 }
 
 # flush the contents of payment_dir to safeguard subsequent runs from duplicate data
 fs::dir_ls(payment_dir) %>%
   file.remove()
+
+DBI::dbDisconnect(rcc_billing_conn)
+DBI::dbDisconnect(rc_conn)
