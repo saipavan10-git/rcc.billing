@@ -14,7 +14,7 @@ date: "`r Sys.Date()`"
 
 The CTS-IT manages the REDCap system for the UF Clinical Translational Science Institute (CTSI). To generate revenue to cover some of the costs of the running the REDCap System, CTS-IT charges its customers for the REDCap projects they use. These annual charges are assessed on each anniversary of each project via a system named *REDCap Annual Project Billing (APB)*. This report describes that project by assessing the revenue, estimating future revenue, as well as other metrics of growth and performance.
 
-While the original billing system started in July 2019, that system was rewritten from the ground up in 2022. The revision focuses on automated processes to implement a monthly billing cycle and delegates the billing work to the UF CTSI Service Billing Team. The new system was implemented in September 2022.
+While the original billing system started in July 2018, that system was rewritten from the ground up in 2022. The revision focuses on automated processes to implement a monthly billing cycle and delegates the billing work to the UF CTSI Service Billing Team. The new system was implemented in September 2022.
 
 ```{r}
 #| label: calcs
@@ -104,7 +104,8 @@ invoice_status %>%
     labels = dollar,
     limits = c(0, max(revenue$invoices_sent))
     ) +
-  scale_x_date(date_breaks = "2 months") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 30)) +
   xlab("Month Invoiced") +
   ylab("Amount")
 
