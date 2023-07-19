@@ -3,6 +3,14 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.22.1] - 2023-07-19
+### Changed
+- Accommodate very long project titles (Philip Chase)
+- Update revenue_status_and_projections.qmd (Philip Chase)
+- Update update_invoice_line_items_with_invoicing_details.R to handle non-rccbilling data (Philip Chase)
+- Update report_on_projects_by_dept.R (Philip Chase)
+
+
 ## [1.22.0] - 2023-06-23
 ### Added
 - Add cancel_invoice_line_items.R (Philip Chase)

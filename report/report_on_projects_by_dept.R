@@ -48,7 +48,27 @@ dept_projects <-
       inner_join(dept_data, by = c("project_owner_username" = "username"))
   ) %>%
   distinct() %>%
+  filter(!is_deleted) %>%
   select(name, username, ufid, email, everything()) %>%
+  # Git rid of the columns Depts don't need to see
+  select(-c(
+    username,
+    ufid,
+    email,
+    user_suspended_time,
+    user_lastlogin,
+    project_owner_full_name,
+    project_owner_username,
+    creation_month,
+    last_logged_event,
+    is_deleted,
+    project_is_mature,
+    is_deleted_but_not_paid,
+    fiscal_year,
+    month_invoiced
+  )) %>%
+  # re-map column values with descriptive text
+  mutate(across(c("sequestered"), ~ if_else(sequestered == 0, "No", "Yes"))) %>%
   arrange(name)
 
 dept_projects %>% writexl::write_xlsx(path = output_file)
