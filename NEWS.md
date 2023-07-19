@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.22.2] - 2023-07-19
+### Changed
+- Accommodate very long project titles (Philip Chase)
+
+
 ## [1.22.1] - 2023-07-19
 ### Changed
 - Accommodate very long project titles (Philip Chase)
