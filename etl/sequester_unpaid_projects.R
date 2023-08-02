@@ -177,12 +177,12 @@ email_tables <- email_info %>%
 email_df <- email_tables %>%
   rowwise() %>%
   mutate(email_text =
-           str_replace_all(email_template_text, "<owner_name>", project_owner_full_name) %>%
+           str_replace_all(email_template_text, "<owner_name>", str_replace_na(project_owner_full_name)) %>%
            str_replace("<table_of_owned_projects_due_to_be_sequestered>", detail_table) %>%
-           str_replace_all("<app_title>", app_title) %>%
+           str_replace_all("<app_title>", str_replace_na(app_title)) %>%
            str_replace_all("<project_id>", as.character(project_id)) %>%
-           str_replace_all("<invoice_number>", invoice_number) %>%
-           str_replace_all("<month_created>", month_created) %>%
+           str_replace_all("<invoice_number>", str_replace_na(invoice_number)) %>%
+           str_replace_all("<month_created>", str_replace_na(month_created)) %>%
            htmltools::HTML()
   ) %>%
   ungroup()
