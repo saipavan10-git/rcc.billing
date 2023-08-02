@@ -67,10 +67,10 @@ testthat::test_that("sequester_projects closes and sequesters projects", {
 
 testthat::test_that("get_orphaned_projects identifies orphans in the correct sequence", {
   # Create test tables and set the date
-  mem_rc_conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+  mem_rc_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
   purrr::walk(get_orphaned_projects_test_tables, create_a_table_from_rds_test_data, mem_rc_conn, "get_orphaned_projects/rc")
 
-  mem_rcc_billing_conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+  mem_rcc_billing_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
   purrr::walk(c("banned_owners"), create_a_table_from_rds_test_data, mem_rcc_billing_conn, "get_orphaned_projects/rcc_billing")
 
   # TODO: this needs to be dynamic
