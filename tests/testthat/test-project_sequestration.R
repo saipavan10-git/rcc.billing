@@ -58,9 +58,12 @@ testthat::test_that("sequester_projects closes and sequesters projects", {
   # )
 
   project_ids_to_sequester <- c(17,18,666)
+  reasons_project_ids_should_be_sequestered <- c("unpaid", "completed_but_not_sequestered", "unpaid")
   expected_project_ids_sequestered <- c(17,18)
-  result <- sequester_projects(conn = conn, project_ids = project_ids_to_sequester)
-  testthat::expect_equal(expected_project_ids_sequestered, result$project_ids_updated)
+  result <- sequester_projects(conn = conn,
+                               project_id = project_ids_to_sequester,
+                               reason = reasons_project_ids_should_be_sequestered)
+  testthat::expect_equal(result$project_ids_updated, expected_project_ids_sequestered)
 
   dbDisconnect(conn)
 })

@@ -3,7 +3,8 @@
 #' sequester projects listed in `project_ids` that can be sequestered
 #'
 #' @param conn - a connection to a redcap database
-#' @param project_ids - a vector of project IDs to be sequestered
+#' @param project_id - a vector of project IDs to be sequestered
+#' @param reason - a vector of reasons the project IDs were sequestered
 #'
 #' @importFrom magrittr "%>%"
 #'
@@ -19,26 +20,33 @@
 #' \dontrun{
 #' sequester_projects(
 #'   conn = rc_conn,
-#'   project_ids = project_ids_to_sequester
+#'   project_id = project_ids_to_sequester
+#'   reason = reasons_project_ids_should_be_sequestered
 #' }
 sequester_projects <- function(conn,
-                               project_ids = as.numeric(NA)) {
+                               project_id = as.numeric(NA),
+                               reason = as.character(NA)) {
   # exit if there is nothing to do
-  if (length(project_ids) == 1 && is.na(project_ids)) {
+  if (length(project_id) == 1 && is.na(project_id)) {
     result <- list(project_ids_updated = as.numeric(NA))
     return(result)
+  }
+
+  # bind project_ids to reasons if we can
+  if (length(project_id) == length(reason) | length(reason) == 1) {
+    projects_to_sequester <- tibble(project_id, reason)
   }
 
   project_ownership <- dplyr::tbl(conn, "redcap_entity_project_ownership")
   projects <- dplyr::tbl(conn, "redcap_projects") %>%
     dplyr::filter(is.na(.data$date_deleted)) %>%
     dplyr::select(
-      .data$project_id,
-      .data$completed_time,
-      .data$completed_by,
-      .data$log_event_table
+      "project_id",
+      "completed_time",
+      "completed_by",
+      "log_event_table"
     ) %>%
-    dplyr::filter(.data$project_id %in% project_ids)
+    dplyr::filter(.data$project_id %in% !!projects_to_sequester$project_id)
 
   partial_project_state <- projects %>%
     dplyr::inner_join(project_ownership, by = c("project_id" = "pid")) %>%
@@ -100,12 +108,12 @@ sequester_projects <- function(conn,
 
   # prepare dataframes for update
   project_ownership_state <- project_state %>%
-    dplyr::rename(pid = .data$project_id) %>%
+    dplyr::rename(pid = "project_id") %>%
     dplyr::select(
-      .data$id,
-      .data$updated,
-      .data$pid,
-      .data$sequestered
+      "id",
+      "updated",
+      "pid",
+      "sequestered"
     )
 
   project_ownership_update <- project_ownership_state %>%
@@ -114,28 +122,31 @@ sequester_projects <- function(conn,
 
   redcap_projects_state <- project_state %>%
     dplyr::select(
-      .data$project_id,
-      .data$completed_time,
-      .data$completed_by,
-      .data$log_event_table,
-      .data$moved_from_completed_status_events
+      "project_id",
+      "completed_time",
+      "completed_by",
+      "log_event_table",
+      "moved_from_completed_status_events"
     )
 
   redcap_projects_update <- redcap_projects_state %>%
+    left_join(projects_to_sequester, by = "project_id") %>%
     dplyr::mutate(
       completed_time = redcapcustodian::get_script_run_time(),
       completed_by = paste(
         "Sequestered by",
         redcapcustodian::get_script_name(),
+        "with a reason of ",
+        reason,
         "- Previously sequestered",
         .data$moved_from_completed_status_events,
         "times"
       )
     ) %>%
     dplyr::select(
-      .data$project_id,
-      .data$completed_time,
-      .data$completed_by
+      "project_id",
+      "completed_time",
+      "completed_by"
     )
 
   # update tables
