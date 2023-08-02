@@ -206,17 +206,24 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
 
   banned_owners_table <- tbl(rcc_billing_conn, "banned_owners") %>% collect()
 
+  project_ownership_billable_not_sequestered <-
+    project_ownership %>%
+    # is billable
+    filter(.data$billable == 1 &
+      # ...but is not sequestered
+      (is.na(.data$sequestered) | .data$sequestered == 0))
+
   target_projects <-
     redcap_projects %>%
-    # project is not deleted
-    filter(is.na(.data$date_deleted)) %>%
-    # project at least 1 year old
-    filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -months(11)))) %>%
-    # project has an anniversary months_previous months ago
-    filter(rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)) %>%
-    left_join(project_ownership, by = c("project_id" = "pid")) %>%
-    filter(.data$billable == 1) %>%
-    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    filter(
+      # project is not deleted
+      is.na(.data$date_deleted) &
+        # project at least 1 year old
+        .data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -months(11))) &
+        # project has an anniversary months_previous months ago
+        rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)
+    ) %>%
+    inner_join(project_ownership_billable_not_sequestered, by = c("project_id" = "pid")) %>%
     left_join(redcap_record_counts, by = "project_id") %>%
     collect()
 
@@ -281,13 +288,10 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
   complete_but_non_sequestered <-
     redcap_projects %>%
     # project is not deleted
-    filter(is.na(.data$date_deleted)) %>%
-    # project is marked as completed, ...
-    filter(!is.na(.data$completed_time)) %>%
-    left_join(project_ownership, by = c("project_id" = "pid")) %>%
-    filter(.data$billable == 1) %>%
-    # ...but it not sequestered
-    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    filter(is.na(.data$date_deleted) &
+      # project is marked as completed, ...
+      !is.na(.data$completed_time)) %>%
+    inner_join(project_ownership_billable_not_sequestered, by = c("project_id" = "pid")) %>%
     left_join(redcap_record_counts, by = "project_id") %>%
     collect() %>%
     mutate(
@@ -298,8 +302,8 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
   banned_owners <-
     target_projects %>%
     filter(
-      ( !is.na(.data$email) & (.data$email %in% banned_owners_table$email) ) |
-      ( !is.na(.data$username) & (.data$username %in% banned_owners_table$username) )
+      (!is.na(.data$email) & (.data$email %in% banned_owners_table$email)) |
+        (!is.na(.data$username) & (.data$username %in% banned_owners_table$username))
     ) %>%
     collect() %>%
     mutate(
