@@ -4,12 +4,18 @@
 \alias{sequester_projects}
 \title{sequester_projects}
 \usage{
-sequester_projects(conn, project_ids = as.numeric(NA))
+sequester_projects(
+  conn,
+  project_id = as.numeric(NA),
+  reason = as.character(NA)
+)
 }
 \arguments{
 \item{conn}{- a connection to a redcap database}
 
-\item{project_ids}{- a vector of project IDs to be sequestered}
+\item{project_id}{- a vector of project IDs to be sequestered}
+
+\item{reason}{- a vector of reasons the project IDs were sequestered}
 }
 \value{
 - a list describing the function activity via these objects
@@ -26,6 +32,7 @@ sequester projects listed in `project_ids` that can be sequestered
 \dontrun{
 sequester_projects(
   conn = rc_conn,
-  project_ids = project_ids_to_sequester
+  project_id = project_ids_to_sequester
+  reason = reasons_project_ids_should_be_sequestered
 }
 }

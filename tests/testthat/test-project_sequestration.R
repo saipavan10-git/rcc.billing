@@ -58,19 +58,22 @@ testthat::test_that("sequester_projects closes and sequesters projects", {
   # )
 
   project_ids_to_sequester <- c(17,18,666)
+  reasons_project_ids_should_be_sequestered <- c("unpaid", "completed_but_not_sequestered", "unpaid")
   expected_project_ids_sequestered <- c(17,18)
-  result <- sequester_projects(conn = conn, project_ids = project_ids_to_sequester)
-  testthat::expect_equal(expected_project_ids_sequestered, result$project_ids_updated)
+  result <- sequester_projects(conn = conn,
+                               project_id = project_ids_to_sequester,
+                               reason = reasons_project_ids_should_be_sequestered)
+  testthat::expect_equal(result$project_ids_updated, expected_project_ids_sequestered)
 
   dbDisconnect(conn)
 })
 
 testthat::test_that("get_orphaned_projects identifies orphans in the correct sequence", {
   # Create test tables and set the date
-  mem_rc_conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+  mem_rc_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
   purrr::walk(get_orphaned_projects_test_tables, create_a_table_from_rds_test_data, mem_rc_conn, "get_orphaned_projects/rc")
 
-  mem_rcc_billing_conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+  mem_rcc_billing_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
   purrr::walk(c("banned_owners"), create_a_table_from_rds_test_data, mem_rcc_billing_conn, "get_orphaned_projects/rcc_billing")
 
   # TODO: this needs to be dynamic
