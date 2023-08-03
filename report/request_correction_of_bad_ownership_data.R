@@ -167,6 +167,7 @@ send_please_fix_alert_email <- function(row) {
   return(send_alert_email(row, email_subject = "Please fix the PI or Ownership of this REDCap Project"))
 }
 
+if (nrow(please_fix_email_df) > 0){
 please_fix_log <- apply(
   please_fix_email_df,
   MARGIN = 1,
@@ -175,6 +176,7 @@ please_fix_log <- apply(
   # turn list into dataframe
   do.call("rbind", .) %>%
   mutate(reason = "please_fix")
+}
 
 ###############################################################################
 #                         Sequestered Today processing                        #
