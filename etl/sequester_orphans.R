@@ -84,7 +84,8 @@ email_info <-
 # Sequester the orphans
 result <- sequester_projects(
   conn = rc_conn,
-  project_ids = orphaned_projects$project_id
+  project_id = orphaned_projects$project_id,
+  reason = orphaned_projects$reason
 )
 
 # email every owner who had a project sequestered

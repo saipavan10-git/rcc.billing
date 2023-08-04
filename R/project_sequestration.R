@@ -3,7 +3,8 @@
 #' sequester projects listed in `project_ids` that can be sequestered
 #'
 #' @param conn - a connection to a redcap database
-#' @param project_ids - a vector of project IDs to be sequestered
+#' @param project_id - a vector of project IDs to be sequestered
+#' @param reason - a vector of reasons the project IDs were sequestered
 #'
 #' @importFrom magrittr "%>%"
 #'
@@ -19,26 +20,33 @@
 #' \dontrun{
 #' sequester_projects(
 #'   conn = rc_conn,
-#'   project_ids = project_ids_to_sequester
+#'   project_id = project_ids_to_sequester
+#'   reason = reasons_project_ids_should_be_sequestered
 #' }
 sequester_projects <- function(conn,
-                               project_ids = as.numeric(NA)) {
+                               project_id = as.numeric(NA),
+                               reason = as.character(NA)) {
   # exit if there is nothing to do
-  if (length(project_ids) == 1 && is.na(project_ids)) {
+  if (length(project_id) == 1 && is.na(project_id)) {
     result <- list(project_ids_updated = as.numeric(NA))
     return(result)
+  }
+
+  # bind project_ids to reasons if we can
+  if (length(project_id) == length(reason) | length(reason) == 1) {
+    projects_to_sequester <- tibble(project_id, reason)
   }
 
   project_ownership <- dplyr::tbl(conn, "redcap_entity_project_ownership")
   projects <- dplyr::tbl(conn, "redcap_projects") %>%
     dplyr::filter(is.na(.data$date_deleted)) %>%
     dplyr::select(
-      .data$project_id,
-      .data$completed_time,
-      .data$completed_by,
-      .data$log_event_table
+      "project_id",
+      "completed_time",
+      "completed_by",
+      "log_event_table"
     ) %>%
-    dplyr::filter(.data$project_id %in% project_ids)
+    dplyr::filter(.data$project_id %in% !!projects_to_sequester$project_id)
 
   partial_project_state <- projects %>%
     dplyr::inner_join(project_ownership, by = c("project_id" = "pid")) %>%
@@ -100,12 +108,12 @@ sequester_projects <- function(conn,
 
   # prepare dataframes for update
   project_ownership_state <- project_state %>%
-    dplyr::rename(pid = .data$project_id) %>%
+    dplyr::rename(pid = "project_id") %>%
     dplyr::select(
-      .data$id,
-      .data$updated,
-      .data$pid,
-      .data$sequestered
+      "id",
+      "updated",
+      "pid",
+      "sequestered"
     )
 
   project_ownership_update <- project_ownership_state %>%
@@ -114,28 +122,31 @@ sequester_projects <- function(conn,
 
   redcap_projects_state <- project_state %>%
     dplyr::select(
-      .data$project_id,
-      .data$completed_time,
-      .data$completed_by,
-      .data$log_event_table,
-      .data$moved_from_completed_status_events
+      "project_id",
+      "completed_time",
+      "completed_by",
+      "log_event_table",
+      "moved_from_completed_status_events"
     )
 
   redcap_projects_update <- redcap_projects_state %>%
+    left_join(projects_to_sequester, by = "project_id") %>%
     dplyr::mutate(
       completed_time = redcapcustodian::get_script_run_time(),
       completed_by = paste(
         "Sequestered by",
         redcapcustodian::get_script_name(),
+        "with a reason of ",
+        reason,
         "- Previously sequestered",
         .data$moved_from_completed_status_events,
         "times"
       )
     ) %>%
     dplyr::select(
-      .data$project_id,
-      .data$completed_time,
-      .data$completed_by
+      "project_id",
+      "completed_time",
+      "completed_by"
     )
 
   # update tables
@@ -206,21 +217,26 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
 
   banned_owners_table <- tbl(rcc_billing_conn, "banned_owners") %>% collect()
 
+  project_ownership_billable_not_sequestered <-
+    project_ownership %>%
+    # is billable
+    filter(.data$billable == 1 &
+      # ...but is not sequestered
+      (is.na(.data$sequestered) | .data$sequestered == 0))
+
   target_projects <-
     redcap_projects %>%
-    # project is not deleted
-    filter(is.na(.data$date_deleted)) %>%
-    # project at least 1 year old
-    filter(.data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -months(11)))) %>%
-    left_join(project_ownership, by = c("project_id" = "pid")) %>%
-    filter(.data$billable == 1) %>%
-    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    filter(
+      # project is not deleted
+      is.na(.data$date_deleted) &
+        # project at least 1 year old
+        .data$creation_time <= local(add_with_rollback(ceiling_date(get_script_run_time(), unit = "month"), -months(11))) &
+        # project has an anniversary months_previous months ago
+        rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time)
+    ) %>%
+    inner_join(project_ownership_billable_not_sequestered, by = c("project_id" = "pid")) %>%
     left_join(redcap_record_counts, by = "project_id") %>%
-    collect() %>%
-    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event")) %>%
-    # project has an anniversary months_previous months ago
-    filter(rcc.billing::previous_n_months(month(get_script_run_time()), months_previous) == month(.data$creation_time))
+    collect()
 
   # empty and inactive projects
   empty_and_inactive_projects <- target_projects %>%
@@ -283,38 +299,28 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
   complete_but_non_sequestered <-
     redcap_projects %>%
     # project is not deleted
-    filter(is.na(.data$date_deleted)) %>%
-    # project is marked as completed, ...
-    filter(!is.na(.data$completed_time)) %>%
-    left_join(project_ownership, by = c("project_id" = "pid")) %>%
-    filter(.data$billable == 1) %>%
-    # ...but it not sequestered
-    filter(is.na(.data$sequestered) | .data$sequestered == 0) %>%
+    filter(is.na(.data$date_deleted) &
+      # project is marked as completed, ...
+      !is.na(.data$completed_time)) %>%
+    inner_join(project_ownership_billable_not_sequestered, by = c("project_id" = "pid")) %>%
     left_join(redcap_record_counts, by = "project_id") %>%
     collect() %>%
-    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event")) %>%
     mutate(
       reason = "complete_but_non_sequestered",
       priority = 4
-    )  %>%
-    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-    mutate_columns_to_posixct("creation_time")
+    )
 
   banned_owners <-
     target_projects %>%
     filter(
-      ( !is.na(.data$email) & (.data$email %in% banned_owners_table$email) ) |
-      ( !is.na(.data$username) & (.data$username %in% banned_owners_table$username) )
+      (!is.na(.data$email) & (.data$email %in% banned_owners_table$email)) |
+        (!is.na(.data$username) & (.data$username %in% banned_owners_table$username))
     ) %>%
     collect() %>%
     mutate(
       reason = "banned_owner",
       priority = 5
-    ) %>%
-    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
-
+    )
 
   unresolvable_ownership_issues <-
     redcap_projects %>%
@@ -340,9 +346,7 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
     mutate(
       reason = "unresolvable_ownership_issues",
       priority = 6
-    ) %>%
-    # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-    mutate_columns_to_posixct(c("creation_time", "time_of_count", "last_logged_event"))
+    )
 
   orphaned_projects <- bind_rows(
     empty_and_inactive_projects_with_no_viable_users,
@@ -355,9 +359,9 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
     arrange(.data$priority) %>%
     distinct(.data$project_id, .keep_all = T) %>%
     select(
-      .data$project_id,
-      .data$reason,
-      .data$priority
+      "project_id",
+      "reason",
+      "priority"
     )
 
   return(orphaned_projects)

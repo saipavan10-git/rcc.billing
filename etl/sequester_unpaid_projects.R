@@ -119,14 +119,16 @@ email_info <- email_info %>%
 # sequester the projects
 result <- sequester_projects(
   conn = rc_conn,
-  project_ids = project_ids_to_sequester
+  project_id = project_ids_to_sequester,
+  reason = "unpaid_after_90_days"
 )
 
 email_template_text <- str_replace( "<p><owner_name>,</p>
 
 <p>The REDCap project listed below has been sequestered (made inaccessible) due to an outstanding invoice that is over 90 days past due. The invoice ID <invoice_number> was sent to the project's owner, <owner_name>, in early <month_created></p>
 
-<p>To pay for the project, please provide the payment information, i.e., chartfields, along with the invoice ID, in an email to CTSI-SvcCntrBilling@ad.ufl.edu.</p>
+<p>To pay for the project, please provide the payment information, i.e., chartfields,
+along with the invoice ID, in an email to CTSI-SvcBillingTeam@ad.ufl.edu.</p>
 
 <p>We are happy to unsequester the project if you will make a good faith effort to pay the outstanding invoice as soon as possible. If you still need access to this project, please open a <a href=\"https://redcap.ctsi.ufl.edu/redcap/surveys/?s=DUPrXGmx3L&service_type=2&project_id=<project_id>&project_name=<app_title>\">REDCap Service/Consultation Request</a> telling us which project needs to be unsequestered. Please include this project ID and project name in your request. This is the project sequestered today:</p>
 
@@ -177,12 +179,12 @@ email_tables <- email_info %>%
 email_df <- email_tables %>%
   rowwise() %>%
   mutate(email_text =
-           str_replace_all(email_template_text, "<owner_name>", project_owner_full_name) %>%
+           str_replace_all(email_template_text, "<owner_name>", str_replace_na(project_owner_full_name)) %>%
            str_replace("<table_of_owned_projects_due_to_be_sequestered>", detail_table) %>%
-           str_replace_all("<app_title>", app_title) %>%
+           str_replace_all("<app_title>", str_replace_na(app_title)) %>%
            str_replace_all("<project_id>", as.character(project_id)) %>%
-           str_replace_all("<invoice_number>", invoice_number) %>%
-           str_replace_all("<month_created>", month_created) %>%
+           str_replace_all("<invoice_number>", str_replace_na(invoice_number)) %>%
+           str_replace_all("<month_created>", str_replace_na(month_created)) %>%
            htmltools::HTML()
   ) %>%
   ungroup()
