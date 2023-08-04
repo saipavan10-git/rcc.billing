@@ -3,6 +3,17 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.23.0] - 2023-08-04
+### Added
+- Add reason to project sequestration messages (Philip Chase)
+
+### Changed
+- Add speed improvements to get_orphaned_projects (Philip Chase)
+- Replace NA character with NA string to prevent entire email from appearing as NA (Kyle Chesney)
+- Refactor SQLite out of get_orphaned_projects and its tests (Philip Chase)
+- Update render report (Laurence James-Woodley)
+
+
 ## [1.22.2] - 2023-07-19
 ### Changed
 - Accommodate very long project titles (Philip Chase)
