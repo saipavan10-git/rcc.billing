@@ -176,6 +176,15 @@ please_fix_log <- apply(
   # turn list into dataframe
   do.call("rbind", .) %>%
   mutate(reason = "please_fix")
+} else {
+  please_fix_log <- data.frame(
+    recipients = character(),
+    project = character(),
+    users_with_design_rights = character(),
+    error_message = character(),
+    reason = character(),
+    stringsAsFactors = FALSE
+  )
 }
 
 ###############################################################################
