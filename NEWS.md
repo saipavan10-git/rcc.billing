@@ -3,6 +3,17 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.24.0] - 2023-08-23
+### Added
+- Add write_uf_fiscal_orgs_to_person_org ETL (Kyle Chesney)
+- add cron job for invoice line item creation (Laurence James-Woodley)
+- add test for df row count (Laurence James-Woodley)
+
+### Changed
+- Replace current_fiscal_year with fiscal_year_invoiced concept (Philip Chase)
+- create empty please_fix_log df (Laurence James-Woodley)
+
+
 ## [1.23.0] - 2023-08-04
 ### Added
 - Add reason to project sequestration messages (Philip Chase)
