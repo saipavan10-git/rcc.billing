@@ -1,0 +1,2 @@
+# Copy data from VIVO to org_hierarchies every Monday at 3:13 AM
+13 3 * * 1 root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/write_uf_fiscal_orgs_to_person_org.R

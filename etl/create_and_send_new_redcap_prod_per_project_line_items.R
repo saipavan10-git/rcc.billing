@@ -59,8 +59,8 @@ redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
 previous_month_name <- previous_month(month(get_script_run_time())) %>%
   month(label = TRUE, abbr = FALSE)
 
-current_fiscal_year <- fiscal_years %>%
-  filter(get_script_run_time() %within% fy_interval) %>%
+fiscal_year_invoiced <- fiscal_years %>%
+  filter((get_script_run_time() - dmonths(1)) %within% fy_interval) %>%
   head(1) %>% # HACK: overlaps may occur on July 1, just choose the earlier year
   pull(csbt_label)
 
@@ -98,7 +98,7 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   anti_join(
     initial_invoice_line_item %>%
       filter(
-        fiscal_year == current_fiscal_year,
+        fiscal_year == fiscal_year_invoiced,
         month_invoiced == previous_month_name
       ) %>%
       select(ctsi_study_id, fiscal_year, month_invoiced),
@@ -169,7 +169,7 @@ new_invoice_line_item_writes <- target_projects %>%
     service_identifier = as.character(project_id),
     name_of_service_instance = app_title,
     other_system_invoicing_comments = paste0(redcap_project_uri_base, project_id),
-    fiscal_year = current_fiscal_year,
+    fiscal_year = fiscal_year_invoiced,
     month_invoiced = previous_month_name,
     # TODO: should this be stripped from the PI email instead?
     gatorlink = username,
@@ -232,7 +232,7 @@ new_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(
     status == "draft",
     month_invoiced == previous_month_name,
-    fiscal_year == current_fiscal_year
+    fiscal_year == fiscal_year_invoiced
   ) %>%
   collect()
 
