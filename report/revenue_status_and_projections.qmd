@@ -119,6 +119,170 @@ We will estimate the payment rate based on the historic data, but we will ignore
 
 Using the historic payment rate, and the actual number of invoices sent, we can project revenue for recent and future months to get a projected annual revenue of `r scales::dollar(revenue_and_projections$expected_annual_revenue)`
 
+```{r}
+#| label: project-status
+#| echo: false
+#| warning: false
+
+rc_conn <- connect_to_redcap_db()
+
+invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
+  filter(service_type_code == 1) %>%
+  arrange(desc(created)) %>%
+  collect() %>%
+  distinct(service_identifier, .keep_all = T) %>%
+  mutate(service_identifier = as.numeric(service_identifier))
+
+redcap_projects <- tbl(rc_conn, "redcap_projects") %>% collect()
+redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership") %>% collect()
+
+project_status <-
+  redcap_projects %>%
+  left_join(
+    redcap_entity_project_ownership %>% select(-id, -created, -updated),
+    by = c("project_id" = "pid")
+  ) %>%
+  left_join(invoice_line_items,
+    by = c("project_id" = "service_identifier"),
+    suffix = c(".project", ".invoice")
+  ) %>%
+    mutate(
+      status.active = last_logged_event >= get_script_run_time() - dmonths(2),
+      status.mature = creation_time >= get_script_run_time() - dyears(1),
+      status.deleted = !is.na(date_deleted),
+      status.canceled = status.invoice == "canceled",
+      status.invoiced = status.invoice == "invoiced",
+      status.paid = status.invoice == "paid",
+      status.sent = status.invoice == "sent",
+      status.sequestered = sequestered == 1,
+      status.non_billable = billable == 1,
+      status.could_not_have_been_billed =
+        creation_time + dmonths(11) >= today() |
+        month(creation_time) %in% c(8),
+      status.overall = case_when(
+        status.paid ~ "paid",
+        status.deleted ~ "deleted",
+        status.sequestered & status.invoiced ~ "invoiced_and_sequestered",
+        status.invoiced ~ "invoiced",
+        status.non_billable & !status.could_not_have_been_billed & !status.deleted & !status.sequestered ~ "non-billable opportunity",
+        status.canceled & status.active ~ "erroneously_canceled opportunity",
+        status.canceled ~ "canceled",
+        status.sent ~ "sent",
+        status.sequestered ~ "sequestered",
+        status.could_not_have_been_billed ~ "could_not_yet_have_been_billed",
+        status.non_billable ~ "non-billable",
+        T ~ "other opportunity"
+      )
+    ) %>%
+    select(
+      project_id,
+      starts_with("status"),
+      creation_time,
+      -c(status.project, status.invoice)
+    )
+```
+
+## Lost revenue
+
+There is reason to believe we are leaving some revenue on the table. There are `r nrow(project_status)` projects in the REDCap project table. Their overall status is shown in @fig-overall-status
+
+```{r}
+#| label: fig-overall-status
+#| fig-cap: Overall project status
+#| echo: false
+#| warning: false
+project_status %>%
+  count(status.overall) %>%
+  arrange(desc(n))
+```
+
+Of note are the statuses in @fig-opportunities
+
+```{r}
+#| label: fig-opportunities
+#| fig-cap: Income opportunities we should pursue
+#| echo: false
+#| warning: false
+project_status %>%
+  filter(str_detect(status.overall, "opportunity")) %>%
+  count(status.overall) %>%
+  arrange(desc(n))
+```
+
+```{r}
+#| label: project-lifecycle-income-forecast-df
+#| echo: false
+#| warning: false
+project_lifecycle_income_forecast <-
+  project_status %>%
+  mutate(income_status = case_when(
+    status.deleted | status.sequestered ~ "deleted",
+    status.non_billable ~ "not billable",
+    T ~ "created"
+  )) %>%
+  mutate(income_status = factor(income_status, levels = c(
+    "deleted",
+    "not billable",
+    "created"
+  )
+  )) %>%
+  mutate(creation = as.Date(floor_date(creation_time, unit = "month"))) %>%
+  mutate(income_source = if_else(income_status == "created" & creation_time < get_script_run_time() - dmonths(1), 1, 0)) %>%
+  mutate(cumulative_income_source = cumsum(income_source)) %>%
+  select(project_id, creation, income_status, cumulative_income_source)
+  
+maturity_date <- as.Date(floor_date(get_script_run_time() - dyears(1), unit = "month"))
+cumulative_income_source_at_maturity <- project_lifecycle_income_forecast %>%
+  filter(creation == maturity_date) %>%
+  summarise(cumulative_income_source = max(cumulative_income_source)) %>%
+  pull(cumulative_income_source)
+```
+
+## Projecting income from extant billable projects
+
+To continue to make money in this venture, we need extant, billable projects. We need new projects to offset the deletion rate of old projects. As a first blush view of our extant and future income sources, @fig-project-lifecycle-income-forecast shows every extant project by creation date. The projects are shown with one of 3 categories: *Created* projects could be billed when they reach maturity. *Non-billable* projects are CTS-IT's projects and cannot be billed. *Deleted* projects are not viable for billing going forward. The category includes sequestered projects. The black line shows the cumulative sum of *created* projects. It shows `r cumulative_income_source_at_maturity` projects that could (should?) be sources of income.
+
+```{r}
+#| label: fig-project-lifecycle-income-forecast
+#| fig-cap: Income forecast based on project lifecycle
+#| echo: false
+#| warning: false
+ggplot(
+  project_lifecycle_income_forecast,
+  aes(fill = income_status, x = creation)
+) +
+  geom_bar(position = "stack") +
+  geom_line(mapping = aes(y = cumulative_income_source)) +
+  ylab("Projects") +
+  xlab("Months") +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  theme(axis.text.x = element_text(angle = 45),
+        axis.text = element_text(size = 8)) +
+  geom_vline(aes(xintercept = maturity_date)) +
+  annotate("segment",
+           x = as.Date(maturity_date - dyears(1)),
+           y = cumulative_income_source_at_maturity,
+           xend = maturity_date,
+           yend = cumulative_income_source_at_maturity,
+           arrow = arrow(type = "open", length = unit(0.02, "npc"))) +
+  annotate("text",
+           x = as.Date(maturity_date - dyears(1)),
+           y = cumulative_income_source_at_maturity,
+           label = paste(cumulative_income_source_at_maturity, "projects at maturity"),
+           hjust = 1) +
+  geom_text(aes(
+    x = maturity_date,
+    y = cumulative_income_source_at_maturity,
+    label = paste(
+      "maturity date:",
+      maturity_date
+    ),
+    angle = 90,
+    vjust = 0.0,
+    hjust = 0.0
+  ))
+```
+
 ## Aging Report
 
 The unpaid invoices breakdown as shown in @fig-aging-report
