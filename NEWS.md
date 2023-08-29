@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.25.0] - 2023-08-29
+### Changed
+- Update revenue_status_and_projections (Philip Chase)
+
+
 ## [1.24.0] - 2023-08-23
 ### Added
 - Add write_uf_fiscal_orgs_to_person_org ETL (Kyle Chesney)
