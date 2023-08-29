@@ -29,12 +29,7 @@ redcap_project_uri_home_base <- str_remove(Sys.getenv("URI"), "/api") %>%
 redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("index.php?action=project_ownership")
 
-current_month_name <- month(floor_date(get_script_run_time(), unit = "month"), label = T) %>% as.character()
 next_month_name <- month(ceiling_date(get_script_run_time(), unit = "month"), label = T, abbr = F) %>% as.character()
-current_fiscal_year <- fiscal_years %>%
-  filter(get_script_run_time() %within% fy_interval) %>%
-  head(1) %>% # HACK: overlaps may occur on July 1, just choose the earlier year
-  pull(csbt_label)
 
 initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   collect() %>%
