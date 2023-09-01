@@ -221,9 +221,8 @@ if(nrow(billable_details) > 0) {
   log_job_success(jsonlite::toJSON(activity_log))
 }
 
-# flush the contents of payment_dir to safeguard subsequent runs from duplicate data
-fs::dir_ls(payment_dir) %>%
-  file.remove()
+# Remove the file we just loaded to safeguard subsequent runs from duplicate data
+file.remove(latest_payment_file)
 
 DBI::dbDisconnect(rcc_billing_conn)
 DBI::dbDisconnect(rc_conn)
