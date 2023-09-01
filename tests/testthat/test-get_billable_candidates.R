@@ -37,5 +37,5 @@ testthat::test_that("get_billable_candidates returns the correct names", {
     expected_names
   )
 
-  dbDisconnect(conn)
+  DBI::dbDisconnect(conn)
 })
