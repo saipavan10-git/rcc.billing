@@ -140,7 +140,7 @@ please_fix_email_template_text <- "<p>Hello,</p>
 
 <users_with_design_rights>
 
-<p>If you no longer need or use this REDCap project, we encourage you to export your project design and your project data, and delete the project. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf\">Deleting a Project in REDCap</a>.</p>
+<p>If you no longer need or use this REDCap project, we encourage you to export your project design and your project data, and delete the project. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Delete-a-Project-in-REDCap_new.pdf\">Deleting a Project in REDCap</a>.</p>
 <p>Instructions on how to update the PI/Owner can be found at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
 
 <p>Regards,<br>REDCap Support</p>
