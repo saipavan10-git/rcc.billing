@@ -144,7 +144,7 @@ the project PI is responsible for paying the invoice regardless of project statu
 <p>If this project is still in use, but you are no longer responsible for it, you can
 change the ownership to the new owner AFTER it is unsequestered. There is a guide to
 assist you in this process at
-<a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.
+<a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Update-Change-Project-Ownership-Info-PI-Name-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.
 Outstanding invoices can be transferred to the new project owner.</p>
 
 <p>If you are curious to review the other projects you own, you can see all of them at <a href=\"<redcap_project_ownership_page>\">REDCap Project Ownership</a>.</p>

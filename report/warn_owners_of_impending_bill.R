@@ -107,9 +107,9 @@ email_template_text <- str_replace( "<p><owner_name>,<p>
 
 <table_of_owned_projects_due_to_be_billed>
 
-<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf\">Deleting a Project in REDCap</a>.</p>
+<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Delete-a-Project-in-REDCap_new.pdf\">Deleting a Project in REDCap</a>.</p>
 
-<p>Alternatively, if a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
+<p>Alternatively, if a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Update-Change-Project-Ownership-Info-PI-Name-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
 
 <p>The projects listed above are the ones scheduled to be invoiced <i>this</i> month. You can see all of the projects you own at <a href=\"<redcap_project_ownership_page>\">REDCap Project Ownership</a>.</p>
 
