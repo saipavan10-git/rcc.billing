@@ -39,6 +39,7 @@ initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
 target_projects <- tbl(rc_conn, "redcap_projects") %>%
   inner_join(
     tbl(rc_conn, "redcap_entity_project_ownership") %>%
+    filter(is.na(sequestered) || sequestered == 0) %>%
       filter(billable == 1),
     by = c("project_id" = "pid")
   ) %>%
