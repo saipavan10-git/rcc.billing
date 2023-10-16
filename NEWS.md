@@ -3,6 +3,19 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.25.1] - 2023-10-16
+### Changed
+- Update broken Update Project Ownership links (Kyle Chesney)
+- Prevent sequestered projects from receiving billing warnings (Kyle Chesney)
+- Fix typo in revenue_status_and_projections.qmd (Philip Chase)
+- Update broken link to document that details project deletion steps (Kyle Chesney)
+- Update update_invoice_line_items_with_invoicing_details.R (Philip Chase)
+- Remove unused code from warn_owners_of_impending_bill.R (Philip Chase)
+- Update Roxygen version in DESCRIPTION (Philip Chase)
+- Update test-get_billable_candidates.R (Philip Chase)
+- Remove unused code from get_billable_candidates() (Philip Chase)
+
+
 ## [1.25.0] - 2023-08-29
 ### Changed
 - Update revenue_status_and_projections (Philip Chase)
