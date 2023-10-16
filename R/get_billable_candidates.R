@@ -40,22 +40,6 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
   redcap_project_ownership_page <- stringr::str_remove(Sys.getenv("URI"), "/api") %>%
     paste0("index.php?action=project_ownership")
 
-  current_month_name <- lubridate::month(
-    lubridate::floor_date(redcapcustodian::get_script_run_time(), unit = "month"),
-    label = T
-  ) %>%
-    as.character()
-  next_month_name <- lubridate::month(
-    lubridate::ceiling_date(redcapcustodian::get_script_run_time(), unit = "month"),
-    label = T,
-    abbr = F
-  ) %>%
-    as.character()
-  current_fiscal_year <- rcc.billing::fiscal_years %>%
-    dplyr::filter(redcapcustodian::get_script_run_time() %within% .data$fy_interval) %>%
-    dplyr::slice_head(n = 1) %>% # HACK: overlaps may occur on July 1, just choose the earlier year
-    dplyr::pull(.data$csbt_label)
-
   initial_invoice_line_item <- dplyr::tbl(rcc_billing_conn, "invoice_line_item") %>%
     dplyr::collect() %>%
     # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection

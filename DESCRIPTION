@@ -1,6 +1,6 @@
 Package: rcc.billing
 Title: REDCap Custodian Billing
-Version: 1.25.0
+Version: 1.25.1
 Authors@R: c(
   person("Philip", "Chase", email = "pbc@ufl.edu", role = c("aut", "cre")),
   person("Laurence", "James-Woodley", email = "lawjames1@ufl.edu", role = "aut"),
@@ -34,6 +34,6 @@ Suggests:
     digest,
     purrr
 Config/testthat/edition: 3
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends: 
     R (>= 3.5.0)

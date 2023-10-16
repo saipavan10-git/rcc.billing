@@ -75,9 +75,9 @@ email_template_text <- "<p><owner_name>,<p>
 
 <table_of_owned_projects_due_to_be_billed>
 
-<p>If a project is still in use, but you are no longer responsible for it, please change the ownership data and/or PI data to reflect the current  ownership and research details by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Update-Project-Ownership-Info-PI-Information-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
+<p>If a project is still in use, but you are no longer responsible for it, please change the ownership data and/or PI data to reflect the current  ownership and research details by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Update-Change-Project-Ownership-Info-PI-Name-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
 
-<p>If the project is no longer is in use, we encourage you to export your project design and your project data, and delete the project. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/files/2018/04/How-to-Delete-a-Project-in-REDCap.pdf\">Deleting a Project in REDCap</a>.</p>
+<p>If the project is no longer is in use, we encourage you to export your project design and your project data, and delete the project. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Delete-a-Project-in-REDCap_new.pdf\">Deleting a Project in REDCap</a>.</p>
 
 <h3>Why are we asking?</h3>
 
