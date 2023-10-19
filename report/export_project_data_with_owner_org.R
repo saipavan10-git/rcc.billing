@@ -44,13 +44,6 @@ owner_user <- ownership %>%
     user_suspended_time
   )
 
-users %>% count(user_email== "")
-ownership %>% count(email== "")
-owner_user %>% count(is.na(email))
-owner_user %>% count(is.na(username))
-owner_user %>% count(username == "")
-owner_user %>% count(email == "")
-
 projects_with_orgs <-
   bind_rows(
     projects %>%
@@ -83,6 +76,10 @@ projects_with_orgs <-
   left_join(org_hierarchies %>% select(primary_uf_fiscal_org = DEPT_ID, primary_uf_fiscal_org_name = DEPT_NAME), by = "primary_uf_fiscal_org")
 
 projects_with_orgs %>% writexl::write_xlsx(here::here("output", "projects_with_orgs.xlsx"))
+
+# # How many projects have no org data?
+# projects_with_orgs %>%
+#   count(is.na(primary_uf_fiscal_org))
 
 # # who might need an external rate ?
 # projects_with_orgs %>%
