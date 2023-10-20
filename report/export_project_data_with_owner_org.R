@@ -12,12 +12,23 @@ rcc_billing_conn <- connect_to_rcc_billing_db()
 rc_conn <- connect_to_redcap_db()
 
 # Identify a department's project
-person_org <- tbl(rcc_billing_conn, "person_org") |> collect()
+person_org <- tbl(rcc_billing_conn, "person_org") |>
+  collect() |>
+  mutate(
+    email = tolower(email),
+    user_id = tolower(user_id)
+  )
 org_hierarchies <- tbl(rcc_billing_conn, "org_hierarchies") |> collect()
 
 projects <- tbl(rc_conn, "redcap_projects") %>% collect()
-ownership <- tbl(rc_conn, "redcap_entity_project_ownership") %>% collect()
-users <- tbl(rc_conn, "redcap_user_information") %>% collect()
+ownership <- tbl(rc_conn, "redcap_entity_project_ownership") |>
+  collect() |>
+  mutate(username = tolower(username)) |>
+  mutate(email = tolower(email))
+users <- tbl(rc_conn, "redcap_user_information") |>
+  collect() |>
+  mutate(username = tolower(username)) |>
+  mutate(user_email = tolower(user_email))
 
 owner_user <- ownership %>%
   left_join(users %>% select(
@@ -59,11 +70,7 @@ projects_with_orgs <-
   select(
     project_id,
     app_title,
-    status,
     creation_time,
-    production_time,
-    inactive_time,
-    billable,
     ufid,
     username,
     email,
@@ -77,9 +84,9 @@ projects_with_orgs <-
 
 projects_with_orgs %>% writexl::write_xlsx(here::here("output", "projects_with_orgs.xlsx"))
 
-# # How many projects have no org data?
-# projects_with_orgs %>%
-#   count(is.na(primary_uf_fiscal_org))
+# How many projects have no org data?
+projects_with_orgs %>%
+  count(is.na(primary_uf_fiscal_org))
 
 # # who might need an external rate ?
 # projects_with_orgs %>%
