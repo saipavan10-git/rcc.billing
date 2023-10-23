@@ -104,11 +104,11 @@ redcapcustodian::send_email(
 
 
 email_template_text <- str_replace( "<p><owner_name>,<p>
-<p>The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $100 for the past year of service for <b>each</b> of the projects listed here:</p>
+<p>The REDCap projects you own, listed below, are due to be billed on <next_month> 1st. If you take no action, you will receive an invoice from the CTSI Service Billing Team charging you $130 for the past year of service for <b>each</b> of the projects listed here:</p>
 
 <table_of_owned_projects_due_to_be_billed>
 
-<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $100. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Delete-a-Project-in-REDCap_new.pdf\">Deleting a Project in REDCap</a>.</p>
+<p>If you no longer need or use one or more of these REDCap projects, we encourage you to export your project design and your project data, and delete the project before the first of next month. Projects deleted <i>before</i> annual invoicing will not be charged the annual fee of $130. To delete a project, access its project link above then follow the instructions in <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Delete-a-Project-in-REDCap_new.pdf\">Deleting a Project in REDCap</a>.</p>
 
 <p>Alternatively, if a project is still in use, but you are no longer responsible for it, you can change the ownership to the new owner by clicking any of the project links above. There is a guide to assist you in this process at <a href=\"https://www.ctsi.ufl.edu/wordpress/files/2023/07/How-to-Update-Change-Project-Ownership-Info-PI-Name-and-IRB-Number.pdf\">Update Project Ownership, PI Name & Email and IRB Number in REDCap</a>.</p>
 

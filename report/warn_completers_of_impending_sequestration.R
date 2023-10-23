@@ -106,7 +106,7 @@ email_template_text <- "<p><owner_name>,<p>
 
 <table_of_projects_to_be_sequestered>
 
-<p>That status is no longer supported in our system. As it looks like you are done with this project, we are going to sequester it on 1/30 unless you ask us not to. If the project is not sequestered, you will be expected to pay the normal $100 annual fee to keep it on the REDCap system when it comes due. Sequestered projects will be automatically deleted after one year in sequestration.</p>
+<p>That status is no longer supported in our system. As it looks like you are done with this project, we are going to sequester it on 1/30 unless you ask us not to. If the project is not sequestered, you will be expected to pay the normal $130 annual fee to keep it on the REDCap system when it comes due. Sequestered projects will be automatically deleted after one year in sequestration.</p>
 
 <p>Regards,</p>
 <p>REDCap Support</p>
