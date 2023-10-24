@@ -3,6 +3,14 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.26.0] - 2023-10-24
+### Added
+- Add export_project_data_with_owner_org.R (Philip Chase)
+
+### Changed
+- Change annual project price from $100 to $130 in warning communications (Kyle Chesney)
+
+
 ## [1.25.1] - 2023-10-16
 ### Changed
 - Update broken Update Project Ownership links (Kyle Chesney)
