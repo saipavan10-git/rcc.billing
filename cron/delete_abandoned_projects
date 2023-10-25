@@ -1,0 +1,2 @@
+# delete abandoned projects on the 28th of the month at 14:03.
+3 14 28 * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/delete_abandoned_projects.R
