@@ -19,14 +19,14 @@ previously_deleted_projects <- tbl(rc_conn, "redcap_projects") |>
   select(project_id) |>
   collect()
 
-sent_invoices <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-  filter(status == "sent") %>%
+old_unpaid_invoices <- tbl(rcc_billing_conn, "invoice_line_item") |>
+  filter(status == "invoiced") |>
   collect() |>
-  filter(today() - as_date(date_sent) > 365)
+  filter(today() - as_date(date_sent) > days(365))
 
-if(nrow(sent_invoices) > 0) {
-  unpaid_projects <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
-    filter(pid %in% local(sent_invoices$service_identifier) & sequestered == 1) |>
+if(nrow(old_unpaid_invoices) > 0) {
+  unpaid_projects <- tbl(rc_conn, "redcap_entity_project_ownership") |>
+    filter(pid %in% local(old_unpaid_invoices$service_identifier) & sequestered == 1) |>
     select(pid) |>
     collect() |>
     mutate(reason = "unpaid project")
@@ -34,7 +34,7 @@ if(nrow(sent_invoices) > 0) {
   unpaid_projects <- data.frame(pid = integer(), reason = character())
 }
 
-sequestered_orphans <- tbl(rcc_billing_conn, "rcc_job_log") %>%
+sequestered_orphans <- tbl(rcc_billing_conn, "rcc_job_log") |>
   filter(
     script_name == "sequester_orphans" &
       level == "SUCCESS" &
