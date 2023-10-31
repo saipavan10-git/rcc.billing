@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.27.0] - 2023-10-31
+### Added
+- Add delete_abandoned_projects.R (Laurence James-Woodley)
+
+
 ## [1.26.0] - 2023-10-24
 ### Added
 - Add export_project_data_with_owner_org.R (Philip Chase)
