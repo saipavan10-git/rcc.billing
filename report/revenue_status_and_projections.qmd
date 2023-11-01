@@ -123,7 +123,7 @@ invoice_status |>
   scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
   geom_text(aes(y = amount_invoiced, label = amount_invoiced),
-    vjust = -0.5, position = position_dodge(width = 0.9), size = 3
+    vjust = -0.5, position = position_dodge(width = 0.9), size = 2
   ) +
   xlab("Month Invoiced") +
   ylab("Amount")
@@ -156,7 +156,7 @@ invoice_status |>
   theme(axis.text.x = element_text(angle = 30)) +
   geom_text(aes(y = amount_received, label = amount_received),
     vjust = -0.5,
-    size = 3
+    size = 2
   ) +
   xlab("Month Received") +
   ylab("Amount")
