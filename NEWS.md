@@ -3,6 +3,13 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.28.0] - 2023-11-01
+### Changed
+- Replace fig-revenue-by-month with fig-revenue-by-month-invoiced and fig-revenue-by-month-received in revenue_status_and_projections.qmd (Philip Chase)
+- Add bar labels to fig-revenue-by-month-* figures in revenue_status_and_projections.qmd (Philip Chase)
+- Adjust project revenue to use just the last 12 months and correct for the rate increase in revenue_status_and_projections.qmd (Philip Chase)
+
+
 ## [1.27.0] - 2023-10-31
 ### Added
 - Add delete_abandoned_projects.R (Laurence James-Woodley)
