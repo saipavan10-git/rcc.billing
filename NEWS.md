@@ -3,6 +3,12 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.29.0] - 2023-11-21
+### Changed
+- Implement code changes required for the Fall 2023 rate increase (Philip Chase)
+- Update revenue_status_and_projections.qmd adding revenue_by_month_received (Philip Chase, Laurence James-Woodley)
+
+
 ## [1.28.0] - 2023-11-01
 ### Changed
 - Replace fig-revenue-by-month with fig-revenue-by-month-invoiced and fig-revenue-by-month-received in revenue_status_and_projections.qmd (Philip Chase)
