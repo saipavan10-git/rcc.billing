@@ -7,7 +7,7 @@ service_type_test_data <- tribble(
   ~service_type,
   ~price,
   ~billing_frequency,
-  1, "Annual Project Maintenance", 100, 12,
+  1, "Annual REDCap Project Maintenance", 130, 12,
   2, "redcap_project_phone", 1000, 0,
   3, "redcap_table_account_prod", 35, 6,
   4, "redcap_table_account_phone", 35, 6,
