@@ -2,6 +2,10 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.29.1] - 2023-12-08
+### Changed
+- Fix create_and_send_new_redcap_prod_per_project_line_items.R
+
 
 ## [1.29.0] - 2023-11-21
 ### Changed
