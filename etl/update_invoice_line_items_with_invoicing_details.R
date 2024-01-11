@@ -72,6 +72,14 @@ if(nrow(billable_details) > 0) {
       suffix = c(".billable", ".line_item")
     ) %>%
     mutate(status = if_else(!is.na(date_of_pmt), "paid", "invoiced")) %>%
+    mutate(dnb_flag = if_else(
+      (do_not_bill != 0 | !is.na(do_not_bill_reason) | do_not_bill_reason != ""),
+      TRUE, FALSE, FALSE)
+    ) |>
+    mutate(status = if_else(dnb_flag, "canceled", status)) |>
+    mutate(amount_due = if_else(dnb_flag, 0, amount_due)) |>
+    mutate(qty_provided = if_else(dnb_flag, 0, qty_provided)) |>
+    mutate(reason = if_else(str_detect(deposit_or_je_number, "voucher"), "seeking voucher", coalesce(do_not_bill_reason, reason))) |>
     select(
       id,
       service_instance_id,
@@ -85,7 +93,10 @@ if(nrow(billable_details) > 0) {
       do_not_bill,
       do_not_bill_reason,
       pi_email,
-      gatorlink
+      gatorlink,
+      amount_due,
+      qty_provided,
+      reason
     ) %>%
     mutate(updated = get_script_run_time())
 
@@ -174,7 +185,7 @@ if(nrow(billable_details) > 0) {
 
   banned_owners_updates <- invoice_line_item_with_billable_details %>%
     # identify people of interest
-    filter(do_not_bill_reason == "27. PI no longer with UF") %>%
+    filter(do_not_bill_reason %in% c("27. PI no longer with UF", "45. PI Left UF and project should have been sequestered/not invoiced.")) %>%
     distinct(pi_email, gatorlink) %>%
     rename(
       username = gatorlink,
