@@ -2,6 +2,15 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [1.30.0] - 2024-01-12
+### Added
+- Fix typos in text of revenue_status_and_projections.qmd (@pbchase)
+
+### Changed
+- Update update_invoice_line_items_with_invoicing_details to handle do not bill reasons (@ChemiKyle)
+
+
 ## [1.29.1] - 2023-12-08
 ### Changed
 - Fix create_and_send_new_redcap_prod_per_project_line_items.R
