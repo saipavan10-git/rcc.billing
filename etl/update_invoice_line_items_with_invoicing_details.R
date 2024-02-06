@@ -223,10 +223,31 @@ if(nrow(billable_details) > 0) {
     )
   }
 
+  # Update service instances with new CTSI Study IDs
+  service_instance <- tbl(rcc_billing_conn, "service_instance") %>% collect()
+  invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>% collect()
+  service_instance_updates <- get_new_ctsi_study_ids(service_instance, invoice_line_item) |>
+    select(service_instance_id, ctsi_study_id)
+
+  if(nrow(service_instance_updates) > 0) {
+    banned_owners_sync_activity <- redcapcustodian::sync_table_2(
+      conn = rcc_billing_conn,
+      table_name = "service_instance",
+      source = service_instance_updates,
+      source_pk = "service_instance_id",
+      target = initial_banned_owners,
+      target_pk = "service_instance_id",
+      update = T,
+      insert = F,
+      delete = F
+    )
+  }
+
   activity_log <- list(
     invoice_line_item_updates = updated_invoice_line_items,
     invoice_line_item_communications = new_invoice_line_item_communications,
-    banned_owners_updates = banned_owners_updates
+    banned_owners_updates = banned_owners_updates,
+    service_instance_updates = service_instance_updates
   )
 
   log_job_success(jsonlite::toJSON(activity_log))
