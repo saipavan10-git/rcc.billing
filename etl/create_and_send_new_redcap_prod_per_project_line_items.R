@@ -119,6 +119,8 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   filter(!is.na(pi_email))
 
 # Make new service_instance rows ##############################################
+initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
+  collect()
 
 new_service_instances <- target_projects %>%
   mutate(
@@ -128,6 +130,7 @@ new_service_instances <- target_projects %>%
     active = 1,
     ctsi_study_id = as.numeric(NA)
   ) %>%
+  anti_join(initial_service_instance, by = c("service_instance_id")) |>
   select(
     service_type_code,
     service_identifier,
@@ -135,9 +138,6 @@ new_service_instances <- target_projects %>%
     active,
     ctsi_study_id
   )
-
-initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
-  collect()
 
 new_service_instances_diff <- redcapcustodian::dataset_diff(
   source = new_service_instances,
