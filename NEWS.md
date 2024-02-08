@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.31.0] - 2024-02-08
+### Added
+- Curate and use CTSI Study IDs (@pbchase)
+
+
 ## [1.30.0] - 2024-01-12
 ### Added
 - Fix typos in text of revenue_status_and_projections.qmd (@pbchase)
