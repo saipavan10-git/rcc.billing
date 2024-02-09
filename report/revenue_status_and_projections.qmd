@@ -7,6 +7,10 @@ format:
     code-tools: true
     df-print: kable
   pdf:
+    geometry:
+      - margin=19mm
+      - bottom=30mm
+    fig-pos: 'H'
     df-print: kable
 editor: visual
 date: "`r Sys.Date()`"
