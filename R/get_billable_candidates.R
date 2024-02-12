@@ -28,8 +28,8 @@
 get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
   redcap_version <- dplyr::tbl(rc_conn, "redcap_config") %>%
     dplyr::filter(.data$field_name == "redcap_version") %>%
-    dplyr::collect(.data$value) %>%
-    dplyr::pull()
+    dplyr::collect() %>%
+    dplyr::pull(.data$value)
 
   redcap_project_uri_base <- stringr::str_remove(Sys.getenv("URI"), "/api") %>%
     paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
@@ -113,7 +113,23 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
     dplyr::select("project_id", "record_count") %>%
     dplyr::collect()
 
+  person_org <- dplyr::tbl(rcc_billing_conn, "person_org") |>
+    dplyr::left_join(dplyr::tbl(rcc_billing_conn, "org_hierarchies"), by = c("primary_uf_fiscal_org" = "DEPT_ID")) |>
+    dplyr::select("ufid", "user_id", "email", "primary_uf_fiscal_org", "DEPT_NAME") |>
+    dplyr::collect() |>
+    dplyr::rename(dept_name = "DEPT_NAME")
+
   billable_candidates <- email_info %>%
+    dplyr::left_join(person_org |> dplyr::select(-c("ufid", "user_id")),
+      by = c("project_owner_email" = "email"),
+      relationship = "many-to-many"
+    ) |>
+    dplyr::left_join(person_org |> dplyr::select(-c("ufid", "email")),
+      by = c("project_owner_username" = "user_id"),
+      relationship = "many-to-many"
+    ) |>
+    dplyr::mutate(primary_uf_fiscal_org = dplyr::coalesce(.data$primary_uf_fiscal_org.x, .data$primary_uf_fiscal_org.y)) |>
+    dplyr::mutate(dept_name = dplyr::coalesce(.data$dept_name.x, .data$dept_name.y)) |>
     dplyr::mutate(app_title = writexl::xl_hyperlink(
       paste0(redcap_project_uri_home_base, .data$project_id),
       .data$app_title
@@ -133,6 +149,8 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
       "project_owner_email",
       "project_owner_full_name",
       "project_owner_username",
+      "primary_uf_fiscal_org",
+      "dept_name",
       "user_suspended_time",
       "user_lastlogin",
       "project_id",
