@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.31.1] - 2024-02-12
+### Changed
+Update update_invoice_line_items_with_invoicing_details.R to fix target table in service_instance_update.  (@pbchase)
+
+
 ## [1.31.0] - 2024-02-08
 ### Added
 - Curate and use CTSI Study IDs (@pbchase)
