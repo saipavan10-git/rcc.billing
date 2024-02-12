@@ -235,7 +235,7 @@ if(nrow(billable_details) > 0) {
       table_name = "service_instance",
       source = service_instance_updates,
       source_pk = "service_instance_id",
-      target = initial_banned_owners,
+      target = service_instance,
       target_pk = "service_instance_id",
       update = T,
       insert = F,
