@@ -63,6 +63,19 @@ invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   rowwise() %>%
   mutate(across(c("invoice_number"), my_hash))
 
+person_org <- dplyr::tbl(rcc_billing_conn, "person_org") |>
+  dplyr::select(ufid, user_id, email, primary_uf_fiscal_org) |>
+  dplyr::collect() |>
+  rowwise() %>%
+  mutate(across(c("ufid", "user_id", "email"), my_hash)) %>%
+  mutate(across("email", append_fake_email_domain)) |>
+  filter(email %in% redcap_user_information$user_email | user_id %in% redcap_user_information$username) |>
+  ungroup()
+
+org_hierarchies <- dplyr::tbl(rcc_billing_conn, "org_hierarchies") |>
+  dplyr::select("DEPT_ID", "DEPT_NAME") |>
+  dplyr::collect() |>
+  dplyr::filter(DEPT_ID %in% person_org$primary_uf_fiscal_org)
 
 # Write rc db tables ##########################################################
 
