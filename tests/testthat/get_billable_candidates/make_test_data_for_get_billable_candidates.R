@@ -69,7 +69,8 @@ person_org <- dplyr::tbl(rcc_billing_conn, "person_org") |>
   rowwise() %>%
   mutate(across(c("ufid", "user_id", "email"), my_hash)) %>%
   mutate(across("email", append_fake_email_domain)) |>
-  filter(email %in% redcap_user_information$user_email | user_id %in% redcap_user_information$username)
+  filter(email %in% redcap_user_information$user_email | user_id %in% redcap_user_information$username) |>
+  ungroup()
 
 org_hierarchies <- dplyr::tbl(rcc_billing_conn, "org_hierarchies") |>
   dplyr::select("DEPT_ID", "DEPT_NAME") |>
