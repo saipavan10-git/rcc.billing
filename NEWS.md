@@ -2,6 +2,10 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.32.0] - 2024-02-14
+### Added
+- Add owner's org data to get_billable_candidates() output (@pbchase, @ChemiKyle)
+
 
 ## [1.31.1] - 2024-02-12
 ### Changed
