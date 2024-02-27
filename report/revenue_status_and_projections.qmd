@@ -7,6 +7,10 @@ format:
     code-tools: true
     df-print: kable
   pdf:
+    geometry:
+      - margin=19mm
+      - bottom=30mm
+    fig-pos: 'H'
     df-print: kable
 editor: visual
 date: "`r Sys.Date()`"
@@ -121,7 +125,7 @@ invoice_status |>
     labels = dollar,
     limits = c(0, max(revenue$invoices_sent))
     ) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  scale_x_date(date_breaks = "2 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
   geom_text(aes(y = amount_invoiced, label = amount_invoiced),
     vjust = -0.5, position = position_dodge(width = 0.9), size = 2
@@ -144,7 +148,8 @@ revenue_by_month_received <- invoice_status |>
   group_by(Status, `Month Received`) |>
   summarise(
     amount_received = sum(amount_due)
-  )
+  ) |>
+  ungroup()
 
 # write_out actuals for completed months to other scripts to consume
 revenue_by_month_received |>
@@ -177,7 +182,7 @@ revenue_by_month_received |>
     labels = dollar,
     limits = c(0, max(revenue$invoices_sent))
   ) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  scale_x_date(date_breaks = "2 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
   geom_text(aes(y = amount_received, label = amount_received),
     vjust = -0.5,
@@ -186,6 +191,79 @@ revenue_by_month_received |>
   xlab("Month Received") +
   ylab("Amount")
 ```
+
+```{r}
+#| label: revenue_by_month_received_with_projections
+#| echo: false
+#| warning: false
+
+# Actuals from all completed months
+revenue_by_month_received_actuals <- revenue_by_month_received |>
+      filter(lubridate::ceiling_date(`Month Received`, unit = "month") < today())
+
+# Actuals from last 12 completed months, rescaled according to the rate change
+# applied 1 months after it went in to effect, softened halfway towards the mean, 
+# and moved 12 months forward in time
+revenue_by_month_received_12mo_of_estimates <- revenue_by_month_received_actuals |>
+      slice_tail(n = 12) |>
+      mutate(estimated_revenue = if_else(`Month Received` < ymd("2023-11-15"),
+                                        amount_received * 1.30,
+                                        amount_received)) |>
+      mutate(`Month Received` = `Month Received` + years(1)) |>
+      # Soften the peaks and valleys of the expected revenue
+      mutate(estimated_revenue = round((estimated_revenue + mean(estimated_revenue)) / 2)) |>
+      mutate(amount_received = NA_real_)
+
+revenue_by_month_received_another_12_mo_of_estimates <- 
+  revenue_by_month_received_12mo_of_estimates |>
+  mutate(estimated_revenue = mean(estimated_revenue)) |>
+  mutate(`Month Received` = `Month Received` + years(1))
+
+revenue_by_month_received_with_projections <-
+  bind_rows(
+    revenue_by_month_received_actuals,
+    revenue_by_month_received_12mo_of_estimates,
+    revenue_by_month_received_another_12_mo_of_estimates
+  ) |>
+  mutate(month_received = lubridate::as_datetime(
+    `Month Received`,
+    tz = Sys.getenv("TIME_ZONE")
+  ) + days(1)) |>
+  cross_join(rcc.billing::fiscal_years) |>
+  filter(month_received %within% fy_interval) |>
+  rename(FY = csbt_label) |>
+  select(-c(Status, fy_interval, month_received)) |>
+  rowwise() |>
+  mutate(actuals_and_estimated = sum(amount_received, estimated_revenue, na.rm = T)) |>
+  add_count(FY) |>
+  filter(n == 12 | FY == "2022-2023") |>
+  select(-n)
+
+revenue_by_fy_received_with_projections <- revenue_by_month_received_with_projections |>
+  group_by(FY) |>
+  summarize(
+    Revenue = sum(amount_received, na.rm = T),
+    `Estimated Revenue` = sum(estimated_revenue, na.rm = T),
+    `Actual Plus Estimated Revenue` = sum(actuals_and_estimated, na.rm = T),
+    `Months included` = n()
+  ) |>
+  ungroup()
+```
+
+## Revenue and projections by fiscal year
+
+@fig-revenue-by-month-received-with-projections shows actual revenue by fiscal year with an additional 12 months of projected revenue. These projections are based on the previous 12 months of actual revenue, corrected for the 11/2023 rate change.
+
+```{r}
+#| label: fig-revenue-by-month-received-with-projections
+#| fig-cap: REDCap APB Revenue by FY with 12 months of projected revenue. 
+#| echo: false
+#| warning: false
+revenue_by_fy_received_with_projections |>
+  mutate(across(where(is.double), scales::dollar))
+```
+
+The revenue estimates in this section differ from those in the other sections. They strictly separate estimates from actual revenue. These estimate will probably replace those elsewhere in the report.
 
 ## Payments Rates and Projections
 
