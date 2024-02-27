@@ -150,12 +150,14 @@ revenue_by_month_received <- invoice_status |>
 revenue_by_month_received |>
   ungroup() |>
   mutate(revenue_code = "redcap_apb") |>
+  mutate(revenue_description = "REDCap Billing") |>
   rename(
     payment_date = `Month Received`,
     amount = amount_received
   ) |>
   select(
     revenue_code,
+    revenue_description,
     payment_date,
     amount
   ) |>
