@@ -23,8 +23,8 @@ rcc_billing_conn <- connect_to_rcc_billing_db()
 
 redcap_version <- tbl(rc_conn, "redcap_config") %>%
   filter(field_name == "redcap_version") %>%
-  collect(value) %>%
-  pull()
+  collect() %>%
+  pull(value)
 
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
@@ -38,13 +38,13 @@ redcap_project_ownership_page <- str_remove(Sys.getenv("URI"), "/api") %>%
 non_deleted_projects <- tbl(rc_conn, "redcap_projects") %>%
   filter(is.na(date_deleted)) %>%
   select(project_id) %>%
-  collect(project_id) %>%
+  collect() %>%
   pull(project_id)
 
 non_completed_projects <- tbl(rc_conn, "redcap_projects") %>%
   filter(is.na(completed_time)) %>%
   select(project_id) %>%
-  collect(project_id) %>%
+  collect() %>%
   pull(project_id)
 
 non_sequestered_projects <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
@@ -65,7 +65,8 @@ projects_to_sequester_invoices <-
   collect()
 
 project_ids_to_sequester <- projects_to_sequester_invoices %>%
-  pull(service_identifier)
+  pull(service_identifier) |>
+  as.numeric()
 
 email_info <-
   tbl(rc_conn, "redcap_projects") %>%

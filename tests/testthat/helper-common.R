@@ -32,3 +32,10 @@ create_a_table_from_rds_test_data <- function(table_name, conn, directory_under_
   readRDS(testthat::test_path(directory_under_test_path, paste0(table_name, ".rds"))) %>%
     DBI::dbWriteTable(conn = conn, name = table_name, value = .)
 }
+
+create_a_table_from_rds <- function(path, conn) {
+  table_name <- stringr::str_replace_all(path, c(".*/" =  "", ".rds" = ""))
+
+  readRDS(path) %>%
+    DBI::dbWriteTable(conn = conn, name = table_name, value = .)
+}
