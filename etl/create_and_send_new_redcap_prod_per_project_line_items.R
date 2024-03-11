@@ -13,8 +13,8 @@ rcc_billing_conn <- connect_to_rcc_billing_db()
 
 redcap_version <- tbl(rc_conn, "redcap_config") %>%
   filter(field_name == "redcap_version") %>%
-  collect(value) %>%
-  pull()
+  collect() %>%
+  pull(value)
 
 table_names <- c(
   "redcap_entity_project_ownership",
