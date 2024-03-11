@@ -30,8 +30,8 @@ rcui <- tbl(rc_conn, "redcap_user_information")
 
 redcap_version <- tbl(rc_conn, "redcap_config") %>%
   filter(field_name == "redcap_version") %>%
-  collect(value) %>%
-  pull()
+  collect() %>%
+  pull(value)
 
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
   paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
