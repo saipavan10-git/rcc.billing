@@ -2,6 +2,13 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [1.33.1] - 2024-03-12
+### Changed
+- Fix bad collect() syntax (@pbchase)
+- Fix crashes in sequester_unpaid_projects.R (@pbchase)
+
+
 ## [1.33.0] - 2024-02-27
 ### Added
 - Add fiscal year reporting to revenue_status_and_projections.qmd (@pbchase)
