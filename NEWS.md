@@ -3,6 +3,11 @@ All notable changes to the rcc.billing package and its contained scripts will be
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.33.2] - 2024-03-15
+### Changed
+- Fix NA in average_portion_paid in revenue_status_and_projections.qmd (@pbchase)
+
+
 ## [1.33.1] - 2024-03-12
 ### Changed
 - Fix bad collect() syntax (@pbchase)

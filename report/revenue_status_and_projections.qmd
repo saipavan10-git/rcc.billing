@@ -62,9 +62,11 @@ revenue <-
   mutate(
     invoices_sent = invoiced + coalesce(paid, 0),
     portion_paid = coalesce(paid, 0) / invoices_sent
-  )
+  ) |>
+  ungroup() |>
+  arrange(invoice_month)
 
-# the average portion paid should ignore the last three months as sequester_unpaid_projects has not yet been applied to these months
+# The average portion paid should ignore the last three months as sequester_unpaid_projects has not yet been applied to these months
 average_portion_paid <- revenue %>%
   slice_head(n = nrow(revenue) - 4) %>%
   summarise(average_portion_paid = mean(portion_paid)) %>%
