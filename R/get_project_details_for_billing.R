@@ -30,7 +30,7 @@ get_project_details_for_billing <- function(rc_conn, rc_billing_con, project_ids
       select(username, user_email, user_firstname, user_lastname)
 
     invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-      distinct(id, service_identifier, ctsi_study_id) |>
+      distinct(service_identifier, ctsi_study_id) |>
       collect()
 
     project_details <- redcap_projects %>%
