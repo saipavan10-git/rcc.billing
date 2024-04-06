@@ -18,10 +18,12 @@ A data frame with project details.
 }
 \description{
 This function retrieves detailed information about specific projects for billing purposes. It queries:
- - redcap_projects
- - redcap_entity_project_ownership
- - redcap_user_information
- - invoice_line_item
+\itemize{
+ \item redcap_projects
+ \item redcap_entity_project_ownership
+ \item redcap_user_information
+ \item invoice_line_item
+ }
 }
 \examples{
 \dontrun{

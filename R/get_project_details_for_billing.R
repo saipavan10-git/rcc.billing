@@ -1,10 +1,12 @@
 #' Get Project Details for Billing
 #'
 #' This function retrieves detailed information about specific projects for billing purposes. It queries:
-#'  - redcap_projects
-#'  - redcap_entity_project_ownership
-#'  - redcap_user_information
-#'  - invoice_line_item
+#' \itemize{
+#'  \item redcap_projects
+#'  \item redcap_entity_project_ownership
+#'  \item redcap_user_information
+#'  \item invoice_line_item
+#'  }
 #'
 #' @param rc_conn A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #' @param rc_billing_conn  A connection to REDCap billing database. \code{\link{connect_to_rcc_billing_db}}
