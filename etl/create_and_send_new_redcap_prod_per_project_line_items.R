@@ -101,8 +101,9 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
         fiscal_year == fiscal_year_invoiced,
         month_invoiced == previous_month_name
       ) %>%
-      select(ctsi_study_id, fiscal_year, month_invoiced),
-    by = c("project_id" = "ctsi_study_id")
+      select(service_identifier, fiscal_year, month_invoiced) %>%
+      mutate_at("service_identifier", as.integer),
+    by = c("project_id" = "service_identifier")
   ) %>%
   # birthday in past month
   filter(previous_month(month(get_script_run_time())) == month(creation_time)) %>%
