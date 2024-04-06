@@ -44,7 +44,6 @@ get_project_details_for_billing <- function(rc_conn, rc_billing_con, project_ids
           dplyr::mutate_at("service_identifier", as.integer),
         by = c("project_id" = "service_identifier")
       ) |>
-      # project is not deleted
       # Assure non-distinct rows in redcap_entity_project_ownership do not foment chaos
       dplyr::distinct(.data$project_id, .keep_all = T) %>%
       # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
