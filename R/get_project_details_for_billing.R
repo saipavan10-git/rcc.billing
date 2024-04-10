@@ -9,7 +9,7 @@
 #'  }
 #'
 #' @param rc_conn A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
-#' @param rc_billing_conn  A connection to REDCap billing database. \code{\link{connect_to_rcc_billing_db}}
+#' @param rcc_billing_conn  A connection to REDCap billing database. \code{\link{connect_to_rcc_billing_db}}
 #' @param project_ids Vector of project IDs to retrieve details for.
 #'
 #' @return A data frame with project details.
@@ -19,11 +19,11 @@
 #' rc_conn <- connect_to_redcap_db()
 #' rcc_billing_conn <- connect_to_rcc_billing_db()
 #' project_ids <- c(12, 14, 22)
-#' project_details <- get_project_details_for_billing(rc_conn, rc_billing_con, project_ids)
+#' project_details <- get_project_details_for_billing(rc_conn, rcc_billing_con, project_ids)
 #' }
 #'
 #' @export
-get_project_details_for_billing <- function(rc_conn, rc_billing_con, project_ids) {
+get_project_details_for_billing <- function(rc_conn, rcc_billing_con, project_ids) {
     redcap_projects <- tbl(rc_conn, "redcap_projects")
     redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership")
     redcap_user_information <- tbl(rc_conn, "redcap_user_information") |>
