@@ -23,7 +23,7 @@
 #' }
 #'
 #' @export
-get_project_details_for_billing <- function(rc_conn, rcc_billing_con, project_ids) {
+get_project_details_for_billing <- function(rc_conn, rcc_billing_conn, project_ids) {
     redcap_projects <- tbl(rc_conn, "redcap_projects")
     redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership")
     redcap_user_information <- tbl(rc_conn, "redcap_user_information") |>
