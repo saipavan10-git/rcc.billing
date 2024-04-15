@@ -15,7 +15,7 @@
 get_ctsi_study_id_to_project_id_map <- function(service_requests, rcc_billing_conn) {
     extant_invoice_line_items <-
       dplyr::tbl(rcc_billing_conn, "invoice_line_item") |>
-      dplyr::filter(.data$service_type_code %in% 1:2 & !is.na(ctsi_study_id)) |>
+      dplyr::filter(.data$service_type_code %in% 1:2 & !is.na(.data$ctsi_study_id)) |>
       dplyr::select(
         .data$id,
         .data$service_type_code,
