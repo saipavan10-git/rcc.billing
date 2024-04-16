@@ -43,7 +43,10 @@ get_ctsi_study_id_to_project_id_map <- function(service_requests, rcc_billing_co
 
     result <- annual_project_billing_line_items |>
       dplyr::bind_rows(service_request_line_items) |>
-      dplyr::distinct(.data$project_id, .data$ctsi_study_id)
+      dplyr::select(.data$project_id, .data$ctsi_study_id) |>
+      dplyr::slice_max(order_by = .data$ctsi_study_id, by = .data$project_id, n = 1) |>
+      dplyr::slice_max(order_by = .data$project_id, by = .data$ctsi_study_id, n = 1) |>
+      distinct(.data$project_id, .data$ctsi_study_id)
 
     return(result)
   }
