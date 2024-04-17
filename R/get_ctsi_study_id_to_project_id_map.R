@@ -45,7 +45,6 @@ get_ctsi_study_id_to_project_id_map <- function(service_requests, rcc_billing_co
       dplyr::bind_rows(service_request_line_items) |>
       dplyr::select(.data$project_id, .data$ctsi_study_id) |>
       dplyr::slice_max(order_by = .data$ctsi_study_id, by = .data$project_id, n = 1) |>
-      dplyr::slice_max(order_by = .data$project_id, by = .data$ctsi_study_id, n = 1) |>
       dplyr::distinct(.data$project_id, .data$ctsi_study_id)
 
     return(result)
