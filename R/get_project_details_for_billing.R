@@ -27,14 +27,14 @@ get_project_details_for_billing <- function(rc_conn, rcc_billing_conn, project_i
     redcap_projects <- tbl(rc_conn, "redcap_projects")
     redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership")
     redcap_user_information <- tbl(rc_conn, "redcap_user_information") |>
-      select(username, user_email, user_firstname, user_lastname)
+      select("username", "user_email", "user_firstname", "user_lastname")
 
     invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-      distinct(service_identifier, ctsi_study_id) |>
+      distinct(.data$service_identifier, .data$ctsi_study_id) |>
       collect()
 
     project_details <- redcap_projects %>%
-      filter(project_id %in% project_ids) |>
+      filter(.data$project_id %in% project_ids) |>
       dplyr::inner_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) %>%
       # get user info for owners who are also redcap users
       dplyr::left_join(redcap_user_information, by = "username") |>
