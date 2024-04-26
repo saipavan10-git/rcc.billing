@@ -258,7 +258,7 @@ revenue_by_fy_received_with_projections <- revenue_by_month_received_with_projec
 
 ```{r}
 #| label: fig-revenue-by-month-received-with-projections
-#| fig-cap: REDCap APB Revenue by FY with 12 months of projected revenue. 
+#| fig-cap: REDCap APB Revenue by FY with 12 months of projected revenue. (The current month's revenue is always estimated.)
 #| echo: false
 #| warning: false
 revenue_by_fy_received_with_projections |>
