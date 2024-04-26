@@ -265,16 +265,6 @@ revenue_by_fy_received_with_projections |>
   mutate(across(where(is.double), scales::dollar))
 ```
 
-The revenue estimates in this section differ from those in the other sections. They strictly separate estimates from actual revenue. These estimate will probably replace those elsewhere in the report.
-
-## Payments Rates and Projections
-
-Projecting potential revenue for the project requires an estimate of the portion of invoices that are likely to be paid. The history of payment in past months informs estimates of future payment, yet there are some issues in those data. The REDCap APB project uses several methods to reduce the number of abandoned projects that get invoiced. Yet many of these methods were developed after the start of the project. Other methods had implementation issues in the early months of the project. As such, it is reasonable to expect the early months of the project will have lower payment rates than later months due to these process refinements. We will use the historic payment rates to estimate future payment with the understanding these estimates of payment rate are probably conservative.
-
-We will estimate the payment rate based on the historic data, but we will ignore the last 4 months of invoicing. This will allow the invoices to age and allow payment incentives like past due reminders and sequestration for non-payment to have their effect to incentivize payment. Using this constraint, the average historic payment rate we will use for estimating revenue is `r scales::percent(average_portion_paid)`
-
-Using the historic payment rate, and the actual number of invoices sent, we can project revenue for recent and future months to get a projected monthly revenue of `r scales::dollar(revenue_and_projections$expected_monthly_revenue)` and an expected annual revenue of `r scales::dollar(revenue_and_projections$expected_annual_revenue)`
-
 ```{r}
 #| label: project-status
 #| echo: false
@@ -338,7 +328,7 @@ project_status <-
     )
 ```
 
-## Lost revenue
+## Possible revenue opportunities
 
 There is reason to believe we are leaving some revenue on the table. There are `r nrow(project_status)` projects in the REDCap project table. Their overall status is shown in @fig-overall-status
 
@@ -441,7 +431,7 @@ ggplot(
 
 ## Aging Report
 
-The unpaid invoices breakdown as shown in @fig-aging-report
+Excluding the last 4 months of invoicing, the historic payment rate `r scales::percent(average_portion_paid)`. The unpaid invoices breakdown as shown in @fig-aging-report
 
 ```{r}
 #| label: fig-aging-report
@@ -462,15 +452,4 @@ invoice_status %>%
   ))) %>%
   count(`Aging Group`, name = "Invoices") %>%
   arrange(desc(`Aging Group`))
-
 ```
-
-## Report summary
-
--   Revenue since inception: `r scales::dollar(revenue_and_projections$actual_revenue)`
-
--   Accounts Receivable since inception: `r scales::dollar(revenue_and_projections$accounts_receivable)`
-
--   Average historic payment rate: `r scales::percent(average_portion_paid)`
-
--   Projected annual revenue: `r scales::dollar(revenue_and_projections$expected_annual_revenue)`
