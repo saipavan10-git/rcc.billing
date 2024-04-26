@@ -2,6 +2,24 @@
 All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.34.0] - 2024-04-26
+### Added
+- Add draft_reports.qmd (@pbchase)
+- Add get_project_details_for_billing (@ljwoodley)
+- Add 'REDCap consulting' service_type to test data (@pbchase)
+
+### Changed
+- CC REDCAP_BILLING_L in request_correction_of_bad_ownership_data.R (@pbchase)
+- Update create_and_send_new_redcap_prod_per_project_line_items.R to prevent duplicates (@pbchase)
+- Update revenue_status_and_projections.qmd (@pbchase)
+  - Add a note to Figure 3. 'REDCap APB Revenue by FY with 12 months of projected revenue.'    
+  - Add more aging brackets.
+  - Fix chit-chat about historic payment rate.
+  - Remove 'Possible revenue opportunities'.
+  - Remove 'Projecting income from extant billable projects' section    
+  - Remove 'Payments Rates and Projections' section.
+  - Remove 'Report summary' section.
+
 
 ## [1.33.2] - 2024-03-15
 ### Changed
