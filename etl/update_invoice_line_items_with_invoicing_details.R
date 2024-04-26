@@ -7,6 +7,7 @@ library(lubridate)
 library(dotenv)
 library(fs)
 
+load_dot_env("prod.env")
 init_etl("update_invoice_line_items_with_invoicing_details")
 
 rcc_billing_conn <- connect_to_rcc_billing_db()
@@ -37,17 +38,18 @@ rc_conn <- connect_to_redcap_db()
 # rcc_billing_conn <- rcc_billing_conn_m
 # rc_conn <- rc_conn_m
 
-# Read the data in the latest payment file in the directory ./output/payments/
-payment_dir = here::here("output", "payments")
-latest_payment_file <- fs::dir_ls(payment_dir) %>%
+# Read the data in the latest payment file in the directory ~/Downloads/
+payment_dir = "~/Downloads"
+latest_payment_file_info <-
+  fs::dir_ls(payment_dir) %>%
   fs::file_info() %>%
-  # NOTE: if more than one file is in here (especially if more than one was uploaded at the same time)
-  # behavior may be undefined
-  # TODO: check if volumes mounted in docker retain host's file metadata
   arrange(desc(modification_time)) %>%
-  head(n=1) %>%
+  head(n=1) |>
+  select("path", "size", "modification_time")
+latest_payment_file <- latest_payment_file_info |>
   pull(path)
-latest_payment_file
+latest_payment_file_info
+
 csbt_billable_details <- readxl::read_excel(latest_payment_file)
 
 billable_details <- transform_invoice_line_items_for_ctsit(csbt_billable_details) %>%
