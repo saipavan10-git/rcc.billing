@@ -96,7 +96,7 @@ send_alert_email <- function(row, email_subject = "") {
         email_body = list(msg),
         email_subject = email_subject,
         email_to = row["emails"],
-        ## email_cc = paste(Sys.getenv("REDCAP_BILLING_L"), Sys.getenv("CSBT_EMAIL")),
+        email_cc = paste(Sys.getenv("REDCAP_BILLING_L")),
         email_from = "ctsit-redcap-reply@ad.ufl.edu"
       )
       my_response <- data.frame(

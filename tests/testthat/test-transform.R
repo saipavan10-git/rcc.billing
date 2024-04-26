@@ -65,3 +65,19 @@ test_that("draft_communication_record_from_line_item correctly adds requisite co
     all( added_columns %in% colnames(communication_records) )
   )
 })
+
+test_that("service_request_time returns the proper time", {
+  service_times <- tribble(
+    ~id, ~time2, ~time_more, ~expected_result,
+    1, 15, NA_real_, 0.25,
+    2, 30, NA_real_, 0.5,
+    3, 45, NA_real_, 0.75,
+    4, 60, NA_real_, 1.0,
+    5, 75, 1.25, 1.25,
+    6, 75, 1.5, 1.5,
+    7, 75, 1.75, 1.75
+  ) |>
+    mutate(time = service_request_time(time2, time_more))
+
+  expect_equal(service_times$expected_result, service_times$time)
+})

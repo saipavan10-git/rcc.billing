@@ -94,16 +94,6 @@ target_projects <- tbl(rc_conn, "redcap_projects") %>%
   distinct(project_id, .keep_all = T) %>%
   # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
   mutate_columns_to_posixct("creation_time") %>%
-  # not have an entry for the same month in the invoice_line_item table
-  anti_join(
-    initial_invoice_line_item %>%
-      filter(
-        fiscal_year == fiscal_year_invoiced,
-        month_invoiced == previous_month_name
-      ) %>%
-      select(ctsi_study_id, fiscal_year, month_invoiced),
-    by = c("project_id" = "ctsi_study_id")
-  ) %>%
   # birthday in past month
   filter(previous_month(month(get_script_run_time())) == month(creation_time)) %>%
   mutate(
@@ -190,6 +180,16 @@ new_invoice_line_item_writes <- target_projects %>%
     price_of_service = price,
     qty_provided = 1,
     amount_due = price * qty_provided
+  ) %>%
+  # Make sure we are not making a duplicate entry with these new invoice line items
+  anti_join(
+    initial_invoice_line_item %>%
+      filter(
+        fiscal_year == fiscal_year_invoiced,
+        month_invoiced == previous_month_name
+      ) %>%
+      select(service_identifier, fiscal_year, month_invoiced),
+    by = c("service_identifier", "fiscal_year", "month_invoiced")
   ) %>%
   # fabricate new IDs
   mutate(id = row_number() + max(initial_invoice_line_item$id)) %>%
