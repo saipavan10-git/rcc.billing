@@ -265,6 +265,31 @@ revenue_by_fy_received_with_projections |>
   mutate(across(where(is.double), scales::dollar))
 ```
 
+## Aging Report
+
+Excluding the last 4 months of invoicing, the historic payment rate `r scales::percent(average_portion_paid)`. The unpaid invoices breakdown as shown in @fig-aging-report
+
+```{r}
+#| label: fig-aging-report
+#| fig-cap: Unpaid invoices grouped by age
+#| echo: false
+#| warning: false
+
+invoice_status %>%
+  filter(status == "invoiced") %>%
+  select(invoice_month, status, amount_due, created) %>%
+  mutate(age_in_days = now() - created) %>%
+  mutate(`Aging Group` = as_factor(case_when(
+    age_in_days <= 30 ~ "0-30 days",
+    age_in_days <= 60 ~ "31-60 days",
+    age_in_days <= 90 ~ "61-90 days",
+    age_in_days <= 120 ~ "91-120 days",
+    TRUE ~ "120+ days"
+  ))) %>%
+  count(`Aging Group`, name = "Invoices") %>%
+  arrange(desc(`Aging Group`))
+```
+
 ```{r}
 #| label: project-status
 #| echo: false
@@ -355,27 +380,3 @@ project_status %>%
   arrange(desc(n))
 ```
 
-## Aging Report
-
-Excluding the last 4 months of invoicing, the historic payment rate `r scales::percent(average_portion_paid)`. The unpaid invoices breakdown as shown in @fig-aging-report
-
-```{r}
-#| label: fig-aging-report
-#| fig-cap: Unpaid invoices grouped by age
-#| echo: false
-#| warning: false
-
-invoice_status %>%
-  filter(status == "invoiced") %>%
-  select(invoice_month, status, amount_due, created) %>%
-  mutate(age_in_days = now() - created) %>%
-  mutate(`Aging Group` = as_factor(case_when(
-    age_in_days <= 30 ~ "0-30 days",
-    age_in_days <= 60 ~ "31-60 days",
-    age_in_days <= 90 ~ "61-90 days",
-    age_in_days <= 120 ~ "91-120 days",
-    TRUE ~ "120+ days"
-  ))) %>%
-  count(`Aging Group`, name = "Invoices") %>%
-  arrange(desc(`Aging Group`))
-```
