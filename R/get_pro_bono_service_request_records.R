@@ -2,8 +2,7 @@
 #'
 #' This function processes a dataframe of service requests to update the billable_rate field
 #'
-#' @param service_requests A dataframe containing service request data, including record IDs, instrument names,
-#' instance numbers, project IDs, and billing details.
+#' @param service_requests A dataframe containing service request data form REDCap PID 1414
 #'
 #' @return Returns a dataframe with updated billable rate
 #'
