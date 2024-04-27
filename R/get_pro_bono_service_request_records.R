@@ -20,7 +20,7 @@ get_probono_service_request_updates <- function(service_requests) {
       .data$redcap_repeat_instance) |>
     # fill project ids on each record group
     dplyr::group_by(.data$record_id) |>
-    tidyr::fill(.data$project_id, .direction = "updown") |>
+    tidyr::fill("project_id", .direction = "updown") |>
     dplyr::ungroup() |>
     dplyr::filter(!is.na(.data$project_id)) |>
     # Compute time, and time total for each project_id-probono group
