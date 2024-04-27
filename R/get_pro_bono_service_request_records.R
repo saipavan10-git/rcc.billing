@@ -40,7 +40,7 @@ get_probono_service_request_updates <- function(service_requests) {
     # Copy probono time to each record across a project_id group
     dplyr::group_by(.data$project_id) |>
     dplyr::mutate(probono_time = dplyr::case_when(
-      .data$probono ~ total_time,
+      .data$probono ~ .data$total_time,
       TRUE ~ 0)) |>
     dplyr::mutate(probono_time = max(.data$probono_time)) |>
     # Mark additional records as probono as needed
