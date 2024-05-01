@@ -36,9 +36,17 @@ redcap_projects <-
   collect() %>%
   sample_n(size = 120) %>%
   arrange(project_id) %>%
-    rowwise() %>%
-    mutate(across(c("project_pi_firstname", "project_pi_lastname", "project_pi_email", "project_irb_number"), my_hash)) %>%
-    mutate(across("project_pi_email", append_fake_email_domain))
+  rowwise() %>%
+  mutate(across(
+    c(
+      "project_pi_firstname",
+      "project_pi_lastname",
+      "project_pi_email",
+      "project_irb_number"
+    ),
+    my_hash
+  )) %>%
+  mutate(across("project_pi_email", append_fake_email_domain))
 
 redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
   filter(pid %in% !!redcap_projects$project_id) %>%
@@ -54,7 +62,15 @@ redcap_record_counts <- tbl(rc_conn, "redcap_record_counts") %>%
 redcap_user_information <- tbl(rc_conn, "redcap_user_information") %>%
   collect() %>%
   rowwise() %>%
-  mutate(across(c("username", "user_email", "user_email2", "user_email3", "user_firstname", "user_lastname", "user_sponsor"), my_hash)) %>%
+  mutate(across(c(
+    "username",
+    "user_email",
+    "user_email2",
+    "user_email3",
+    "user_firstname",
+    "user_lastname",
+    "user_sponsor"
+  ), my_hash)) %>%
   mutate(across("user_email", append_fake_email_domain))
 
 invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
@@ -69,7 +85,8 @@ person_org <- dplyr::tbl(rcc_billing_conn, "person_org") |>
   rowwise() %>%
   mutate(across(c("ufid", "user_id", "email"), my_hash)) %>%
   mutate(across("email", append_fake_email_domain)) |>
-  filter(email %in% redcap_user_information$user_email | user_id %in% redcap_user_information$username) |>
+  filter(email %in% redcap_user_information$user_email |
+    user_id %in% redcap_user_information$username) |>
   ungroup()
 
 org_hierarchies <- dplyr::tbl(rcc_billing_conn, "org_hierarchies") |>
