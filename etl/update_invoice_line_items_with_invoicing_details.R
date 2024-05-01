@@ -256,7 +256,7 @@ if(nrow(billable_details) > 0) {
 }
 
 # Remove the file we just loaded to safeguard subsequent runs from duplicate data
-file.remove(latest_payment_file)
+# file.remove(latest_payment_file)
 
 DBI::dbDisconnect(rcc_billing_conn)
 DBI::dbDisconnect(rc_conn)
