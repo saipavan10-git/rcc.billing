@@ -28,7 +28,7 @@ get_ctsi_study_id_to_project_id_map <- function(service_requests, rcc_billing_co
 
     annual_project_billing_line_items <- extant_invoice_line_items |>
       dplyr::filter(.data$service_type_code == 1) |>
-      dplyr::rename(project_id = .data$service_identifier)
+      dplyr::rename(project_id = "service_identifier")
 
     service_request_line_items <- extant_invoice_line_items |>
       dplyr::filter(.data$service_type_code == 2) |>
@@ -43,9 +43,9 @@ get_ctsi_study_id_to_project_id_map <- function(service_requests, rcc_billing_co
 
     result <- annual_project_billing_line_items |>
       dplyr::bind_rows(service_request_line_items) |>
-      dplyr::select(.data$project_id, .data$ctsi_study_id) |>
+      dplyr::select("project_id", "ctsi_study_id") |>
       dplyr::slice_max(order_by = .data$ctsi_study_id, by = .data$project_id, n = 1) |>
-      dplyr::distinct("project_id", "ctsi_study_id")
+      dplyr::distinct(.data$project_id, .data$ctsi_study_id)
 
     return(result)
   }
