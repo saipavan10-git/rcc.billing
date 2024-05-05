@@ -1,6 +1,6 @@
 invoice_line_item <- data.frame(
   id = c(1, 2, 3, 4),
-  service_type_code = c(1,1,2,1),
+  service_type_code = c(1, 1, 2, 1),
   service_identifier = c(100, 100, 115, 400),
   ctsi_study_id = c(300, 310, 200, 970)
 ) |>
