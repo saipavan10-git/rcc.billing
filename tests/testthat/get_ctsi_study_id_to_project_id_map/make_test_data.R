@@ -1,3 +1,7 @@
+# Record 3 does not have the project_id service_identifier
+# To get the project_id, we will need the first record in
+# the service_requests dataframe below.
+# get_ctsi_study_id_to_project_id_map will make that join among other tasks.
 invoice_line_item <- data.frame(
   id = c(1, 2, 3, 4),
   service_type_code = c(1, 1, 2, 1),
