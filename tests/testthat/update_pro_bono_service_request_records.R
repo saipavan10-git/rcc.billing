@@ -1,7 +1,7 @@
-# records 1128 and 4907 contains duplicated project id.The record with the least time
+# records 1128 and 4907 contain duplicated project id.The record with the least time
 # will be updated by get_probono_service_request_updates in addition to record_id 3
 # which contians a unique project_id.
-testthat::test_that("get_probono_service_request_updates returns the correct output", {
+testthat::test_that("get_probono_service_request_updates returns the correct df", {
   service_requests <- data.frame(
     record_id = rep(c(3, 66, 1128, 4907, 6458, 6473, 5883), each = 2),
     redcap_repeat_instrument = rep(c(NA, "help_desk_response"), 7),
