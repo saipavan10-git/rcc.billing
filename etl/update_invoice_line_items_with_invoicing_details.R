@@ -44,6 +44,7 @@ latest_payment_file_info <-
   fs::dir_ls(payment_dir) %>%
   fs::file_info() %>%
   arrange(desc(modification_time)) %>%
+  filter(str_detect(path, "CTSIT.*xlsx$")) |>
   head(n=1) |>
   select("path", "size", "modification_time")
 latest_payment_file <- latest_payment_file_info |>
