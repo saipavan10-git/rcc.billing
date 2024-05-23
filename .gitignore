@@ -5,6 +5,7 @@
 .env
 *.env
 !examples/testing.env
+!env/*
 
 # output files
 *.pdf
