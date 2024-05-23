@@ -1,6 +1,9 @@
-# Change Log
-All notable changes to the rcc.billing package and its contained scripts will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/).
+
+# rcc.billing 1.35.0 (released 2024-05-23)
+- Set custom CC when running revenue_status_and_projections (@pbchase)
+- Revise input file search and management in update_invoice_line_items_with_invoicing_details.R (@pbchase)
+- Add get_ctsi_study_id_to_project_id_map (@ljwoodley, @pbchase, @ChemiKyle, #212)
+- Reflow make_test_data_for_get_billable_candidates.R (@pbchase)
 
 ## [1.34.0] - 2024-04-26
 ### Added
