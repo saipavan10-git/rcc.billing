@@ -27,6 +27,7 @@ Imports:
     rcc.ctsit,
     stringr,
     testthat,
+    tidyr,
     writexl
 Suggests:
     RSQLite,
