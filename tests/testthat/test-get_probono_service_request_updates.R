@@ -200,7 +200,7 @@ testthat::test_that("get_probono_service_request_updates handles multiple reques
 
 testthat::test_that("get_probono_service_request_updates handles multiple requests with multiple time entries for 3 projects, where some entries are already probono. Also add non-project entries", {
   service_requests <-
-    bind_rows(
+    dplyr::bind_rows(
       data.frame(
         record_id = c(rep(1, 5), rep(2, 5), rep(3, 5)),
         redcap_repeat_instrument = rep(c(NA, rep("help_desk_response", 4)), 3),
