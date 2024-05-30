@@ -5,13 +5,10 @@
 - Add get_ctsi_study_id_to_project_id_map (@ljwoodley, @pbchase, @ChemiKyle, #212)
 - Reflow make_test_data_for_get_billable_candidates.R (@pbchase)
 
-## [1.34.0] - 2024-04-26
-### Added
+# rcc.billing 1.34.0 (released 2024-04-26)
 - Add draft_reports.qmd (@pbchase)
 - Add get_project_details_for_billing (@ljwoodley)
 - Add 'REDCap consulting' service_type to test data (@pbchase)
-
-### Changed
 - CC REDCAP_BILLING_L in request_correction_of_bad_ownership_data.R (@pbchase)
 - Update create_and_send_new_redcap_prod_per_project_line_items.R to prevent duplicates (@pbchase)
 - Update revenue_status_and_projections.qmd (@pbchase)
