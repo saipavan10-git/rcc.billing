@@ -4,8 +4,6 @@ library(REDCapR)
 library(tidyverse)
 library(rcc.billing)
 
-init_etl("dev")
-
 source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
 
 read_service_requests <- redcap_read(
