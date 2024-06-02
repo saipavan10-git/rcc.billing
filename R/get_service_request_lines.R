@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' processed_requests <- get_service_request_lines(service_requests)
+#' service_request_lines <- get_service_request_lines(service_requests)
 #'}
 #' @export
 get_service_request_lines <- function(service_requests) {
