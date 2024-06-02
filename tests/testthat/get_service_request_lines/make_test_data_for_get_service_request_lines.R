@@ -35,7 +35,16 @@ service_requests <- read_service_requests |>
     time_more,
     response
   ) |>
-  mutate(response = if_else(!is.na(response), "fake response", response))
+  mutate(
+    irb_number = if_else(!is.na(irb_number), "123", irb_number),
+    pi = if_else(!is.na(pi), "Dr. Bogus PI", pi),
+    last_name = if_else(!is.na(last_name), "l_name", last_name),
+    first_name = if_else(!is.na(first_name), "f_name", first_name),
+    pi_email = if_else(!is.na(pi_email), "pi_email@ufl.edu", pi_email),
+    email = if_else(!is.na(email), "bogus@ufl.edu", email),
+    redcap_username = if_else(!is.na(redcap_username), "bogus_rc_username", redcap_username),
+    gatorlink= if_else(!is.na(gatorlink), "bogus_gatorlink", gatorlink),
+    response = if_else(!is.na(response), "fake response", response))
 
 saveRDS(
   service_requests,

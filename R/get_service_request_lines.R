@@ -13,7 +13,7 @@
 #'}
 #' @export
 get_service_request_lines <- function(service_requests) {
-  request_details <- read_service_requests |>
+  request_details <- service_requests |>
     dplyr::filter(is.na(.data$redcap_repeat_instrument)) |>
     #TODO: Is a column missing in paste?
     dplyr::mutate(
