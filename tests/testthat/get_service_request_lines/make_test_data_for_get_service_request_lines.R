@@ -33,7 +33,10 @@ service_requests <- read_service_requests |>
     billable_rate,
     time2,
     time_more,
-    response
+    response,
+    fiscal_contact_fn,
+    fiscal_contact_ln,
+    fiscal_contact_email
   ) |>
   mutate(
     irb_number = if_else(!is.na(irb_number), "123", irb_number),
@@ -53,4 +56,3 @@ saveRDS(
     "service_requests.rds"
   )
 )
-

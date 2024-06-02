@@ -50,6 +50,9 @@ get_service_request_lines <- function(service_requests) {
       "pi_last_name",
       "pi_first_name",
       "pi_email",
+      "fiscal_contact_fn",
+      "fiscal_contact_ln",
+      "fiscal_contact_email",
       "service_identifier",
       "service_instance_id",
       "service_type_code"
@@ -97,6 +100,9 @@ get_service_request_lines <- function(service_requests) {
       "pi_first_name",
       "pi_email",
       "other_system_invoicing_comments",
+      "fiscal_contact_fn",
+      "fiscal_contact_ln",
+      "fiscal_contact_email",
       "qty_provided",
       "amount_due",
       "price_of_service"

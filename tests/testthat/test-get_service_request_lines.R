@@ -19,6 +19,9 @@ testthat::test_that("get_service_request_lines returns the proper df", {
       "6469bogus_rc_username2024-04-30fake response :",
       "6473bogus_gatorlink2024-05-01Pro-bono : fake response :"
     ),
+    fiscal_contact_fn = rep(NA_character_, 5),
+    fiscal_contact_ln = rep(NA_character_, 5),
+    fiscal_contact_email = rep(NA_character_, 5),
     qty_provided = c(1.50, 0.25, 0.25, 0.50, 0.25),
     amount_due = c(195.0, 32.5, 32.5, 65.0, 0.0),
     price_of_service = c(130, 130, 130, 130, 0)
