@@ -14,7 +14,7 @@ user_info <- get_user_rights_and_info(rc_conn) |>
 
 unpaid_invoice_line_items <-
   tbl(rcc_billing_conn, "invoice_line_item") |>
-  filter(status == "invoiced" & !is.na(date_sent) & service_type_code == 1) |>
+  filter(status == "invoiced" & service_type_code == 1) |>
   collect()
 
 project_flags <- get_project_flags(rc_conn) |>
