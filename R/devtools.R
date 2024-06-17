@@ -4,7 +4,6 @@
 #' @param table_name, the name of the table to convert
 #'
 #' @returns sqlite schema for table_name
-#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' \dontrun{
@@ -25,7 +24,7 @@ convert_schema_to_sqlite <- function(table_name) {
   # convert to sqlite
   cmd <- paste("cat", original_schema_file, "|", "perl", pl_to_sqlite)
 
-  result <- system(cmd, intern = TRUE) %>% paste(collapse = "")
+  result <- system(cmd, intern = TRUE) |> paste(collapse = "")
   return(result)
 }
 
@@ -35,7 +34,6 @@ convert_schema_to_sqlite <- function(table_name) {
 #' @param schema, a MySQL/MariaDB Schema
 #'
 #' @returns sqlite schema for `schema`
-#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' \dontrun{
@@ -49,7 +47,7 @@ mysql_schema_to_sqlite <- function(schema) {
   # construct conversion command
   cmd <- paste("perl", pl_to_sqlite)
 
-  result <- system(cmd, input = schema, intern = TRUE) %>% paste(collapse = "")
+  result <- system(cmd, input = schema, intern = TRUE) |> paste(collapse = "")
   return(result)
 }
 

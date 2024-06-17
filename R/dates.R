@@ -27,8 +27,6 @@ previous_month <- function(month) {
 #' @param month - an integer month number
 #' @param n - the number of months to subtract from current month (default = 1)
 #'
-#' @importFrom dplyr if_else
-#' @importFrom lubridate add_with_rollback ceiling_date years month
 #' @return the nth previous month number as in integer
 #' @export
 #'
@@ -38,7 +36,7 @@ previous_month <- function(month) {
 previous_n_months <- function(month, n = 1) {
 
   result = month - n %% 12
-  result = if_else(result <= 0, result + 12, result)
+  result = dplyr::if_else(result <= 0, result + 12, result)
 
   return(result)
 }
@@ -51,8 +49,6 @@ previous_n_months <- function(month, n = 1) {
 #' @param month - an integer month number
 #' @param n - the number of months to add to the current month (default = 1)
 #'
-#' @importFrom dplyr if_else
-#' @importFrom lubridate add_with_rollback ceiling_date years month
 #' @return the nth next month number as in integer
 #' @export
 #'
@@ -62,7 +58,7 @@ previous_n_months <- function(month, n = 1) {
 next_n_months <- function(month, n = 1) {
 
   result = month + n %% 12
-  result = if_else(result > 12, result - 12, result)
+  result = dplyr::if_else(result > 12, result - 12, result)
 
   return(result)
 }

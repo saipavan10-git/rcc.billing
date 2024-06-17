@@ -8,9 +8,6 @@
 #' @return The input dataframe with revised data types
 #' @export
 #'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
-#'
 #' @examples
 #' \dontrun{
 #' time_columns <- c("created", "updated")
@@ -18,7 +15,7 @@
 #' }
 #' @export
 mutate_columns_to_posixct <- function(data, column_names) {
-  result <- data %>%
+  result <- data |>
     dplyr::mutate(dplyr::across(
       dplyr::any_of(column_names),
       ~ as.POSIXct(., origin = "1970-01-01 00:00.00 UTC", tz = "UTC")
@@ -32,8 +29,6 @@ mutate_columns_to_posixct <- function(data, column_names) {
 #' @param invoice_line_item_communications, data that follows the format of invoice_line_item_communications_test_data located in R/data.R
 #'
 #' @returns invoice_line_item dataframe
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -47,18 +42,18 @@ invoice_line_item_df_from <- function(invoice_line_item_communications) {
     "service_identifier", "fiscal_year", "month_invoiced"
   )
 
-  created <- invoice_line_item_communications %>%
-    dplyr::arrange(created) %>%
-    dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) %>%
-    dplyr::select(dplyr::any_of(id_columns), created)
+  created <- invoice_line_item_communications |>
+    dplyr::arrange(created) |>
+    dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) |>
+    dplyr::select(dplyr::any_of(id_columns), "created")
 
-  invoice_line_item <- invoice_line_item_communications %>%
-    dplyr::arrange(dplyr::desc(created)) %>%
-    dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) %>%
-    dplyr::select(-dplyr::any_of(excluded_columns)) %>%
-    dplyr::inner_join(created, by = id_columns) %>%
-    dplyr::relocate(.data$updated, .after = created) %>%
-    dplyr::arrange((.data$je_number)) %>%
+  invoice_line_item <- invoice_line_item_communications |>
+    dplyr::arrange(dplyr::desc(created)) |>
+    dplyr::distinct(.data$service_identifier, .data$fiscal_year, .data$month_invoiced, .keep_all = T) |>
+    dplyr::select(-dplyr::any_of(excluded_columns)) |>
+    dplyr::inner_join(created, by = id_columns) |>
+    dplyr::relocate("updated", .after = "created") |>
+    dplyr::arrange((.data$je_number)) |>
     dplyr::mutate(id = as.double(dplyr::row_number()))
 
   return(invoice_line_item)
@@ -73,9 +68,6 @@ invoice_line_item_df_from <- function(invoice_line_item_communications) {
 #'
 #' @return The input dataframe with revised data types
 #' @export
-#'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -104,9 +96,6 @@ fix_data_in_invoice_line_item <- function(data) {
 #' @return The input dataframe with revised data types
 #' @export
 #'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
-#'
 #' @examples
 #' \dontrun{
 #' fix_data_in_invoice_line_item_communication(invoice_line_item_communication_test_data)
@@ -133,9 +122,6 @@ fix_data_in_invoice_line_item_communication <- function(data) {
 #'
 #' @return The input dataframe with revised data types
 #' @export
-#'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -166,9 +152,6 @@ fix_data_in_redcap_projects <- function(data) {
 #'
 #' @return The input dataframe with revised data types
 #' @export
-#'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -202,9 +185,6 @@ fix_data_in_redcap_user_information <- function(data) {
 #' @return The input dataframe with revised data types
 #' @export
 #'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
-#'
 #' @examples
 #' \dontrun{
 #' fix_data_in_redcap_log_event(redcap_log_event_test_data)
@@ -215,7 +195,7 @@ fix_data_in_redcap_log_event <- function(data) {
     "ts"
   )
   if (nrow(data) == 0) { # zero-row SQLite3 tables get the wrong data type on ts
-    result <- data %>%
+    result <- data |>
       dplyr::mutate(
         dplyr::across(
           dplyr::any_of(integer64_columns),
@@ -238,8 +218,8 @@ fix_data_in_redcap_log_event <- function(data) {
 #' @details DETAILS
 #' @examples
 #' \dontrun{
-#' tbl(conn, "invoice_line_item") %>%
-#'   collect() %>%
+#' tbl(conn, "invoice_line_item") |>
+#'   collect() |>
 #'   transform_invoice_line_items_for_csbt()
 #' }
 #' @export
@@ -247,13 +227,13 @@ fix_data_in_redcap_log_event <- function(data) {
 transform_invoice_line_items_for_csbt <- function(invoice_line_items) {
 
   new_names <- function(old_column_names) {
-    rcc.billing::csbt_column_names %>%
-      dplyr::filter(.data$ctsit %in% old_column_names) %>%
+    rcc.billing::csbt_column_names |>
+      dplyr::filter(.data$ctsit %in% old_column_names) |>
       dplyr::pull(.data$csbt)
   }
 
-  result <- invoice_line_items %>%
-    dplyr::select(dplyr::any_of(rcc.billing::csbt_column_names$ctsit)) %>%
+  result <- invoice_line_items |>
+    dplyr::select(dplyr::any_of(rcc.billing::csbt_column_names$ctsit)) |>
     dplyr::rename_with(.fn = ~ new_names(.), .cols = dplyr::any_of(rcc.billing::csbt_column_names$ctsit))
 
   return(result)
@@ -268,8 +248,8 @@ transform_invoice_line_items_for_csbt <- function(invoice_line_items) {
 #' @details DETAILS
 #' @examples
 #' \dontrun{
-#' df_from_csbt %>%
-#'   transform_invoice_line_items_for_ctsit() %>%
+#' df_from_csbt |>
+#'   transform_invoice_line_items_for_ctsit() |>
 #'   janitor::clean_names()
 #' }
 #' @export
@@ -277,14 +257,14 @@ transform_invoice_line_items_for_csbt <- function(invoice_line_items) {
 transform_invoice_line_items_for_ctsit <- function(invoice_line_items) {
 
   new_names <- function(old_column_names) {
-    rcc.billing::csbt_column_names %>%
-      dplyr::filter(.data$csbt %in% old_column_names) %>%
+    rcc.billing::csbt_column_names |>
+      dplyr::filter(.data$csbt %in% old_column_names) |>
       dplyr::pull(.data$ctsit)
   }
 
-  result <- invoice_line_items %>%
+  result <- invoice_line_items |>
     # NOTE: we do not want to lose column names here
-    # dplyr::select(dplyr::any_of(rcc.billing::csbt_column_names$csbt)) %>%
+    # dplyr::select(dplyr::any_of(rcc.billing::csbt_column_names$csbt)) |>
     dplyr::rename_with(.fn = ~ new_names(.), .cols = dplyr::any_of(rcc.billing::csbt_column_names$csbt))
 
   return(result)
@@ -304,13 +284,13 @@ transform_invoice_line_items_for_ctsit <- function(invoice_line_items) {
 #' }
 #' @examples
 #' \dontrun{
-#' tbl(conn, "invoice_line_item") %>%
-#'   collect() %>%
+#' tbl(conn, "invoice_line_item") |>
+#'   collect() |>
 #'   draft_communication_record_from_line_item()
 #' }
 #' @export
 draft_communication_record_from_line_item <- function(invoice_line_items) {
-  result <- invoice_line_items %>%
+  result <- invoice_line_items |>
     dplyr::mutate(
       updated = redcapcustodian::get_script_run_time(),
       sender = Sys.getenv("EMAIL_FROM"),
@@ -355,4 +335,3 @@ service_request_time <- function(time_minutes, time_hours) {
 
   return(result)
 }
-

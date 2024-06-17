@@ -7,7 +7,6 @@
 #'
 #' @return Username of the last user to log an actio against the project
 #' @export
-#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' \dontrun{
@@ -18,16 +17,16 @@
 #' }
 get_last_project_user <- function(con, pid) {
 
-  log_event_table <- dplyr::tbl(con, "redcap_projects") %>%
-    dplyr::filter(.data$project_id == pid) %>%
+  log_event_table <- dplyr::tbl(con, "redcap_projects") |>
+    dplyr::filter(.data$project_id == pid) |>
     dplyr::pull(.data$log_event_table)
 
-  last_user <- dplyr::tbl(con, log_event_table) %>%
-    dplyr::filter(.data$project_id == pid) %>%
-    dplyr::arrange(dplyr::desc(.data$ts)) %>%
-    utils::head(1) %>%
-    dplyr::select(.data$user) %>%
-    dplyr::collect() %>%
+  last_user <- dplyr::tbl(con, log_event_table) |>
+    dplyr::filter(.data$project_id == pid) |>
+    dplyr::arrange(dplyr::desc(.data$ts)) |>
+    utils::head(1) |>
+    dplyr::select("user") |>
+    dplyr::collect() |>
     dplyr::pull(.data$user)
 
   return(last_user)
@@ -43,8 +42,6 @@ get_last_project_user <- function(con, pid) {
 #'
 #' @return a vector of project IDs
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' get_projects_needing_new_owners(
@@ -55,9 +52,9 @@ get_last_project_user <- function(con, pid) {
 #' )
 get_projects_needing_new_owners <- function(redcap_entity_project_ownership,
                                             redcap_user_information) {
-  projects_needing_new_owners <- redcap_entity_project_ownership %>%
-    dplyr::inner_join(redcap_user_information, by = "username") %>%
-    dplyr::filter(is.na(.data$user_email)) %>%
+  projects_needing_new_owners <- redcap_entity_project_ownership |>
+    dplyr::inner_join(redcap_user_information, by = "username") |>
+    dplyr::filter(is.na(.data$user_email)) |>
     dplyr::pull(.data$pid)
 
   return(projects_needing_new_owners)
@@ -72,8 +69,6 @@ get_projects_needing_new_owners <- function(redcap_entity_project_ownership,
 #'
 #' @return a vector of project IDs
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' get_projects_without_owners(
@@ -84,9 +79,9 @@ get_projects_needing_new_owners <- function(redcap_entity_project_ownership,
 #' )
 get_projects_without_owners <- function(redcap_projects,
                                         redcap_entity_project_ownership) {
-  redcap_projects %>%
-    dplyr::anti_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) %>%
-    dplyr::filter(!.data$project_id %in% seq(from = 1, to = 14)) %>%
+  redcap_projects |>
+    dplyr::anti_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) |>
+    dplyr::filter(!.data$project_id %in% seq(from = 1, to = 14)) |>
     dplyr::pull(.data$project_id)
 }
 
@@ -100,8 +95,6 @@ get_projects_without_owners <- function(redcap_projects,
 #'
 #' @return a dataframe of project_PI details from redcap_projects
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' get_project_pis(
@@ -111,27 +104,27 @@ get_projects_without_owners <- function(redcap_projects,
 #' )
 get_project_pis <- function(redcap_projects,
                             return_project_ownership_format = FALSE) {
-  non_blank_project_pis <- redcap_projects %>%
-    dplyr::filter(stringr::str_detect(.data$project_pi_email, "^.+@.+\\..+")) %>%
+  non_blank_project_pis <- redcap_projects |>
+    dplyr::filter(stringr::str_detect(.data$project_pi_email, "^.+@.+\\..+")) |>
     dplyr::select(
-      .data$project_id,
-      .data$project_pi_email,
-      .data$project_pi_firstname,
-      .data$project_pi_mi,
-      .data$project_pi_lastname,
-      .data$project_pi_username
+      "project_id",
+      "project_pi_email",
+      "project_pi_firstname",
+      "project_pi_mi",
+      "project_pi_lastname",
+      "project_pi_username"
     )
 
   if(return_project_ownership_format) {
-    result <- non_blank_project_pis %>%
+    result <- non_blank_project_pis |>
       dplyr::rename(
-        pid = .data$project_id,
-        email = .data$project_pi_email,
-        firstname = .data$project_pi_firstname,
-        lastname = .data$project_pi_lastname,
-        username = .data$project_pi_username
-      ) %>%
-      dplyr::select(-.data$project_pi_mi)
+        pid = "project_id",
+        email = "project_pi_email",
+        firstname = "project_pi_firstname",
+        lastname = "project_pi_lastname",
+        username = "project_pi_username"
+      ) |>
+      dplyr::select(-"project_pi_mi")
   } else {
     result <- non_blank_project_pis
   }
@@ -155,8 +148,6 @@ get_project_pis <- function(redcap_projects,
 #'
 #' @return a dataframe of project creators from redcap_projects
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -180,28 +171,28 @@ get_creators <- function(redcap_projects,
                          redcap_staff_employment_periods,
                          include_suspended_users = FALSE,
                          return_project_ownership_format = FALSE) {
-  redcap_user_information_without_extra_columns <- redcap_user_information %>%
+  redcap_user_information_without_extra_columns <- redcap_user_information |>
     dplyr::select(
-      .data$ui_id,
-      .data$username,
-      .data$user_email,
-      .data$user_suspended_time
+      "ui_id",
+      "username",
+      "user_email",
+      "user_suspended_time"
     )
 
-  result <- redcap_projects %>%
-    dplyr::left_join(redcap_user_information_without_extra_columns, by = c("created_by" = "ui_id")) %>%
-    dplyr::filter(!is.na(.data$user_email)) %>%
-    dplyr::filter(is.na(.data$user_suspended_time) | include_suspended_users) %>%
-    dplyr::left_join(redcap_staff_employment_periods, by = c("username" = "redcap_username")) %>%
-    dplyr::filter(!.data$creation_time %in% .data$employment_interval) %>%
+  result <- redcap_projects |>
+    dplyr::left_join(redcap_user_information_without_extra_columns, by = c("created_by" = "ui_id")) |>
+    dplyr::filter(!is.na(.data$user_email)) |>
+    dplyr::filter(is.na(.data$user_suspended_time) | include_suspended_users) |>
+    dplyr::left_join(redcap_staff_employment_periods, by = c("username" = "redcap_username")) |>
+    dplyr::filter(!.data$creation_time %in% .data$employment_interval) |>
     dplyr::select(
-      .data$project_id,
-      .data$username
+      "project_id",
+      "username"
     )
 
   if (return_project_ownership_format) {
-    result <- result %>%
-      dplyr::rename(pid = .data$project_id)
+    result <- result |>
+      dplyr::rename(pid = "project_id")
   }
 
   return(result)
@@ -229,8 +220,6 @@ get_creators <- function(redcap_projects,
 #'
 #' @return a dataframe of privileged,  _user_ accounts on the projects provided
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -284,40 +273,40 @@ get_privileged_user <- function(redcap_projects,
                                 include_low_privilege_users = FALSE,
                                 include_suspended_users = FALSE,
                                 return_project_ownership_format = FALSE) {
-  redcap_user_information_without_extra_columns <- redcap_user_information %>%
+  redcap_user_information_without_extra_columns <- redcap_user_information |>
     dplyr::select(
-      .data$ui_id,
-      .data$username,
-      .data$user_email,
-      .data$user_suspended_time
+      "ui_id",
+      "username",
+      "user_email",
+      "user_suspended_time"
     )
 
-  result <- redcap_projects %>%
-    dplyr::left_join(redcap_user_rights, by = c("project_id")) %>%
-    dplyr::left_join(redcap_user_roles, by = c("project_id", "role_id"), suffix = c(".rights", ".roles")) %>%
+  result <- redcap_projects |>
+    dplyr::left_join(redcap_user_rights, by = c("project_id")) |>
+    dplyr::left_join(redcap_user_roles, by = c("project_id", "role_id"), suffix = c(".rights", ".roles")) |>
     # Test for any privileges aka "Low privileges". Will satisfy PID 31 in test data
-    dplyr::filter(dplyr::if_any(dplyr::ends_with(c(".rights", ".roles")), ~ .x == 1)) %>%
+    dplyr::filter(dplyr::if_any(dplyr::ends_with(c(".rights", ".roles")), ~ .x == 1)) |>
     # Test for high privileges. Will satisfy PID 30 in test data
     # include_low_privilege_users bypasses this test
     dplyr::filter(include_low_privilege_users |
-      dplyr::if_any(dplyr::starts_with(c("design.", "user_rights.")), ~ .x == 1)) %>%
-    dplyr::left_join(redcap_user_information_without_extra_columns, by = "username") %>%
-    dplyr::filter(!is.na(.data$user_email)) %>%
+      dplyr::if_any(dplyr::starts_with(c("design.", "user_rights.")), ~ .x == 1)) |>
+    dplyr::left_join(redcap_user_information_without_extra_columns, by = "username") |>
+    dplyr::filter(!is.na(.data$user_email)) |>
     # include_suspended_users bypasses this test
-    dplyr::filter(is.na(.data$user_suspended_time) | include_suspended_users) %>%
-    dplyr::left_join(redcap_staff_employment_periods, by = c("username" = "redcap_username")) %>%
-    dplyr::filter(!.data$creation_time %in% .data$employment_interval) %>%
+    dplyr::filter(is.na(.data$user_suspended_time) | include_suspended_users) |>
+    dplyr::left_join(redcap_staff_employment_periods, by = c("username" = "redcap_username")) |>
+    dplyr::filter(!.data$creation_time %in% .data$employment_interval) |>
     # filter_for_faculty adds this test
-    filter(!filter_for_faculty | is_faculty(.data$username)) %>%
+    dplyr::filter(!filter_for_faculty | is_faculty(.data$username)) |>
     dplyr::select(
-      .data$project_id,
-      .data$username
-    ) %>%
+      "project_id",
+      "username"
+    ) |>
     dplyr::distinct(.data$project_id, .keep_all = T)
 
   if (return_project_ownership_format) {
-    result <- result %>%
-      dplyr::rename(pid = .data$project_id)
+    result <- result |>
+      dplyr::rename(pid = "project_id")
   }
 
   return(result)
@@ -328,9 +317,7 @@ get_privileged_user <- function(redcap_projects,
 #'
 #' @param conn - A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #'
-#' @importFrom magrittr "%>%"
 #' @importFrom lubridate "%within%"
-#' @importFrom rlang .data
 #'
 #' @return A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
 #' @export
@@ -346,29 +333,29 @@ get_privileged_user <- function(redcap_projects,
 #' )
 #' }
 update_billable_by_ownership <- function(conn) {
-  actionable_projects <- dplyr::tbl(conn, "redcap_entity_project_ownership") %>%
-    dplyr::filter(is.na(.data$billable)) %>%
+  actionable_projects <- dplyr::tbl(conn, "redcap_entity_project_ownership") |>
+    dplyr::filter(is.na(.data$billable)) |>
     # filter out projects created less than 1 month ago
     dplyr::inner_join(
-      dplyr::tbl(conn, "redcap_projects") %>%
-        dplyr::select(.data$project_id, .data$creation_time),
+      dplyr::tbl(conn, "redcap_projects") |>
+        dplyr::select("project_id", "creation_time"),
       by = c("pid" = "project_id")
-    ) %>%
-    dplyr::collect() %>%
-    dplyr::filter(.data$creation_time < redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %>%
-    dplyr::select(-.data$creation_time)
+    ) |>
+    dplyr::collect() |>
+    dplyr::filter(.data$creation_time < redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) |>
+    dplyr::select(-"creation_time")
 
-  billable_update <- actionable_projects %>%
-    dplyr::full_join(rcc.billing::ctsit_staff_employment_periods, by = c("username" = "redcap_username" )) %>%
+  billable_update <- actionable_projects |>
+    dplyr::full_join(rcc.billing::ctsit_staff_employment_periods, by = c("username" = "redcap_username" )) |>
     dplyr::mutate(billable = dplyr::if_else(
       as.Date.POSIXct(.data$created) %within% .data$employment_interval, 0, 1)
-    ) %>%
+    ) |>
     # correct non-staff NA values
-    dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) %>%
-    dplyr::select(-c(.data$employment_interval)) %>%
+    dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) |>
+    dplyr::select(-c("employment_interval")) |>
     # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
-    dplyr::arrange(.data$pid, .data$billable) %>%
-    dplyr::distinct(.data$pid, .keep_all = TRUE) %>%
+    dplyr::arrange(.data$pid, .data$billable) |>
+    dplyr::distinct(.data$pid, .keep_all = TRUE) |>
     dplyr::mutate(updated = as.integer(redcapcustodian::get_script_run_time()))
 
   billable_update_diff <- redcapcustodian::dataset_diff(
@@ -387,9 +374,7 @@ update_billable_by_ownership <- function(conn) {
 #'
 #' @param conn - A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #'
-#' @importFrom magrittr "%>%"
 #' @importFrom lubridate "%within%"
-#' @importFrom rlang .data
 #'
 #' @return A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
 #' @export
@@ -405,33 +390,33 @@ update_billable_by_ownership <- function(conn) {
 #' )
 #' }
 update_billable_if_owned_by_ctsit <- function(conn) {
-  actionable_projects <- dplyr::tbl(conn, "redcap_entity_project_ownership") %>%
-    dplyr::filter(.data$billable == 1) %>%
+  actionable_projects <- dplyr::tbl(conn, "redcap_entity_project_ownership") |>
+    dplyr::filter(.data$billable == 1) |>
     # filter out projects created less than 1 month ago
     dplyr::inner_join(
-      dplyr::tbl(conn, "redcap_projects") %>%
-        dplyr::select(.data$project_id, .data$creation_time),
+      dplyr::tbl(conn, "redcap_projects") |>
+        dplyr::select("project_id", "creation_time"),
       by = c("pid" = "project_id")
-    ) %>%
-    dplyr::collect() %>%
-    dplyr::filter(.data$creation_time < redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %>%
-    dplyr::select(-.data$creation_time) %>%
+    ) |>
+    dplyr::collect() |>
+    dplyr::filter(.data$creation_time < redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) |>
+    dplyr::select(-"creation_time") |>
     # filter for projects owned by CTS-IT staff
-    dplyr::full_join(rcc.billing::ctsit_staff_employment_periods, by = c("username" = "redcap_username" )) %>%
-    dplyr::filter(!is.na(.data$pid)) %>%
+    dplyr::full_join(rcc.billing::ctsit_staff_employment_periods, by = c("username" = "redcap_username" )) |>
+    dplyr::filter(!is.na(.data$pid)) |>
     dplyr::filter(!is.na(.data$employment_interval))
 
-  billable_update <- actionable_projects %>%
+  billable_update <- actionable_projects |>
     dplyr::mutate(billable = dplyr::if_else(
       as.Date.POSIXct(.data$created) %within% .data$employment_interval, 0, 1)
-    ) %>%
+    ) |>
     # correct non-staff NA values
-    dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) %>%
-    dplyr::select(-c(.data$employment_interval)) %>%
+    dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) |>
+    dplyr::select(-c("employment_interval")) |>
     # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
-    dplyr::arrange(.data$pid, .data$billable) %>%
-    dplyr::distinct(.data$pid, .keep_all = TRUE) %>%
-    dplyr::filter(.data$billable == 0) %>%
+    dplyr::arrange(.data$pid, .data$billable) |>
+    dplyr::distinct(.data$pid, .keep_all = TRUE) |>
+    dplyr::filter(.data$billable == 0) |>
     dplyr::mutate(updated = as.integer(redcapcustodian::get_script_run_time()))
 
   billable_update_diff <- redcapcustodian::dataset_diff(
@@ -451,9 +436,9 @@ update_billable_if_owned_by_ctsit <- function(conn) {
 #' @examples
 #' \dontrun{sent_line_items <- get_unpaid_redcap_prod_per_project_line_items(rcc_billing_conn)}
 get_unpaid_redcap_prod_per_project_line_items <- function(rcc_billing_conn) {
-  unpaid_redcap_prod_per_project_line_items <- dplyr::tbl(rcc_billing_conn, "invoice_line_item") %>%
-    dplyr::filter(.data$service_type_code == 1 & .data$status == "sent") %>%
-    dplyr::collect() %>%
+  unpaid_redcap_prod_per_project_line_items <- dplyr::tbl(rcc_billing_conn, "invoice_line_item") |>
+    dplyr::filter(.data$service_type_code == 1 & .data$status == "sent") |>
+    dplyr::collect() |>
     dplyr::mutate(project_id = stringr::str_replace(.data$service_instance_id, "1-", ""))
 
   return(unpaid_redcap_prod_per_project_line_items)
@@ -470,9 +455,6 @@ get_unpaid_redcap_prod_per_project_line_items <- function(rcc_billing_conn) {
 #' @param sent_line_items a dataframe returned by \code{\link{get_unpaid_redcap_prod_per_project_line_items}}
 #' @param rc_conn - A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #'
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
-#'
 #' @return A dataframe of revised redcap project invoice_line_items reassigned to new owners
 #' @export
 #'
@@ -486,20 +468,20 @@ get_unpaid_redcap_prod_per_project_line_items <- function(rcc_billing_conn) {
 #' }
 #' @seealso \code{\link{csbt_column_names}}
 get_reassigned_line_items <- function(sent_line_items, rc_conn) {
-  redcap_entity_project_ownership <- dplyr::tbl(rc_conn, "redcap_entity_project_ownership") %>%
-    dplyr::filter(.data$pid %in% !!sent_line_items$project_id) %>%
-    dplyr::mutate_at("pid", as.character) %>%
-    dplyr::select(-c(.data$id, .data$created, .data$updated)) %>%
+  redcap_entity_project_ownership <- dplyr::tbl(rc_conn, "redcap_entity_project_ownership") |>
+    dplyr::filter(.data$pid %in% !!sent_line_items$project_id) |>
+    dplyr::mutate_at("pid", as.character) |>
+    dplyr::select(-c("id", "created", "updated")) |>
     dplyr::collect()
 
-  reassigned_line_items <- sent_line_items %>%
-    dplyr::left_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) %>%
+  reassigned_line_items <- sent_line_items |>
+    dplyr::left_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) |>
     dplyr::filter(
       .data$gatorlink  != .data$username |
         .data$pi_email != .data$email |
         .data$pi_first_name != .data$firstname |
         .data$pi_last_name != .data$lastname
-    ) %>%
+    ) |>
     dplyr::mutate(
       gatorlink  = .data$username,
       pi_email = .data$email,
@@ -507,16 +489,16 @@ get_reassigned_line_items <- function(sent_line_items, rc_conn) {
       pi_last_name = .data$lastname,
       reason = "PI reassigned",
       updated = redcapcustodian::get_script_run_time()
-    ) %>%
+    ) |>
     dplyr::select(
-      .data$id,
-      .data$service_type_code,
+      "id",
+      "service_type_code",
       dplyr::any_of(rcc.billing::csbt_column_names$ctsit),
-      .data$gatorlink,
-      .data$reason,
-      .data$status,
-      .data$created,
-      .data$updated
+      "gatorlink",
+      "reason",
+      "status",
+      "created",
+      "updated"
     )
 
   return(reassigned_line_items)
@@ -532,10 +514,6 @@ get_reassigned_line_items <- function(sent_line_items, rc_conn) {
 #'
 #' @return a vector of project IDs
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
-#' @importFrom stringr str_detect
-#' @importFrom dplyr coalesce filter inner_join left_join pull select
 #'
 #' @examples
 #' get_research_projects_not_using_viable_pi_data(
@@ -549,29 +527,34 @@ get_reassigned_line_items <- function(sent_line_items, rc_conn) {
 get_research_projects_not_using_viable_pi_data <- function(redcap_projects,
                                                            redcap_entity_project_ownership,
                                                            redcap_user_information) {
-  result <- redcap_projects %>%
+  result <- redcap_projects |>
     # project purpose is coded for research
-    filter(.data$purpose == 2) %>%
+    dplyr::filter(.data$purpose == 2) |>
     # ... and this is not a template project
-    filter(!.data$project_id %in% seq(from = 1, to = 14)) %>%
-    inner_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) %>%
-    left_join(redcap_user_information, by = "username") %>%
-    mutate(owner_email_address = coalesce(.data$email, .data$user_email)) %>%
+    dplyr::filter(!.data$project_id %in% seq(from = 1, to = 14)) |>
+    dplyr::inner_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) |>
+    dplyr::left_join(redcap_user_information, by = "username") |>
+    dplyr::mutate(owner_email_address = dplyr::coalesce(.data$email, .data$user_email)) |>
     # select only the columns we care about to make this easier to test and debug
-    select(.data$project_id, .data$owner_email_address, .data$email, .data$user_email, .data$project_pi_email) %>%
-    filter(
+    dplyr::select(
+      "project_id",
+      "owner_email_address",
+      "email",
+      "user_email",
+      "project_pi_email") |>
+    dplyr::filter(
       # project_pi_email is missing or ...
       is.na(.data$project_pi_email) |
       # ... project_pi_email looks like garbage or ...
-      !str_detect(.data$project_pi_email, "^.+@.+\\..+") |
+      !stringr::str_detect(.data$project_pi_email, "^.+@.+\\..+") |
       (
         # ... project_pi_email looks like an email address...
-        str_detect(.data$project_pi_email, "^.+@.+\\..+") &
+        stringr::str_detect(.data$project_pi_email, "^.+@.+\\..+") &
         # ... but owner is not set to that project_pi_email...
         tolower(.data$project_pi_email) != tolower(.data$owner_email_address)
       )
-    ) %>%
-    pull(.data$project_id)
+    ) |>
+    dplyr::pull(.data$project_id)
 
   return(result)
 }

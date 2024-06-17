@@ -6,11 +6,6 @@
 #'
 #' @return a logical vector the length of user_ids indicating which user_ids belong to faculty
 #' @export
-#' @importFrom magrittr "%>%"
-#' @importFrom rlang .data
-#' @importFrom dplyr filter tibble tribble
-#' @importFrom rcc.ctsit get_uf_person_data_by_gatorlink
-#' @importFrom testthat is_testing
 #'
 #' @examples
 #' \dontrun{
@@ -21,10 +16,10 @@ is_faculty <- function(
     user_ids
     ) {
 
-  if (!is_testing()) {
+  if (!testthat::is_testing()) {
     uf_person_data <- rcc.ctsit::get_uf_person_data_by_gatorlink(user_ids = user_ids)
   } else {
-    uf_person_data <- tribble(
+    uf_person_data <- dplyr::tribble(
       ~USERIDALIAS, ~UF_PRIMARY_AFFL,
       "pbc", "T",
       "hoganwr", "F",
@@ -33,13 +28,13 @@ is_faculty <- function(
     )
   }
 
-  faculty_user_ids <- uf_person_data %>%
-    filter(.data$UF_PRIMARY_AFFL == "F") %>%
-    pull(.data$USERIDALIAS)
+  faculty_user_ids <- uf_person_data |>
+    dplyr::filter(.data$UF_PRIMARY_AFFL == "F") |>
+    dplyr::pull(.data$USERIDALIAS)
 
-  result <- tibble(user_ids) %>%
-    mutate(is_faculty = user_ids %in% faculty_user_ids) %>%
-    pull(is_faculty)
+  result <- dplyr::tibble(user_ids) |>
+    dplyr::mutate(is_faculty = user_ids %in% faculty_user_ids) |>
+    dplyr::pull(is_faculty)
 
   return(result)
 }
