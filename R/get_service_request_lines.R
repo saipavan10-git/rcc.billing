@@ -1,7 +1,9 @@
 #' Get Service Request Lines
 #'
 #' This function processes a dataset of service requests to extract and transform
-#' various service details.
+#' various service details. It groups response data by record_id, service_date,
+#' and probono status to summarize response data and create a source dataset for
+#' invoice line items.
 #'
 #' @param service_requests A data frame of service requests, REDCap Service Request PID 1414.
 
@@ -15,7 +17,8 @@
 get_service_request_lines <- function(service_requests) {
   request_details <- service_requests |>
     dplyr::filter(is.na(.data$redcap_repeat_instrument)) |>
-    #TODO: Is a column missing in paste?
+    dplyr::filter(!is.na(.data$project_id)) |>
+    # TODO: Is a column missing in paste?
     dplyr::mutate(
       service_identifier = paste(.data$record_id),
       service_type_code = 2,
@@ -33,8 +36,8 @@ get_service_request_lines <- function(service_requests) {
       "clean_pi",
       delim = " ",
       names = c("pi_fn", "pi_ln"),
-      too_few = "debug",
-      too_many = "debug"
+      too_few = "align_start",
+      too_many = "drop"
     ) |>
     dplyr::mutate(
       pi_last_name = dplyr::coalesce(.data$pi_ln, .data$last_name),
@@ -61,12 +64,29 @@ get_service_request_lines <- function(service_requests) {
   response_details <- service_requests |>
     dplyr::filter(!is.na(.data$redcap_repeat_instrument)) |>
     dplyr::filter(!is.na(.data$billable_rate)) |>
+    dplyr::filter(.data$help_desk_response_complete == 2) |>
     dplyr::mutate(probono = (.data$billable_rate == 0)) |>
     dplyr::rename(price_of_service = "billable_rate") |>
-    dplyr::group_by(.data$record_id, .data$probono, .data$price_of_service) |>
+    dplyr::mutate(service_date = lubridate::floor_date(
+      coalesce(
+        .data$end_date,
+        as.Date(.data$meeting_date_time),
+        as.Date(.data$date_of_work)
+      ),
+      unit = "month"
+    )) |>
+    dplyr::mutate(response = dplyr::coalesce(
+      .data$response,
+      .data$comments,
+      dplyr::if_else(.data$mtg_scheduled_yn == 1, "Meeting", NA_character_)
+    )) |>
     dplyr::mutate(time = rcc.billing::service_request_time(.data$time2, .data$time_more)) |>
-    dplyr::summarize(qty_provided = sum(.data$time),
-              response = paste(.data$response, collapse = " ")) |>
+    dplyr::group_by(.data$record_id, .data$service_date, .data$probono, .data$price_of_service) |>
+    dplyr::summarize(
+      qty_provided = sum(.data$time),
+      response = paste(.data$response, collapse = " "),
+      service_date = max(.data$service_date)
+    ) |>
     dplyr::ungroup() |>
     dplyr::mutate(amount_due = .data$price_of_service * .data$qty_provided)
 
@@ -77,18 +97,26 @@ get_service_request_lines <- function(service_requests) {
       paste0(.data$service_instance_id, "-PB"),
       .data$service_instance_id
     )) |>
-    dplyr::mutate(other_system_invoicing_comments =
-             stringr::str_trim(stringr::str_sub(
-               paste0(
-                 .data$service_identifier,
-                 .data$username,
-                 .data$submit_date,
-                 dplyr::if_else(.data$probono, paste0("Pro-bono : ", .data$response), .data$response),
-                 sep = " : "
-               ),
-               1,
-               255
-             ))) |>
+    dplyr::mutate(
+      other_system_invoicing_comments =
+        stringr::str_trim(stringr::str_sub(
+          paste(
+            .data$service_identifier,
+            .data$username,
+            .data$submit_date,
+            dplyr::if_else(.data$probono, paste0("Pro-bono : ", .data$response), .data$response),
+            sep = " : "
+          ),
+          1,
+          255
+        ))
+    ) |>
+    dplyr::mutate(dplyr::across(c(
+      "project_id",
+      "fiscal_contact_fn",
+      "fiscal_contact_ln",
+      "fiscal_contact_email"
+    ), as.character)) |>
     dplyr::select(
       "record_id",
       "project_id",
@@ -105,7 +133,8 @@ get_service_request_lines <- function(service_requests) {
       "fiscal_contact_email",
       "qty_provided",
       "amount_due",
-      "price_of_service"
+      "price_of_service",
+      "service_date"
     )
 
   return(request_lines)

@@ -14,7 +14,9 @@ A data frame with response details to the service request
 }
 \description{
 This function processes a dataset of service requests to extract and transform
-various service details.
+various service details. It groups response data by record_id, service_date,
+and probono status to summarize response data and create a source dataset for
+invoice line items.
 }
 \examples{
 \dontrun{

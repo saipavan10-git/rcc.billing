@@ -4,15 +4,17 @@ library(REDCapR)
 library(tidyverse)
 library(rcc.billing)
 
+load_dot_env("prod.env")
 source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
+
+record_ids <- c(3, 6267, 6436, 6445,6473, 6469)
 
 read_service_requests <- redcap_read(
   redcap_uri = source_credentials$redcap_uri,
   token = source_credentials$token,
-  batch_size = 2000
+  batch_size = 2000,
+  records = record_ids
 )$data
-
-record_ids <- c(3, 6267, 6436, 6445,6473, 6469)
 
 service_requests <- read_service_requests |>
   filter(record_id %in% record_ids) |>
@@ -33,10 +35,16 @@ service_requests <- read_service_requests |>
     billable_rate,
     time2,
     time_more,
+    mtg_scheduled_yn,
+    meeting_date_time,
+    date_of_work,
+    end_date,
     response,
+    comments,
     fiscal_contact_fn,
     fiscal_contact_ln,
-    fiscal_contact_email
+    fiscal_contact_email,
+    help_desk_response_complete
   ) |>
   mutate(
     irb_number = if_else(!is.na(irb_number), "123", irb_number),
@@ -47,8 +55,8 @@ service_requests <- read_service_requests |>
     email = if_else(!is.na(email), "bogus@ufl.edu", email),
     redcap_username = if_else(!is.na(redcap_username), "bogus_rc_username", redcap_username),
     gatorlink= if_else(!is.na(gatorlink), "bogus_gatorlink", gatorlink),
-    response = if_else(!is.na(response), "fake response", response))
-
+    response = if_else(!is.na(response), "fake response", response),
+    comments = if_else(!is.na(comments), "fake comment", comments))
 saveRDS(
   service_requests,
   testthat::test_path(
