@@ -21,7 +21,7 @@ get_user_rights_and_info <- function(rc_conn,
   redcap_user_information <-
     dplyr::tbl(rc_conn, "redcap_user_information") |>
     dplyr::collect() |>
-    dplyr::filter(require_active_account | is.na(.data$user_suspended_time))
+    dplyr::filter(!require_active_account | is.na(.data$user_suspended_time))
 
   direct_rights <- tbl(rc_conn, "redcap_user_rights") |>
     dplyr::filter(is.na(.data$role_id)) |>

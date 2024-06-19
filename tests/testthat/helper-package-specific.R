@@ -17,3 +17,9 @@ get_billable_candidates_test_tables <- c(
   "person_org", # lives in rcc_billing DB
   "org_hierarchies" # lives in rcc_billing DB
 )
+
+get_user_rights_and_info_test_tables <- c(
+  "redcap_user_information",
+  "redcap_user_rights",
+  "redcap_user_roles"
+)
