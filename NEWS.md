@@ -1,3 +1,6 @@
+# rcc.billing 1.36.1 (released 2024-06-20)
+- Mount the credentials volume in cron/update_probono_service_request_records (@pbchase)
+
 # rcc.billing 1.36.0 (released 2024-06-20)
 - Add single-use/backfill_billable_rate_in_service_request_records.R (@pbchase)
 - Modernize_imports_and_conform_to_tidyselect (@pbchase, #223)
