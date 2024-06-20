@@ -1,3 +1,9 @@
+# rcc.billing 1.36.0 (released 2024-06-20)
+- Add single-use/backfill_billable_rate_in_service_request_records.R (@pbchase)
+- Modernize_imports_and_conform_to_tidyselect (@pbchase, #223)
+- Add get_service_request_lines() (@ljwoodley, @pbchase, #219, #205)
+- Add update_invoice_line_items_to_correct_fiscal_year.R a script we used once in August 2023 (@pbchase)
+- Add get_probono_service_request_records() (@ljwoodley, @pbchase, #218, #207)
 
 # rcc.billing 1.35.0 (released 2024-05-23)
 - Set custom CC when running revenue_status_and_projections (@pbchase)
