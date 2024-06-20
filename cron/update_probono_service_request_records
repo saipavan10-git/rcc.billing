@@ -1,2 +1,2 @@
 # Update probono records daily from 7am - 9pm
-0 7-21/2 * * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/update_probono_service_request_records.R
+0 7-21/2 * * * root /usr/bin/docker run -v /rcc/rcc.billing:/root --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/update_probono_service_request_records.R
