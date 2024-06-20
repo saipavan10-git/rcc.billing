@@ -20,7 +20,6 @@ Imports:
     dplyr,
     jsonlite,
     lubridate,
-    magrittr,
     readr,
     rlang,
     redcapcustodian,

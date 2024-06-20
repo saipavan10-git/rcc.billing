@@ -23,7 +23,7 @@ get_user_rights_and_info <- function(rc_conn,
     dplyr::collect() |>
     dplyr::filter(!require_active_account | is.na(.data$user_suspended_time))
 
-  direct_rights <- tbl(rc_conn, "redcap_user_rights") |>
+  direct_rights <- dplyr::tbl(rc_conn, "redcap_user_rights") |>
     dplyr::filter(is.na(.data$role_id)) |>
     dplyr::collect()
 
@@ -43,12 +43,12 @@ get_user_rights_and_info <- function(rc_conn,
       is.na(.data$expiration) |
       .data$expiration >= redcapcustodian::get_script_run_time())
 
-  result <- combined_user_rights %>%
+  result <- combined_user_rights |>
     dplyr::inner_join(redcap_user_information,
       by = "username",
       suffix = c("", ".redcap_user_information")
     ) |>
-    filter(.data$username %in% redcap_user_information$username)
+    dplyr::filter(.data$username %in% redcap_user_information$username)
 
   return(result)
 }

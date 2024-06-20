@@ -1,4 +1,4 @@
-testthat::test_that("get_csti_study_id_to_project_id_map returns proper mapping", {
+testthat::test_that("get_ctsi_study_id_to_project_id_map returns proper mapping", {
 
   mem_rc_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
   create_a_table_from_rds_test_data("invoice_line_item", mem_rc_conn, "get_ctsi_study_id_to_project_id_map")
