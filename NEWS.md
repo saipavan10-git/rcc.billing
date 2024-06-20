@@ -1,3 +1,9 @@
+# rcc.billing 1.36.0 (released 2024-06-20)
+- Add single-use/backfill_billable_rate_in_service_request_records.R (@pbchase)
+- Modernize_imports_and_conform_to_tidyselect (@pbchase, #223)
+- Add get_service_request_lines() (@ljwoodley, @pbchase, #219, #205)
+- Add update_invoice_line_items_to_correct_fiscal_year.R a script we used once in August 2023 (@pbchase)
+- Add get_probono_service_request_records() (@ljwoodley, @pbchase, #218, #207)
 
 # rcc.billing 1.35.0 (released 2024-05-23)
 - Set custom CC when running revenue_status_and_projections (@pbchase)
@@ -5,13 +11,10 @@
 - Add get_ctsi_study_id_to_project_id_map (@ljwoodley, @pbchase, @ChemiKyle, #212)
 - Reflow make_test_data_for_get_billable_candidates.R (@pbchase)
 
-## [1.34.0] - 2024-04-26
-### Added
+# rcc.billing 1.34.0 (released 2024-04-26)
 - Add draft_reports.qmd (@pbchase)
 - Add get_project_details_for_billing (@ljwoodley)
 - Add 'REDCap consulting' service_type to test data (@pbchase)
-
-### Changed
 - CC REDCAP_BILLING_L in request_correction_of_bad_ownership_data.R (@pbchase)
 - Update create_and_send_new_redcap_prod_per_project_line_items.R to prevent duplicates (@pbchase)
 - Update revenue_status_and_projections.qmd (@pbchase)

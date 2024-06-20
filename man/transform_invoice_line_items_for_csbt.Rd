@@ -21,8 +21,8 @@ DETAILS
 }
 \examples{
 \dontrun{
-tbl(conn, "invoice_line_item") \%>\%
-  collect() \%>\%
+tbl(conn, "invoice_line_item") |>
+  collect() |>
   transform_invoice_line_items_for_csbt()
 }
 }

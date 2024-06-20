@@ -1,6 +1,6 @@
 Package: rcc.billing
 Title: REDCap Custodian Billing
-Version: 1.35.0
+Version: 1.36.0
 Authors@R: c(
   person("Philip", "Chase", email = "pbc@ufl.edu", role = c("aut", "cre")),
   person("Laurence", "James-Woodley", email = "lawjames1@ufl.edu", role = "aut"),
@@ -20,13 +20,13 @@ Imports:
     dplyr,
     jsonlite,
     lubridate,
-    magrittr,
     readr,
     rlang,
     redcapcustodian,
     rcc.ctsit,
     stringr,
     testthat,
+    tidyr,
     writexl
 Suggests:
     RSQLite,
