@@ -21,8 +21,8 @@ DETAILS
 }
 \examples{
 \dontrun{
-df_from_csbt \%>\%
-  transform_invoice_line_items_for_ctsit() \%>\%
+df_from_csbt |>
+  transform_invoice_line_items_for_ctsit() |>
   janitor::clean_names()
 }
 }

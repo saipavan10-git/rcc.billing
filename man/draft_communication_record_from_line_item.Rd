@@ -25,8 +25,8 @@ Adds metadata necessary for sending emails to an invoice_line_item dataframe, e.
 }
 \examples{
 \dontrun{
-tbl(conn, "invoice_line_item") \%>\%
-  collect() \%>\%
+tbl(conn, "invoice_line_item") |>
+  collect() |>
   draft_communication_record_from_line_item()
 }
 }
