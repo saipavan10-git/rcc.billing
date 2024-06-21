@@ -74,7 +74,7 @@ get_orphaned_projects <- function(rc_conn, rcc_billing_conn, months_previous = 0
     dplyr::collect()
   redcap_user_information <- dplyr::tbl(rc_conn, "redcap_user_information") |>
     dplyr::collect()
-  user_info <- get_user_rights_and_info(
+  user_info <- get_user_rights_and_info_v1(
     redcap_user_rights = redcap_user_rights,
     redcap_user_roles = redcap_user_roles,
     redcap_user_information = redcap_user_information

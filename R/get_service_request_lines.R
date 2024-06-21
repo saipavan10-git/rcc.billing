@@ -68,7 +68,7 @@ get_service_request_lines <- function(service_requests) {
     dplyr::mutate(probono = (.data$billable_rate == 0)) |>
     dplyr::rename(price_of_service = "billable_rate") |>
     dplyr::mutate(service_date = lubridate::floor_date(
-      coalesce(
+      dplyr::coalesce(
         .data$end_date,
         as.Date(.data$meeting_date_time),
         as.Date(.data$date_of_work)
