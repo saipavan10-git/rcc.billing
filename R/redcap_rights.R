@@ -1,4 +1,4 @@
-#' get_user_rights_and_info
+#' get_user_rights_and_info_v1
 #'
 #' Get redcap_user_rights combined with roles and user_information
 #'
@@ -11,13 +11,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_user_rights_and_info(
+#' get_user_rights_and_info_v1(
 #'   redcap_user_rights,
 #'   redcap_user_roles,
 #'   redcap_user_information
 #' )
 #' }
-get_user_rights_and_info <- function(redcap_user_rights,
+get_user_rights_and_info_v1 <- function(redcap_user_rights,
                                      redcap_user_roles,
                                      redcap_user_information) {
   direct_rights <- redcap_user_rights |>

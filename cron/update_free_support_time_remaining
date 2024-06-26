@@ -1,0 +1,2 @@
+# Update update_free_support_time_remaining weekdays daily every 2 hours from 7am - 7pm
+7 7-19/2 * * 1-5 root /usr/bin/docker run -v /rcc/rcc.billing:/root --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/update_free_support_time_remaining.R

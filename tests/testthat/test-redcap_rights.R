@@ -1,5 +1,5 @@
-testthat::test_that("get_user_rights", {
-  result <- get_user_rights_and_info(
+testthat::test_that("get_user_rights_and_info_v1 works", {
+  result <- get_user_rights_and_info_v1(
     redcap_user_rights = redcap_rights_test_data$redcap_user_rights,
     redcap_user_roles = redcap_rights_test_data$redcap_user_roles,
     redcap_user_information = redcap_rights_test_data$redcap_user_information
