@@ -1,3 +1,9 @@
+# rcc.billing 1.37.0 (released 2024-06-26)
+- Adjust run times for update_probono_service_request_records (@pbchase)
+- Add update_free_support_time_remaining.R and a schema file for the empty table it needs (@pbchase, #224)
+- Add people_with_rights_to_unpaid_invoice_line_items.R, get_project_flags(), and get_user_rights_and_info() (@pbchase, #220)
+- Rename get_user_rights_and_info() to get_user_rights_and_info_v1() (@pbchase)
+
 # rcc.billing 1.36.1 (released 2024-06-20)
 - Mount the credentials volume in cron/update_probono_service_request_records (@pbchase)
 
