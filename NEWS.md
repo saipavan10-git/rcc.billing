@@ -1,3 +1,6 @@
+# rcc.billing 1.37.1 (released 2024-07-01)
+- Fix bugs in revenue_status_and_projections.qmd (@pbchase)
+
 # rcc.billing 1.37.0 (released 2024-06-26)
 - Adjust run times for update_probono_service_request_records (@pbchase)
 - Add update_free_support_time_remaining.R and a schema file for the empty table it needs (@pbchase, #224)
