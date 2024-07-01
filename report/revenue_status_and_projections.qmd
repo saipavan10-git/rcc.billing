@@ -60,7 +60,7 @@ revenue <-
     values_from = total
   ) %>%
   mutate(
-    invoices_sent = invoiced + coalesce(paid, 0),
+    invoices_sent = coalesce(invoiced, 0) + coalesce(paid, 0),
     portion_paid = coalesce(paid, 0) / invoices_sent
   ) |>
   ungroup() |>
@@ -182,7 +182,6 @@ revenue_by_month_received |>
   geom_bar(stat = "identity") +
   scale_y_continuous(
     labels = dollar,
-    limits = c(0, max(revenue$invoices_sent))
   ) +
   scale_x_date(date_breaks = "2 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
@@ -201,7 +200,7 @@ revenue_by_month_received |>
 
 # Actuals from all completed months
 revenue_by_month_received_actuals <- revenue_by_month_received |>
-      filter(lubridate::ceiling_date(`Month Received`, unit = "month") < today())
+      filter(lubridate::ceiling_date(`Month Received`, unit = "month") <= today())
 
 # Actuals from last 12 completed months, rescaled according to the rate change
 # applied 1 months after it went in to effect, softened halfway towards the mean, 
