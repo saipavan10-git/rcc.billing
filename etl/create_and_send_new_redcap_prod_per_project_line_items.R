@@ -71,63 +71,16 @@ initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
 
 service_type <- tbl(rcc_billing_conn, "service_type") %>% collect()
 
-target_projects <- tbl(rc_conn, "redcap_projects") %>%
-  inner_join(
-    tbl(rc_conn, "redcap_entity_project_ownership") %>%
-      filter(
-        billable == 1,
-        sequestered == 0 | is.na(sequestered)
-      ),
-    by = c("project_id" = "pid")
-  ) %>%
-  # get user info for owners who are also redcap users
-  left_join(
-    tbl(rc_conn, "redcap_user_information") %>% select(username, user_email, user_firstname, user_lastname),
-    by = "username"
-  ) %>%
-  # project is not deleted
-  filter(is.na(date_deleted)) %>%
-  # project at least 1 year old
-  filter(creation_time <= local(get_script_run_time() - dyears(1))) %>%
-  collect() %>%
-  # Assure non-distinct rows in redcap_entity_project_ownership do not foment chaos
-  distinct(project_id, .keep_all = T) %>%
-  # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-  mutate_columns_to_posixct("creation_time") %>%
-  # birthday in past month
-  filter(previous_month(month(get_script_run_time())) == month(creation_time)) %>%
-  mutate(
-    # coerce empty strings to NA for coalesce operations
-    across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
-    across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
-    # ...and make our PI strings
-    pi_last_name = coalesce(user_lastname, project_pi_lastname, lastname),
-    pi_first_name = coalesce(user_firstname, project_pi_firstname, firstname),
-    pi_email = coalesce(user_email, project_pi_email, email)
-  ) %>%
-  ## Do not send any invoices to PIs/Owners with no email address
-  filter(!is.na(pi_email))
+target_projects <- get_target_projects_to_invoice(rc_conn)
 
 # Make new service_instance rows ##############################################
 initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
   collect()
 
-new_service_instances <- target_projects %>%
-  mutate(
-    service_type_code = 1,
-    service_identifier = as.character(project_id),
-    service_instance_id = paste(service_type_code, service_identifier, sep="-"),
-    active = 1,
-    ctsi_study_id = as.numeric(NA)
-  ) %>%
-  anti_join(initial_service_instance, by = c("service_instance_id")) |>
-  select(
-    service_type_code,
-    service_identifier,
-    service_instance_id,
-    active,
-    ctsi_study_id
-  )
+new_service_instances <- get_new_project_service_instances(
+  projects_to_invoice = target_projects,
+  initial_service_instance = initial_service_instance
+)
 
 new_service_instances_diff <- redcapcustodian::dataset_diff(
   source = new_service_instances,
@@ -151,8 +104,8 @@ service_instance_sync_activity <- redcapcustodian::sync_table(
 updated_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
   collect()
 
+# Move to get_new_invoice_line_items
 # Create invoice_line_item rows ###############################################
-
 new_invoice_line_item_writes <- target_projects %>%
   mutate(
     service_type_code = 1,
@@ -216,6 +169,7 @@ new_invoice_line_item_writes <- target_projects %>%
     created,
     updated
   )
+# end get_new_invoice_line_items
 
 redcapcustodian::write_to_sql_db(
   conn = rcc_billing_conn,
