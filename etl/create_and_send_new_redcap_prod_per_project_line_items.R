@@ -54,8 +54,13 @@ new_project_invoice_line_items <- get_new_project_invoice_line_items(
 )
 
 # Row bind all new invoice line items and add IDs
-new_invoice_line_item_writes <- bind_rows(new_project_invoice_line_items) |>
-  mutate(id = row_number() + max(initial_invoice_line_item$id))
+new_invoice_line_item_writes <- dplyr::bind_rows(
+  new_project_invoice_line_items
+) |>
+  dplyr::mutate(
+    id = row_number() + max(initial_invoice_line_item$id),
+    .before = "service_identifier"
+  )
 
 # Write the new invoice line items
 redcapcustodian::write_to_sql_db(
