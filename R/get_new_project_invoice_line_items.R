@@ -94,10 +94,7 @@ get_new_project_invoice_line_items <- function(
         dplyr::select("service_identifier", "fiscal_year", "month_invoiced"),
       by = c("service_identifier", "fiscal_year", "month_invoiced")
     ) |>
-    # fabricate new IDs
-    # dplyr::mutate(id = dplyr::row_number() + max(initial_invoice_line_item$id)) |>
     dplyr::select(
-      # "id",
       "service_identifier",
       "service_type_code",
       "service_instance_id",

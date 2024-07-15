@@ -50,8 +50,7 @@ new_project_invoice_line_items <- get_new_project_invoice_line_items(
     initial_invoice_line_item,
     rc_conn,
     rcc_billing_conn,
-    api_uri = str_remove(Sys.getenv("URI"), "/api") %>%
-      paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
+    api_uri = Sys.getenv("URI")
 )
 
 # Row bind all new invoice line items and add IDs

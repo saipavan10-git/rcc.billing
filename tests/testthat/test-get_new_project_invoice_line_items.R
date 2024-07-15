@@ -1,5 +1,4 @@
 testthat::test_that("get_new_project_invoice_line_items works", {
-
   test_tables <- c(
     "redcap_config",
     "redcap_projects",
@@ -12,10 +11,12 @@ testthat::test_that("get_new_project_invoice_line_items works", {
   )
 
   mem_rc_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
-  purrr::walk(test_tables,
-              create_a_table_from_rds_test_data,
-              mem_rc_conn,
-              "get_new_project_invoice_line_items")
+  purrr::walk(
+    test_tables,
+    create_a_table_from_rds_test_data,
+    mem_rc_conn,
+    "get_new_project_invoice_line_items"
+  )
 
   projects_to_invoice <- dplyr::tbl(mem_rc_conn, "projects_to_invoice") |>
     dplyr::collect()
@@ -35,8 +36,38 @@ testthat::test_that("get_new_project_invoice_line_items works", {
 
   testthat::expect_equal(
     new_project_invoice_line_items$service_identifier,
-                         as.character(projects_to_invoice$project_id)
-    )
+    as.character(projects_to_invoice$project_id)
+  )
   testthat::expect_equal(new_project_invoice_line_items$service_type_code, rep(1, 4))
   testthat::expect_equal(as.character(new_project_invoice_line_items$month_invoiced), rep("March", 4))
+  testthat::expect_equal(
+    stringr::str_detect(
+      new_project_invoice_line_items$other_system_invoicing_comments,
+      "https://example.org/redcap/redcap_v[0-9\\.]{5,8}/ProjectSetup/index\\.php\\?pid=[0-9]{1,}"
+    ),
+    rep(TRUE, 4)
+  )
+  testthat::expect_equal(new_project_invoice_line_items$reason, rep("new_item", 4))
+  testthat::expect_equal(names(new_project_invoice_line_items), c(
+    "service_identifier",
+    "service_type_code",
+    "service_instance_id",
+    "ctsi_study_id",
+    "name_of_service",
+    "name_of_service_instance",
+    "other_system_invoicing_comments",
+    "price_of_service",
+    "qty_provided",
+    "amount_due",
+    "fiscal_year",
+    "month_invoiced",
+    "pi_last_name",
+    "pi_first_name",
+    "pi_email",
+    "gatorlink",
+    "reason",
+    "status",
+    "created",
+    "updated"
+  ))
 })
