@@ -74,6 +74,15 @@ redcapcustodian::write_to_sql_db(
 )
 
 # Send new line items #########################################################
+previous_month_name <- rcc.billing::previous_month(
+  lubridate::month(redcapcustodian::get_script_run_time())
+) |>
+  lubridate::month(label = TRUE, abbr = FALSE)
+
+fiscal_year_invoiced <- rcc.billing::fiscal_years |>
+  dplyr::filter((redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %within% .data$fy_interval) |>
+  dplyr::slice_head(n = 1) |> # HACK: overlaps may occur on July 1, just choose the earlier year
+  dplyr::pull(.data$csbt_label)
 
 new_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(
