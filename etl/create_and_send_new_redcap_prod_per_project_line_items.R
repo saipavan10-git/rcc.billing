@@ -11,123 +11,19 @@ init_etl("create_and_send_new_redcap_prod_per_project_line_items")
 rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
-redcap_version <- tbl(rc_conn, "redcap_config") %>%
-  filter(field_name == "redcap_version") %>%
-  collect() %>%
-  pull(value)
-
-table_names <- c(
-  "redcap_entity_project_ownership",
-  "redcap_projects",
-  "service_instance",
-  "invoice_line_item",
-  "service_type",
-  "invoice_line_item_communications"
-)
-
-# # run these lines to test in MySQL (but not REDCap)
-# for (table_name in table_names) {
-#   create_and_load_test_table(
-#     table_name = table_name,
-#     conn = rcc_billing_conn,
-#     load_test_data = T,
-#     is_sqllite = F
-#   )
-# }
-# dbListTables(rcc_billing_conn)
-# rc_conn <- rcc_billing_conn
-#
-# # run these lines to test in an in-memory database
-# conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
-# for (table_name in table_names) {
-#   create_and_load_test_table(
-#     table_name = table_name,
-#     conn = conn,
-#     load_test_data = T,
-#     is_sqllite = T
-#   )
-# }
-#
-# rc_conn <- conn
-# rcc_billing_conn <- conn
-#
-# dbListTables(conn)
-
-redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
-  paste0("redcap_v", redcap_version, "/ProjectSetup/index.php?pid=")
-
-previous_month_name <- previous_month(month(get_script_run_time())) %>%
-  month(label = TRUE, abbr = FALSE)
-
-fiscal_year_invoiced <- fiscal_years %>%
-  filter((get_script_run_time() - dmonths(1)) %within% fy_interval) %>%
-  head(1) %>% # HACK: overlaps may occur on July 1, just choose the earlier year
-  pull(csbt_label)
-
 initial_invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
-  collect() %>%
-  # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-  mutate_columns_to_posixct(c("created", "updated"))
+  collect()
 
-service_type <- tbl(rcc_billing_conn, "service_type") %>% collect()
-
-target_projects <- tbl(rc_conn, "redcap_projects") %>%
-  inner_join(
-    tbl(rc_conn, "redcap_entity_project_ownership") %>%
-      filter(
-        billable == 1,
-        sequestered == 0 | is.na(sequestered)
-      ),
-    by = c("project_id" = "pid")
-  ) %>%
-  # get user info for owners who are also redcap users
-  left_join(
-    tbl(rc_conn, "redcap_user_information") %>% select(username, user_email, user_firstname, user_lastname),
-    by = "username"
-  ) %>%
-  # project is not deleted
-  filter(is.na(date_deleted)) %>%
-  # project at least 1 year old
-  filter(creation_time <= local(get_script_run_time() - dyears(1))) %>%
-  collect() %>%
-  # Assure non-distinct rows in redcap_entity_project_ownership do not foment chaos
-  distinct(project_id, .keep_all = T) %>%
-  # HACK: when testing, in-memory data for redcap_projects is converted to int upon collection
-  mutate_columns_to_posixct("creation_time") %>%
-  # birthday in past month
-  filter(previous_month(month(get_script_run_time())) == month(creation_time)) %>%
-  mutate(
-    # coerce empty strings to NA for coalesce operations
-    across(any_of(c("user_email", "project_pi_email")), ~ if_else(.x == "", as.character(NA), .x)),
-    across(contains(c("name")), ~ if_else(.x == "", as.character(NA), .x)),
-    # ...and make our PI strings
-    pi_last_name = coalesce(user_lastname, project_pi_lastname, lastname),
-    pi_first_name = coalesce(user_firstname, project_pi_firstname, firstname),
-    pi_email = coalesce(user_email, project_pi_email, email)
-  ) %>%
-  ## Do not send any invoices to PIs/Owners with no email address
-  filter(!is.na(pi_email))
+target_projects <- get_target_projects_to_invoice(rc_conn)
 
 # Make new service_instance rows ##############################################
 initial_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
   collect()
 
-new_service_instances <- target_projects %>%
-  mutate(
-    service_type_code = 1,
-    service_identifier = as.character(project_id),
-    service_instance_id = paste(service_type_code, service_identifier, sep="-"),
-    active = 1,
-    ctsi_study_id = as.numeric(NA)
-  ) %>%
-  anti_join(initial_service_instance, by = c("service_instance_id")) |>
-  select(
-    service_type_code,
-    service_identifier,
-    service_instance_id,
-    active,
-    ctsi_study_id
-  )
+new_service_instances <- get_new_project_service_instances(
+  projects_to_invoice = target_projects,
+  initial_service_instance = initial_service_instance
+)
 
 new_service_instances_diff <- redcapcustodian::dataset_diff(
   source = new_service_instances,
@@ -148,75 +44,25 @@ service_instance_sync_activity <- redcapcustodian::sync_table(
   delete = F
 )
 
-updated_service_instance <- tbl(rcc_billing_conn, "service_instance") %>%
-  collect()
-
 # Create invoice_line_item rows ###############################################
+new_project_invoice_line_items <- get_new_project_invoice_line_items(
+    projects_to_invoice = target_projects,
+    initial_invoice_line_item,
+    rc_conn,
+    rcc_billing_conn,
+    api_uri = Sys.getenv("URI")
+)
 
-new_invoice_line_item_writes <- target_projects %>%
-  mutate(
-    service_type_code = 1,
-    service_identifier = as.character(project_id),
-    name_of_service_instance = app_title,
-    fiscal_year = fiscal_year_invoiced,
-    month_invoiced = previous_month_name,
-    # TODO: should this be stripped from the PI email instead?
-    gatorlink = username,
-    reason = "new_item",
-    status = "draft",
-    created = get_script_run_time(),
-    updated = get_script_run_time()
-  ) %>%
-  inner_join(
-    updated_service_instance,
-    by = c("service_type_code", "service_identifier")
-  ) %>%
-  inner_join(
-    service_type, by = "service_type_code"
-  ) %>%
-  mutate(
-    other_system_invoicing_comments = paste0(service_type, ": ", redcap_project_uri_base, project_id),
-    name_of_service = "Biomedical Informatics Consulting",
-    price_of_service = price,
-    qty_provided = 1,
-    amount_due = price * qty_provided
-  ) %>%
-  # Make sure we are not making a duplicate entry with these new invoice line items
-  anti_join(
-    initial_invoice_line_item %>%
-      filter(
-        fiscal_year == fiscal_year_invoiced,
-        month_invoiced == previous_month_name
-      ) %>%
-      select(service_identifier, fiscal_year, month_invoiced),
-    by = c("service_identifier", "fiscal_year", "month_invoiced")
-  ) %>%
-  # fabricate new IDs
-  mutate(id = row_number() + max(initial_invoice_line_item$id)) %>%
-  select(
-    id,
-    service_identifier,
-    service_type_code,
-    service_instance_id,
-    ctsi_study_id,
-    name_of_service,
-    name_of_service_instance,
-    other_system_invoicing_comments,
-    price_of_service,
-    qty_provided,
-    amount_due,
-    fiscal_year,
-    month_invoiced,
-    pi_last_name,
-    pi_first_name,
-    pi_email,
-    gatorlink,
-    reason,
-    status,
-    created,
-    updated
+# Row bind all new invoice line items and add IDs
+new_invoice_line_item_writes <- dplyr::bind_rows(
+  new_project_invoice_line_items
+) |>
+  dplyr::mutate(
+    id = row_number() + max(initial_invoice_line_item$id),
+    .before = "service_identifier"
   )
 
+# Write the new invoice line items
 redcapcustodian::write_to_sql_db(
   conn = rcc_billing_conn,
   table_name = "invoice_line_item",
@@ -228,6 +74,15 @@ redcapcustodian::write_to_sql_db(
 )
 
 # Send new line items #########################################################
+previous_month_name <- rcc.billing::previous_month(
+  lubridate::month(redcapcustodian::get_script_run_time())
+) |>
+  lubridate::month(label = TRUE, abbr = FALSE)
+
+fiscal_year_invoiced <- rcc.billing::fiscal_years |>
+  dplyr::filter((redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %within% .data$fy_interval) |>
+  dplyr::slice_head(n = 1) |> # HACK: overlaps may occur on July 1, just choose the earlier year
+  dplyr::pull(.data$csbt_label)
 
 new_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(
