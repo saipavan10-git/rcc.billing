@@ -1,3 +1,9 @@
+# rcc.billing 1.37.2 (released 2024-07-22)
+- Refactor create_and_send_new_redcap_prod_per_project_line_items.R (@pbchase, #230)
+- Add get_new_project_invoice_line_items() (@pbchase, #230).
+- Add get_new_project_service_instances() (@pbchase, #230).
+- Add get_target_projects_to_invoice() (@pbchase, #230).
+
 # rcc.billing 1.37.1 (released 2024-07-01)
 - Fix bugs in revenue_status_and_projections.qmd (@pbchase)
 
