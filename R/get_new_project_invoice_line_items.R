@@ -7,6 +7,7 @@
 #' @param rc_conn a DBI connection to the REDCap database
 #' @param rcc_billing_conn a DBI connection to the rcc billing database
 #' @param api_uri the URI to the redcap host's API interface
+#' @param service_request_lines a dataframe of service request line items
 #'
 #' @return a data frame of new invoice line items
 #' @export
@@ -18,14 +19,16 @@
 #'   initial_invoice_line_item,
 #'   rc_conn,
 #'   rcc_billing_conn,
-#'   api_uri
+#'   api_uri,
+#'   service_request_lines
 #' }
 get_new_project_invoice_line_items <- function(
     projects_to_invoice,
     initial_invoice_line_item,
     rc_conn,
     rcc_billing_conn,
-    api_uri
+    api_uri,
+    service_request_lines
   ) {
 
   previous_month_name <- rcc.billing::previous_month(
@@ -116,5 +119,16 @@ get_new_project_invoice_line_items <- function(
       "created",
       "updated"
     )
-  return(new_invoice_line_items)
+
+  service_request_lines <- get_service_request_line_items(service_request_lines,rcc_billing_conn,rc_conn)
+
+  #standardize the datatypes
+  service_request_lines <- service_request_lines |>
+    dplyr::mutate_all(as.character)
+
+  new_invoice_line_items <- new_invoice_line_items |>
+    dplyr::mutate_all(as.character)
+
+  final_invoice_line_items <- dplyr::bind_rows(new_invoice_line_items,service_request_lines)
+  return(final_invoice_line_items)
 }

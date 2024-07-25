@@ -17,37 +17,47 @@ testthat::test_that("get_new_project_invoice_line_items works", {
     mem_rc_conn,
     "get_new_project_invoice_line_items"
   )
-
+  project_ids_from_service_requests <- c("6267", "6267", "6436","6445",  "6469", "6473")
   projects_to_invoice <- dplyr::tbl(mem_rc_conn, "projects_to_invoice") |>
-    dplyr::collect()
+    dplyr::collect() |>
+    dplyr::bind_rows(
+      dplyr::tibble(project_id = as.integer(project_ids_from_service_requests)))
 
   initial_invoice_line_item <- dplyr::tbl(mem_rc_conn, "invoice_line_item") |>
     dplyr::collect()
 
   redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-04-05 12:00:00"))
 
+  mock_service_request_lines <- readRDS(testthat::test_path("get_service_request_lines", "service_requests.rds"))|> mutate(
+    irb_number = c("123"),
+    fiscal_contact_fn = c("John"),
+    fiscal_contact_ln = c("Doe"),
+    fiscal_contact_email = c("test@xyz.com")
+  )
+
   new_project_invoice_line_items <- get_new_project_invoice_line_items(
     projects_to_invoice = projects_to_invoice,
     initial_invoice_line_item = initial_invoice_line_item,
     rc_conn = mem_rc_conn,
     rcc_billing_conn = mem_rc_conn,
-    api_uri = "https://example.org/redcap/api/"
+    api_uri = "https://example.org/redcap/api/",
+    service_request_lines = mock_service_request_lines
   )
 
   testthat::expect_equal(
     new_project_invoice_line_items$service_identifier,
     as.character(projects_to_invoice$project_id)
   )
-  testthat::expect_equal(new_project_invoice_line_items$service_type_code, rep(1, 4))
-  testthat::expect_equal(as.character(new_project_invoice_line_items$month_invoiced), rep("March", 4))
+  testthat::expect_equal(new_project_invoice_line_items$service_type_code, c(rep("1", 4), rep("2", 6)))
+  testthat::expect_equal(as.character(new_project_invoice_line_items$month_invoiced), rep("March", 10))
   testthat::expect_equal(
     stringr::str_detect(
       new_project_invoice_line_items$other_system_invoicing_comments,
       "https://example.org/redcap/redcap_v[0-9\\.]{5,8}/ProjectSetup/index\\.php\\?pid=[0-9]{1,}"
     ),
-    rep(TRUE, 4)
+    c(rep(TRUE, 4), rep(FALSE, 6))
   )
-  testthat::expect_equal(new_project_invoice_line_items$reason, rep("new_item", 4))
+  testthat::expect_equal(new_project_invoice_line_items$reason, rep("new_item", 10))
   testthat::expect_equal(names(new_project_invoice_line_items), c(
     "service_identifier",
     "service_type_code",
@@ -68,6 +78,9 @@ testthat::test_that("get_new_project_invoice_line_items works", {
     "reason",
     "status",
     "created",
-    "updated"
+    "updated",
+    "fiscal_contact_fn",
+    "fiscal_contact_ln" ,
+    "fiscal_contact_name"
   ))
 })
