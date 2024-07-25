@@ -8,6 +8,7 @@ testthat::test_that("get_service_request_lines returns the proper df", {
     service_identifier = c("6267", "6267", "6436", "6445", "6469", "6473"),
     service_type_code = rep(2, 6),
     service_instance_id = c("2-6267", "2-6267", "2-6436", "2-6445", "2-6469", "2-6473-PB"),
+    username = c("bogus_rc_username", "bogus_rc_username", "bogus_rc_username", "bogus_rc_username", "bogus_rc_username", "bogus_gatorlink"),
     irb_number = c("123", "123", NA_character_, "123", "123", NA_character_),
     pi_last_name = c("PI", "PI", "l_name", "PI", "PI", "l_name"),
     pi_first_name = c("Bogus", "Bogus", "f_name","Bogus", "Bogus", "f_name"),
