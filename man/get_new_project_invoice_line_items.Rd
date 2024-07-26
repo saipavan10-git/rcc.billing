@@ -11,7 +11,8 @@ get_new_project_invoice_line_items(
   initial_invoice_line_item,
   rc_conn,
   rcc_billing_conn,
-  api_uri
+  api_uri,
+  service_request_lines
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ get_new_project_invoice_line_items(
 \item{rcc_billing_conn}{a DBI connection to the rcc billing database}
 
 \item{api_uri}{the URI to the redcap host's API interface}
+
+\item{service_request_lines}{a dataframe of service request line items}
 }
 \value{
 a data frame of new invoice line items
@@ -40,6 +43,7 @@ get_new_project_invoice_line_items <- function(
   initial_invoice_line_item,
   rc_conn,
   rcc_billing_conn,
-  api_uri
+  api_uri,
+  service_request_lines
 }
 }
