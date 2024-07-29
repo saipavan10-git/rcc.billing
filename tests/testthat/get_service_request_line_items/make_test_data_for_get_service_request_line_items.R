@@ -1,3 +1,4 @@
+# make test data for get_service_request_line_items
 library(dotenv)
 library(redcapcustodian)
 library(REDCapR)
@@ -11,17 +12,23 @@ redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-02-05 12:00:00"))
 rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
 
-record_ids <- c(3, 6267, 6436, 6445,6473, 6469)
-
+# record_ids <- c(3, 6267, 6436, 6445,6473, 6469)
+#
 read_service_requests <- redcap_read(
   redcap_uri = source_credentials$redcap_uri,
   token = source_credentials$token,
-  batch_size = 2000,
-  records = record_ids
+  batch_size = 2000
+  # records = record_ids
 )$data
 
+service_requests_of_interest <-
+  read_service_requests |>
+  filter(!is.na(project_id)) |>
+    arrange(desc(record_id)) |>
+    slice_head(n = 100)
+
 service_requests <- read_service_requests |>
-  filter(record_id %in% record_ids) |>
+  filter(record_id %in% service_requests_of_interest$record_id) |>
   select(
     record_id,
     redcap_repeat_instrument,
@@ -66,132 +73,68 @@ service_requests <- read_service_requests |>
     fiscal_contact_ln = c("Doe"),
     fiscal_contact_email = c("test@xyz.com")
   )
-saveRDS(
-  service_requests,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "service_requests.rds"
-  )
-)
 
-mock_invoice_line_item <- data.frame(
-    id = c(1, 2, 3, 4),
-    service_type_code = c(1, 1, 2, 1),
-    service_identifier = c(14242, 12665, 14242, 12665),
-    ctsi_study_id = c(300, 310, 200, 970)
-  ) |>
-    dplyr::mutate(across(everything(), as.integer)) |>
-    dplyr::mutate(stringAsFactors = FALSE)
-saveRDS(
-  mock_invoice_line_item,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "invoice_line_item.rds"
-  )
-)
+project_ids_of_interest <- service_requests |>
+  distinct(project_id) |>
+  pull(project_id)
 
-mock_ctsi_study_id_map <- data.frame(
-    project_id = c(14242, 12665),
-    ctsi_study_id = c(300, 310, 200, 970)
-  ) |>
-    dplyr::mutate(across(everything(), as.integer)) |>
-    dplyr::mutate(stringAsFactors = FALSE)
-saveRDS(
-  mock_ctsi_study_id_map,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "ctsi_study_id_map.rds"
-  )
-)
-
-# Create mock data for project details
-mock_project_details <- data.frame(
-    project_id = as.integer(c("14242", "12665")),
-    app_title = c("Project 14242", "Project 12665"),
-    pi_last_name = c(NA, "Doe"),
-    pi_first_name = c(NA, "John"),
-    pi_email = c(NA, "john.doe@example.com"),
-    irb_number = c(NA, "123"),
-    ctsi_study_id = c(NA, "300"),
-    stringsAsFactors = FALSE
-  )
-saveRDS(
-  mock_project_details,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "project_details.rds"
-  )
-)
-# Create mock data for redcap_entity_project_ownership
-mock_redcap_entity_project_ownership <- data.frame(
-    id = 1:2,
-    created = as.numeric(Sys.time()),
-    updated = as.numeric(Sys.time()),
-    pid = as.integer(c("14242", "12665")),
-    username = c(NA, "jsmith"),
-    email = c("jdoe@example.com", NA),
-    firstname = c("John", NA),
-    lastname = c("Doe", NA),
-    billable = c(1, 1),
-    sequestered = c(0, 0)
-  )
-saveRDS(
-  mock_redcap_entity_project_ownership,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "redcap_entity_project_ownership.rds"
-  )
-)
+invoice_line_item <- dplyr::tbl(rcc_billing_conn, "invoice_line_item") |>
+  # collect() |>str()
+  filter(service_type_code == 1 & service_identifier %in% local(as.character(project_ids_of_interest))) |>
+  collect() %>%
+  rowwise() %>%
+  mutate(across(c("invoice_number", contains("pi_"), gatorlink), my_hash))
 
 redcap_projects <-
-  dplyr::tbl(rc_conn, "redcap_projects") |>
-  dplyr::collect() |>
-  dplyr::sample_n(size = 4) |>
-  dplyr::arrange(project_id) |>
-  dplyr::mutate(
-    creation_time = redcapcustodian::get_script_run_time() - lubridate::dyears(1) - lubridate::ddays(15)
-  ) |>
-  dplyr::mutate(date_deleted = as.Date(NA)) |>
-  dplyr::rowwise() |>
-  dplyr::mutate(dplyr::across(dplyr::contains(c("project_pi", "app_title", "project_name")), my_hash)) |>
-  dplyr::mutate(project_id= case_when(
-      project_id %in% c(11987,12271) ~ as.integer(14242),
-      project_id %in% c(13934,15467) ~ as.integer(12665),
-    ))
-saveRDS(
-  redcap_projects,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "redcap_projects.rds"
-  )
-)
+  tbl(rc_conn, "redcap_projects") %>%
+  filter(project_id %in% project_ids_of_interest) %>%
+  collect() %>%
+  arrange(project_id) %>%
+  rowwise() %>%
+  mutate(across(
+    c(
+      "project_pi_firstname",
+      "project_pi_lastname",
+      "project_pi_email",
+      "project_irb_number"
+    ),
+    my_hash
+  )) %>%
+  mutate(across("project_pi_email", append_fake_email_domain))
 
-redcap_entity_project_ownership_raw <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
-  filter(pid %in% !!redcap_projects$project_id) %>%
-  collect() |>
-  dplyr::arrange(pid) |>
-  mutate(billable = 1) |>
-  mutate(sequestered = 0)
+redcap_entity_project_ownership <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
+  filter(pid %in% project_ids_of_interest) %>%
+  collect() %>%
+  rowwise() %>%
+  mutate(across(c("username", "email", "firstname", "lastname"), my_hash)) %>%
+  mutate(across("email", append_fake_email_domain))
 
-redcap_user_information <- dplyr::tbl(rc_conn, "redcap_user_information") |>
-  dplyr::filter(username %in% redcap_entity_project_ownership_raw$username) |>
-  dplyr::select(
+redcap_user_information <- tbl(rc_conn, "redcap_user_information") %>%
+  collect() %>%
+  rowwise() %>%
+  mutate(across(c(
     "username",
     "user_email",
+    "user_email2",
+    "user_email3",
     "user_firstname",
-    "user_lastname"
-  ) |>
-  dplyr::collect() |>
-  dplyr::rowwise() |>
-  dplyr::mutate(dplyr::across(dplyr::everything(), my_hash)) |>
-  dplyr::mutate(dplyr::across(dplyr::contains("email"), ~ if_else(is.na(.), "dummy", .))) |>
-  dplyr::mutate(dplyr::across(dplyr::contains("email"), append_fake_email_domain))
-saveRDS(
-  redcap_user_information,
-  testthat::test_path(
-    "get_service_request_line_items",
-    "redcap_user_information.rds"
-  )
+    "user_lastname",
+    "user_sponsor"
+  ), my_hash)) %>%
+  mutate(across("user_email", append_fake_email_domain))
+
+# Write rc db tables ##########################################################
+
+write_to_testing_rds <- function(dataframe, basename) {
+  dataframe %>% saveRDS(testthat::test_path("get_service_request_line_items", paste0(basename, ".rds")))
+}
+
+# write all of the test inputs
+test_tables <- c(
+  "redcap_projects", # lives in REDCap DB
+  "redcap_entity_project_ownership", # ibid
+  "redcap_user_information", # ibid
+  "invoice_line_item", # lives in rcc_billing DB
+  "service_requests" # lives in REDCap PID 1414
 )
-
-
+walk(test_tables, ~ write_to_testing_rds(get(.), .))
