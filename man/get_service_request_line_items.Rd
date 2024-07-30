@@ -21,7 +21,7 @@ Assemble line items for service requests billing
 }
 \examples{
 \dontrun{
-line_items <- get_service_request_line_items(service_requests, rc_billing_conn)
+line_items <- get_service_request_line_items(service_requests, rc_billing_conn, rc_conn)
 }
 
 }

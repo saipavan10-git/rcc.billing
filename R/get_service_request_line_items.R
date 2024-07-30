@@ -10,10 +10,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' line_items <- get_service_request_line_items(service_requests, rc_billing_conn)
+#' line_items <- get_service_request_line_items(service_requests, rc_billing_conn, rc_conn)
 #' }
 #'
-get_service_request_line_items <- function(service_requests, rc_billing_conn, rc_conn) {
+get_service_request_line_items <- function(service_requests,
+                                           rc_billing_conn,
+                                           rc_conn) {
   service_request_lines <- get_service_request_lines(service_requests)
   ctsi_study_id_map <- get_ctsi_study_id_to_project_id_map(service_requests, rc_billing_conn)
   project_ids <- unique(service_request_lines$project_id)
@@ -21,17 +23,19 @@ get_service_request_line_items <- function(service_requests, rc_billing_conn, rc
 
   # Get data for missing fields
   previous_month_name <- previous_month(
-    lubridate::month(redcapcustodian::get_script_run_time())
-  ) |>
+    lubridate::month(redcapcustodian::get_script_run_time())) |>
     lubridate::month(label = TRUE, abbr = FALSE)
 
   fiscal_year_invoiced <- rcc.billing::fiscal_years |>
-    dplyr::filter((redcapcustodian::get_script_run_time() - lubridate::dmonths(1)) %within% .data$fy_interval) |>
+    dplyr::filter((
+      redcapcustodian::get_script_run_time() -
+        lubridate::dmonths(1)
+    ) %within% .data$fy_interval) |>
     dplyr::slice_head(n = 1) |>
     dplyr::pull(.data$csbt_label)
 
 
-  #standardize the datatypes
+  # standardize the datatypes
   ctsi_study_id_map <- ctsi_study_id_map |>
     dplyr::mutate_all(as.character)
 
@@ -44,8 +48,13 @@ get_service_request_line_items <- function(service_requests, rc_billing_conn, rc
   # Join the data and select required fields
   result <- service_request_lines |>
     dplyr::left_join(ctsi_study_id_map, by = "project_id") |>
-    dplyr::left_join(project_details, by = "project_id", suffix = c("_srv", "_proj")) |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("_srv"), ~ dplyr::coalesce(.x, get(sub("_srv", "_proj", dplyr::cur_column()))))) |>
+    dplyr::left_join(project_details,
+      by = "project_id",
+      suffix = c("_srv", "_proj")
+    ) |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("_srv"), ~ dplyr::coalesce(.x, get(
+      sub("_srv", "_proj", dplyr::cur_column())
+    )))) |>
     dplyr::select(-dplyr::ends_with("_proj")) |>
     dplyr::rename_with(~ gsub("_srv$", "", .), dplyr::ends_with("_srv")) |>
     dplyr::mutate(
@@ -58,35 +67,38 @@ get_service_request_line_items <- function(service_requests, rc_billing_conn, rc
       reason = "new_item",
       created = redcapcustodian::get_script_run_time(),
       updated = redcapcustodian::get_script_run_time(),
-      fiscal_contact_name = paste(service_request_lines$fiscal_contact_fn, service_request_lines$fiscal_contact_ln)
+      fiscal_contact_name = paste(
+        service_request_lines$fiscal_contact_fn,
+        service_request_lines$fiscal_contact_ln
+      )
     )
 
   final_result <- result |>
-  dplyr::select(
-    "service_identifier",
-    "service_type_code",
-    "service_instance_id",
-    "ctsi_study_id",
-    "name_of_service",
-    "name_of_service_instance",
-    "other_system_invoicing_comments",
-    "price_of_service",
-    "qty_provided",
-    "amount_due",
-    "fiscal_year",
-    "month_invoiced",
-    "pi_last_name",
-    "pi_first_name",
-    "pi_email",
-    "gatorlink",
-    "reason",
-    "status",
-    "created",
-    "updated",
-    "fiscal_contact_fn",
-    "fiscal_contact_ln",
-    "fiscal_contact_name",
-  )
+    dplyr::select(
+      "service_identifier",
+      "service_type_code",
+      "service_instance_id",
+      "ctsi_study_id",
+      "name_of_service",
+      "name_of_service_instance",
+      "other_system_invoicing_comments",
+      "price_of_service",
+      "qty_provided",
+      "amount_due",
+      "fiscal_year",
+      "month_invoiced",
+      "pi_last_name",
+      "pi_first_name",
+      "pi_email",
+      "gatorlink",
+      "reason",
+      "status",
+      "created",
+      "updated",
+      "fiscal_contact_fn",
+      "fiscal_contact_ln",
+      "fiscal_contact_name",
+    )
 
   return(final_result)
 }

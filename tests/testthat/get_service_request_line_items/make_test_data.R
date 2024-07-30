@@ -7,7 +7,7 @@ library(rcc.billing)
 
 dotenv::load_dot_env("prod.env")
 source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
-redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-02-05 12:00:00"))
+redcapcustodian::set_script_run_time(lubridate::ymd_hms("2024-08-01 12:00:00"))
 
 rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
