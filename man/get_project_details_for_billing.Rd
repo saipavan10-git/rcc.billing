@@ -4,14 +4,18 @@
 \alias{get_project_details_for_billing}
 \title{Get Project Details for Billing}
 \usage{
-get_project_details_for_billing(rc_conn, rcc_billing_conn, project_ids)
+get_project_details_for_billing(
+  rc_conn,
+  rcc_billing_conn,
+  project_ids = NA_real_
+)
 }
 \arguments{
 \item{rc_conn}{A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}}
 
 \item{rcc_billing_conn}{A connection to REDCap billing database. \code{\link{connect_to_rcc_billing_db}}}
 
-\item{project_ids}{Vector of project IDs to retrieve details for.}
+\item{project_ids}{An optional vector of project IDs to retrieve details for.}
 }
 \value{
 A data frame with project details.
@@ -31,6 +35,7 @@ rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
 project_ids <- c(12, 14, 22)
 project_details <- get_project_details_for_billing(rc_conn, rcc_billing_con, project_ids)
+project_details <- get_project_details_for_billing(rc_conn, rcc_billing_con)
 }
 
 }
