@@ -75,6 +75,9 @@ get_service_request_lines <- function(service_requests) {
       ),
       unit = "month"
     )) |>
+    dplyr::filter(.data$service_date ==
+                    lubridate::floor_date(redcapcustodian::get_script_run_time()-
+                                            lubridate::dmonths(1), unit="month"))|>
     dplyr::mutate(response = dplyr::coalesce(
       .data$response,
       .data$comments,
@@ -123,6 +126,7 @@ get_service_request_lines <- function(service_requests) {
       "service_identifier",
       "service_type_code",
       "service_instance_id",
+      "username",
       "irb_number",
       "pi_last_name",
       "pi_first_name",

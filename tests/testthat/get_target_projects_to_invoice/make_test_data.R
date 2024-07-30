@@ -9,7 +9,7 @@ library(lubridate)
 library(dotenv)
 
 dotenv::load_dot_env("prod.env")
-set_script_run_time(ymd_hms("2023-04-05 12:00:00"))
+redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-04-05 12:00:00"))
 
 rc_conn <- connect_to_redcap_db()
 
@@ -36,11 +36,11 @@ redcap_projects <-
   dplyr::mutate(dplyr::across(dplyr::contains(c("project_pi", "app_title", "project_name")), my_hash))
 
 redcap_entity_project_ownership_raw <- tbl(rc_conn, "redcap_entity_project_ownership") %>%
-  filter(pid %in% !!redcap_projects$project_id) %>%
-  collect() |>
+  dplyr::filter(pid %in% !!redcap_projects$project_id) %>%
+  dplyr::collect() |>
   dplyr::arrange(pid) |>
-  mutate(billable = if_else(row_number() <= n()/2, 1, 0)) |>
-  mutate(sequestered = if_else(row_number()/2 == round(row_number()/2), 0, 1))
+  dplyr::mutate(billable = dplyr::if_else(dplyr::row_number() <= n()/2, 1, 0)) |>
+  dplyr::mutate(sequestered = dplyr::if_else(dplyr::row_number()/2 == round(dplyr::row_number()/2), 0, 1))
 
 redcap_entity_project_ownership <- redcap_entity_project_ownership_raw |>
   dplyr::rowwise() |>
