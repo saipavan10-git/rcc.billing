@@ -10,7 +10,7 @@
 #'
 #' @param rc_conn A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #' @param rcc_billing_conn  A connection to REDCap billing database. \code{\link{connect_to_rcc_billing_db}}
-#' @param project_ids An optional vector of project IDs to retrieve details for.
+#' @param project_ids Vector of project IDs to retrieve details for.
 #'
 #' @return A data frame with project details.
 #'
@@ -20,11 +20,10 @@
 #' rcc_billing_conn <- connect_to_rcc_billing_db()
 #' project_ids <- c(12, 14, 22)
 #' project_details <- get_project_details_for_billing(rc_conn, rcc_billing_con, project_ids)
-#' project_details <- get_project_details_for_billing(rc_conn, rcc_billing_con)
 #' }
 #'
 #' @export
-get_project_details_for_billing <- function(rc_conn, rcc_billing_conn, project_ids = NA_real_) {
+get_project_details_for_billing <- function(rc_conn, rcc_billing_conn, project_ids) {
     redcap_projects <- dplyr::tbl(rc_conn, "redcap_projects")
     redcap_entity_project_ownership <- dplyr::tbl(rc_conn, "redcap_entity_project_ownership")
     redcap_user_information <- dplyr::tbl(rc_conn, "redcap_user_information") |>
@@ -35,7 +34,7 @@ get_project_details_for_billing <- function(rc_conn, rcc_billing_conn, project_i
       dplyr::collect()
 
     project_details <- redcap_projects |>
-      dplyr::filter(is.na(project_ids) | .data$project_id %in% project_ids) |>
+      dplyr::filter(.data$project_id %in% project_ids) |>
       dplyr::inner_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) |>
       # get user info for owners who are also redcap users
       dplyr::left_join(redcap_user_information, by = "username") |>
