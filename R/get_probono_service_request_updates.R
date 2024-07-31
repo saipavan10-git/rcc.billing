@@ -36,6 +36,7 @@ get_probono_service_request_updates <- function(service_requests) {
       "probono",
       "time",
       "billable_rate",
+      "always_bill",
       dplyr::everything()
     ) |>
     dplyr::group_by(.data$project_id, .data$probono) |>
@@ -50,6 +51,8 @@ get_probono_service_request_updates <- function(service_requests) {
     dplyr::mutate(probono_time = max(.data$probono_time)) |>
     # eliminate records that have already been marked as probono
     dplyr::filter(.data$billable_rate != 0) |>
+    # eliminate records that are marked as always_bill
+    dplyr::filter(is.na(.data$always_bill) | .data$always_bill == 0) |>
     # Mark additional records as probono as needed
     dplyr::filter(.data$probono_time < 1) |>
     dplyr::arrange(.data$time) |>
