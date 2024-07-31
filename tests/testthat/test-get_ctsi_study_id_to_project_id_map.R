@@ -16,4 +16,5 @@ testthat::test_that("get_ctsi_study_id_to_project_id_map returns proper mapping"
     expected_output
   )
 
+  DBI::dbDisconnect(mem_rc_conn, shutdown=TRUE)
 })

@@ -39,4 +39,6 @@ testthat::test_that("test that get_project_details_for_billing works", {
     project_details |> dplyr::arrange(project_id) |> dplyr::pull(project_id),
     project_ids
   )
+
+  DBI::dbDisconnect(mem_conn, shutdown = TRUE)
 })
