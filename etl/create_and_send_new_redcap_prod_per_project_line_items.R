@@ -7,6 +7,8 @@ library(lubridate)
 library(dotenv)
 
 init_etl("create_and_send_new_redcap_prod_per_project_line_items")
+dotenv::load_dot_env("prod.env")
+source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
 
 rc_conn <- connect_to_redcap_db()
 rcc_billing_conn <- connect_to_rcc_billing_db()
@@ -53,9 +55,28 @@ new_project_invoice_line_items <- get_new_project_invoice_line_items(
     api_uri = Sys.getenv("URI")
 )
 
+service_requests <- REDCapR::redcap_read(
+  redcap_uri = source_credentials$redcap_uri,
+  token = source_credentials$token,
+  batch_size = 2000
+)$data
+
+service_request_line_items <- get_service_request_line_items(
+  service_requests = service_requests,
+  rc_billing_conn = rcc_billing_conn,
+  rc_conn = rc_conn
+)
+
+#standardize the datatypes
+service_request_line_items<-
+  dplyr::mutate_all(service_request_line_items, as.character)
+new_project_invoice_line_items<-
+  dplyr::mutate_all(new_project_invoice_line_items, as.character)
+
 # Row bind all new invoice line items and add IDs
 new_invoice_line_item_writes <- dplyr::bind_rows(
-  new_project_invoice_line_items
+  new_project_invoice_line_items,
+  service_request_line_items
 ) |>
   dplyr::mutate(
     id = row_number() + max(initial_invoice_line_item$id),
