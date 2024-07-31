@@ -6,8 +6,7 @@ library(tidyverse)
 library(lubridate)
 library(dotenv)
 
-init_etl("create_and_send_new_redcap_prod_per_project_line_items")
-dotenv::load_dot_env("prod.env")
+init_etl("create_and_send_new_invoice_line_items")
 source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
 
 rc_conn <- connect_to_redcap_db()
