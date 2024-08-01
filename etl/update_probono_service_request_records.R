@@ -13,7 +13,8 @@ fields_to_read <- c(
   "project_id",
   "time2",
   "time_more",
-  "billable_rate"
+  "billable_rate",
+  "always_bill"
 )
 
 service_requests <- redcap_read(

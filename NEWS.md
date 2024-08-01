@@ -1,3 +1,6 @@
+# rcc.billing 1.38.1 (released 2024-08-01)
+- Read always_bill in update_probono_service_request_records.R (@pbchase)
+
 # rcc.billing 1.38.0 (released 2024-08-01)
 - Deactivate create_and_send_new_invoice_line_items (@pbchase)
 - Add support for always_bill in get_probono_service_request_updates() (@pbchase, #236)
