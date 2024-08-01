@@ -1,4 +1,5 @@
 # rcc.billing 1.38.0 (released 2024-08-01)
+- Deactivate create_and_send_new_invoice_line_items (@pbchase)
 - Add support for always_bill in get_probono_service_request_updates() (@pbchase, #236)
 - Fix duckdb disconnect warnings caused by tests (@pbchase, #235)
 - Create and send service_request_line_items in create_and_send_new_invoice_line_items (@saipavan10-git, @pbchase, #235)
