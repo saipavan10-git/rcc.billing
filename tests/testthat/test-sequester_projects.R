@@ -36,4 +36,6 @@ testthat::test_that("sequester_projects completes projects and flips the sequest
   testthat::expect_equal(sequestered_count, length(projects))
   testthat::expect_equal(completed_by_count, length(projects))
   testthat::expect_equal(completed_time, run_time)
+
+  DBI::dbDisconnect(mem_rc_conn, shutdown = TRUE)
 })

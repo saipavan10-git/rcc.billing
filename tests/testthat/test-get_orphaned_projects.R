@@ -13,4 +13,7 @@ testthat::test_that("get_orphaned_projects identifies orphans in the correct seq
   # NOTE: it would be great if we could use the "orphaned_project_types" df from make_get_orphaned_projects_test_data
   orphaned_project_priorities <- c(1, 2, 3, 4, 5, 5, 6)
   testthat::expect_equal(result$priority, orphaned_project_priorities)
+
+  DBI::dbDisconnect(mem_rc_conn, shutdown = TRUE)
+  DBI::dbDisconnect(mem_rcc_billing_conn, shutdown = TRUE)
 })

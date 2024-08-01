@@ -16,6 +16,7 @@ testthat::test_that("get_probono_service_request_updates handles single records 
       NA, 60
     ),
     time_more = c(rep(NA, 8)),
+    always_bill = rep(c(NA_real_, 0), 2),
     billable_rate = rep(c(NA, 130), 4)
   )
 
@@ -51,6 +52,7 @@ testthat::test_that("get_probono_service_request_updates handles single records 
       NA, 60
     ),
     time_more = c(rep(NA, 8)),
+    always_bill = rep(c(NA_real_, 0), 2),
     billable_rate = rep(c(NA, 0), 4)
   )
 
@@ -80,6 +82,7 @@ testthat::test_that("get_probono_service_request_updates handles single records 
       NA, 60
     ),
     time_more = c(rep(NA, 8)),
+    always_bill = rep(c(NA_real_, 0), 2),
     billable_rate = rep(c(NA, 130, NA, 0), 2)
   )
 
@@ -115,6 +118,7 @@ testthat::test_that("get_probono_service_request_updates handles multiple helpde
       NA, 60
     ),
     time_more = c(rep(NA, 8)),
+    always_bill = rep(c(NA_real_, 0), 2),
     billable_rate = rep(c(NA, 130, NA, 130), 2)
   )
 
@@ -140,6 +144,7 @@ testthat::test_that("get_probono_service_request_updates handles multiple time e
     project_id = c(10, rep(NA, 4)),
     time2 = c(NA, 15, 15, 45, 75),
     time_more = c(rep(NA, 4), 1.5),
+    always_bill = c(NA_real_, 0, NA_real_, 0, 0),
     billable_rate = c(NA, 0, 130, 130, 130)
   )
 
@@ -176,6 +181,11 @@ testthat::test_that("get_probono_service_request_updates handles multiple reques
       NA, NA, NA, NA, NA,
       NA, NA, NA, NA, NA,
       NA, NA, NA, NA, 3.5
+    ),
+    always_bill = c(
+      NA_real_, 0, NA_real_, 0, 0,
+      NA_real_, 0, NA_real_, 0, 0,
+      NA_real_, 0, NA_real_, 0, 0
     ),
     billable_rate = c(
       NA, 0, 130, 130, 130,
@@ -220,6 +230,11 @@ testthat::test_that("get_probono_service_request_updates handles multiple reques
           NA, NA, NA, NA, NA,
           NA, NA, NA, NA, 3.5
         ),
+        always_bill = c(
+          NA_real_, 0, NA_real_, 0, 0,
+          NA_real_, 0, NA_real_, 0, 0,
+          NA_real_, 0, NA_real_, 0, 0
+        ),
         billable_rate = c(
           NA, 0, 130, 130, 130,
           NA, 0, 0, 130, 130,
@@ -260,3 +275,54 @@ testthat::test_that("get_probono_service_request_updates handles multiple reques
 
 })
 
+testthat::test_that("get_probono_service_request_updates handles multiple time entries on one helpdesk request for a project, where none are already probono, and one is always_bill", {
+  service_requests <- data.frame(
+    record_id = rep(1, 3),
+    redcap_repeat_instrument = c(NA, rep("help_desk_response", 2)),
+    redcap_repeat_instance = c(NA, seq(1,2)),
+    project_id = c(10, rep(NA, 2)),
+    time2 = c(NA, 30, 75),
+    time_more = c(rep(NA, 2), 8),
+    always_bill = c(NA_real_, 0, 1),
+    billable_rate = c(NA, 130, 130)
+  )
+
+  expected_output <- dplyr::tibble(
+    record_id = c(1),
+    redcap_repeat_instrument = rep("help_desk_response", 1),
+    redcap_repeat_instance = c(1),
+    billable_rate = c(0)
+  )
+
+  testthat::expect_equal(
+    get_probono_service_request_updates(service_requests),
+    expected_output
+  )
+
+})
+
+testthat::test_that("get_probono_service_request_updates handles multiple time entries on one helpdesk request for a project, where some entries are already probono, and one is always_bill", {
+  service_requests <- data.frame(
+    record_id = rep(1, 3),
+    redcap_repeat_instrument = c(NA, rep("help_desk_response", 2)),
+    redcap_repeat_instance = c(NA, seq(1,2)),
+    project_id = c(10, rep(NA, 2)),
+    time2 = c(NA, 30, 75),
+    time_more = c(rep(NA, 2), 8),
+    always_bill = c(NA_real_, 0, 1),
+    billable_rate = c(NA, 0, 130)
+  )
+
+  expected_output <- dplyr::tibble(
+    record_id = c(1,1),
+    redcap_repeat_instrument = rep("help_desk_response", 2),
+    redcap_repeat_instance = c(2, 3),
+    billable_rate = c(0, 130)
+  ) |> filter(F)
+
+  testthat::expect_equal(
+    get_probono_service_request_updates(service_requests),
+    expected_output
+  )
+
+})
