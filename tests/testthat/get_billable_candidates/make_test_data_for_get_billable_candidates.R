@@ -77,7 +77,12 @@ invoice_line_item <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(service_identifier %in% !!redcap_projects$project_id) %>%
   collect() %>%
   rowwise() %>%
-  mutate(across(c("invoice_number"), my_hash))
+  mutate(across(c("invoice_number"), my_hash)) |>
+  mutate(
+    fiscal_contact_name = paste0(pi_last_name," ", pi_first_name),
+    fiscal_contact_email = pi_email,
+    .after = "gatorlink"
+  )
 
 person_org <- dplyr::tbl(rcc_billing_conn, "person_org") |>
   dplyr::select(ufid, user_id, email, primary_uf_fiscal_org) |>

@@ -49,7 +49,7 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
     dplyr::filter(.data$service_type_code == 1) |>
     dplyr::filter(redcapcustodian::get_script_run_time() - .data$created < lubridate::dyears(1)) |>
     dplyr::mutate(service_identifier = as.numeric(.data$service_identifier)) |>
-    dplyr::select("invoice_number", "fiscal_year", "month_invoiced", "status", "service_identifier")
+    dplyr::select("invoice_number", "fiscal_year", "month_invoiced", "status", "service_identifier", "fiscal_contact_name","fiscal_contact_email")
 
   target_projects <- dplyr::tbl(rc_conn, "redcap_projects") |>
     dplyr::inner_join(
@@ -151,6 +151,8 @@ get_billable_candidates <- function(rc_conn, rcc_billing_conn) {
       "project_owner_username",
       "primary_uf_fiscal_org",
       "dept_name",
+      "fiscal_contact_name",
+      "fiscal_contact_email",
       "user_suspended_time",
       "user_lastlogin",
       "project_id",
