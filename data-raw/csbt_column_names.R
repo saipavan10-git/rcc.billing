@@ -13,7 +13,9 @@ ctsit <- c(
   "month_invoiced",
   "pi_last_name",
   "pi_first_name",
-  "pi_email"
+  "pi_email",
+  "fiscal_contact_name",
+  "fiscal_contact_email"
 )
 
 csbt <- c(
@@ -29,7 +31,9 @@ csbt <- c(
   "Month Invoiced",
   "PI Last Name",
   "PI First Name",
-  "PI Email"
+  "PI Email",
+  "Fiscal Contact Name",
+  "Fiscal Contact Email"
 )
 
 csbt_column_names <- data.frame(ctsit, csbt)
