@@ -4,10 +4,12 @@
 \alias{get_service_request_lines}
 \title{Get Service Request Lines}
 \usage{
-get_service_request_lines(service_requests)
+get_service_request_lines(service_requests, return_all_records = F)
 }
 \arguments{
 \item{service_requests}{A data frame of service requests, REDCap Service Request PID 1414.}
+
+\item{return_all_records}{A boolean to indicate every record should be returned or just last month's records}
 }
 \value{
 A data frame with response details to the service request
@@ -16,10 +18,14 @@ A data frame with response details to the service request
 This function processes a dataset of service requests to extract and transform
 various service details. It groups response data by record_id, service_date,
 and probono status to summarize response data and create a source dataset for
-invoice line items.
+invoice line items and other tasks.
 }
 \examples{
 \dontrun{
+# get just last month's records
 service_request_lines <- get_service_request_lines(service_requests)
+
+# get all the records
+service_request_lines <- get_service_request_lines(service_requests, return_all_records = T)
 }
 }
