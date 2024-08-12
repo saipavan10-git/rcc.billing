@@ -56,7 +56,8 @@ test_that("get_service_request_line_items returns correct results", {
     "updated",
     "fiscal_contact_fn",
     "fiscal_contact_ln",
-    "fiscal_contact_name"
+    "fiscal_contact_name",
+    "fiscal_contact_email"
   )
   testthat::expect_equal(colnames(result), expected_columns)
 
