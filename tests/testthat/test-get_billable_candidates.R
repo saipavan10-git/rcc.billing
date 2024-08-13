@@ -12,6 +12,8 @@ testthat::test_that("get_billable_candidates returns the correct names", {
     "project_owner_username",
     "primary_uf_fiscal_org",
     "dept_name",
+    "fiscal_contact_name",
+    "fiscal_contact_email",
     "user_suspended_time",
     "user_lastlogin",
     "project_id",
