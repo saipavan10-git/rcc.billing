@@ -3,18 +3,23 @@
 #' This function processes a dataset of service requests to extract and transform
 #' various service details. It groups response data by record_id, service_date,
 #' and probono status to summarize response data and create a source dataset for
-#' invoice line items.
+#' invoice line items and other tasks.
 #'
 #' @param service_requests A data frame of service requests, REDCap Service Request PID 1414.
-
+#' @param return_all_records A boolean to indicate every record should be returned or just last month's records
+#'
 #' @return A data frame with response details to the service request
 #'
 #' @examples
 #' \dontrun{
+#' # get just last month's records
 #' service_request_lines <- get_service_request_lines(service_requests)
+#'
+#' # get all the records
+#' service_request_lines <- get_service_request_lines(service_requests, return_all_records = T)
 #'}
 #' @export
-get_service_request_lines <- function(service_requests) {
+get_service_request_lines <- function(service_requests, return_all_records = F) {
   request_details <- service_requests |>
     dplyr::filter(is.na(.data$redcap_repeat_instrument)) |>
     dplyr::filter(!is.na(.data$project_id)) |>
@@ -62,36 +67,37 @@ get_service_request_lines <- function(service_requests) {
     )
 
   response_details <- service_requests |>
-    dplyr::filter(!is.na(.data$redcap_repeat_instrument)) |>
-    dplyr::filter(!is.na(.data$billable_rate)) |>
-    dplyr::filter(.data$help_desk_response_complete == 2) |>
-    dplyr::mutate(probono = (.data$billable_rate == 0)) |>
-    dplyr::rename(price_of_service = "billable_rate") |>
-    dplyr::mutate(service_date = lubridate::floor_date(
-      dplyr::coalesce(
-        .data$end_date,
-        as.Date(.data$meeting_date_time),
-        as.Date(.data$date_of_work)
-      ),
-      unit = "month"
-    )) |>
-    dplyr::filter(.data$service_date ==
-                    lubridate::floor_date(redcapcustodian::get_script_run_time()-
-                                            lubridate::dmonths(1), unit="month"))|>
-    dplyr::mutate(response = dplyr::coalesce(
-      .data$response,
-      .data$comments,
-      dplyr::if_else(.data$mtg_scheduled_yn == 1, "Meeting", NA_character_)
-    )) |>
-    dplyr::mutate(time = rcc.billing::service_request_time(.data$time2, .data$time_more)) |>
-    dplyr::group_by(.data$record_id, .data$service_date, .data$probono, .data$price_of_service) |>
-    dplyr::summarize(
-      qty_provided = sum(.data$time),
-      response = paste(.data$response, collapse = " "),
-      service_date = max(.data$service_date)
-    ) |>
-    dplyr::ungroup() |>
-    dplyr::mutate(amount_due = .data$price_of_service * .data$qty_provided)
+  dplyr::filter(!is.na(.data$redcap_repeat_instrument)) |>
+  dplyr::filter(!is.na(.data$billable_rate)) |>
+  dplyr::filter(.data$help_desk_response_complete == 2) |>
+  dplyr::mutate(probono = (.data$billable_rate == 0)) |>
+  dplyr::rename(price_of_service = "billable_rate") |>
+  dplyr::mutate(service_date = lubridate::floor_date(
+    dplyr::coalesce(
+      .data$end_date,
+      as.Date(.data$meeting_date_time),
+      as.Date(.data$date_of_work)
+    ),
+    unit = "month"
+  )) |>
+  dplyr::filter(return_all_records |
+    .data$service_date ==
+      lubridate::floor_date(redcapcustodian::get_script_run_time() -
+        lubridate::dmonths(1), unit = "month")) |>
+  dplyr::mutate(response = dplyr::coalesce(
+    .data$response,
+    .data$comments,
+    dplyr::if_else(.data$mtg_scheduled_yn == 1, "Meeting", NA_character_)
+  )) |>
+  dplyr::mutate(time = rcc.billing::service_request_time(.data$time2, .data$time_more)) |>
+  dplyr::group_by(.data$record_id, .data$service_date, .data$probono, .data$price_of_service) |>
+  dplyr::summarize(
+    qty_provided = sum(.data$time),
+    response = paste(.data$response, collapse = " "),
+    service_date = max(.data$service_date)
+  ) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(amount_due = .data$price_of_service * .data$qty_provided)
 
   request_lines <- request_details |>
     dplyr::inner_join(response_details, by = "record_id") |>
