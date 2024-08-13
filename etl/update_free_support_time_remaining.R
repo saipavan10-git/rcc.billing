@@ -15,7 +15,7 @@ service_requests_all <- redcap_read(
   batch_size = 2000
 )$data
 
-all_service_request_lines <- get_service_request_lines(service_requests_all)
+all_service_request_lines <- get_service_request_lines(service_requests_all, return_all_records = T)
 
 rc_conn <- connect_to_redcap_db()
 

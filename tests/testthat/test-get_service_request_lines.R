@@ -50,3 +50,11 @@ testthat::test_that("get_service_request_lines returns Paid and Probono lines", 
     expected_output |> filter(service_date == as.Date("2024-05-01"))
   )
 })
+
+testthat::test_that("get_service_request_lines returns all the lines", {
+  redcapcustodian::set_script_run_time(ymd_hms("2024-06-03 12:00:00"))
+  testthat::expect_equal(
+    get_service_request_lines(service_requests, return_all_records = T),
+    expected_output
+  )
+})

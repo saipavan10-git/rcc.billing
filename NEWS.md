@@ -1,3 +1,6 @@
+# rcc.billing 1.39.1 (released 2024-08-13)
+- Add return_all_records param to get_service_request_lines() (@pbchase, #239)
+
 # rcc.billing 1.39.0 (released 2024-08-13)
 - Add fiscal_contact details to invoice_line_item (@saipavan10-git, @pbchase, #237, #238)  
 
