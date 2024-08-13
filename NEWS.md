@@ -1,3 +1,6 @@
+# rcc.billing 1.39.0 (released 2024-08-13)
+- Add fiscal_contact details to invoice_line_item (@saipavan10-git, @pbchase, #237, #238)  
+
 # rcc.billing 1.38.1 (released 2024-08-01)
 - Read always_bill in update_probono_service_request_records.R (@pbchase)
 
