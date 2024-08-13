@@ -1,6 +1,6 @@
 Package: rcc.billing
 Title: REDCap Custodian Billing
-Version: 1.40.0
+Version: 1.41.0
 Authors@R: c(
   person("Philip", "Chase", email = "pbc@ufl.edu", role = c("aut", "cre")),
   person("Laurence", "James-Woodley", email = "lawjames1@ufl.edu", role = "aut"),
@@ -33,9 +33,12 @@ Suggests:
     duckdb,
     digest,
     fs,
-    purrr
+    purrr,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 Depends: 
     R (>= 3.5.0)
 URL: https://ctsit.github.io/rcc.billing/
+VignetteBuilder: knitr

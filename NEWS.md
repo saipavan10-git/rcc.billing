@@ -1,3 +1,6 @@
+# rcc.billing 1.41.0 (released 2024-08-13)
+- Add first vignette, cleanup_bad_email_addresses (@pbchase)
+
 # rcc.billing 1.40.0 (released 2024-08-13)
 - Initialize pkgdown with usethis::use_pkgdown_github_pages() (@pbchase)
 - Update README.md (@pbchase)

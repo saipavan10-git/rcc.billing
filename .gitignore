@@ -12,3 +12,4 @@
 *.html
 *_files/
 docs
+inst/doc
