@@ -23,3 +23,7 @@
 ^cron$
 wip.*
 .lintr
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$

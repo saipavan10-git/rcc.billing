@@ -1,3 +1,8 @@
+# rcc.billing 1.40.0 (released 2024-08-13)
+- Initialize pkgdown with usethis::use_pkgdown_github_pages() (@pbchase)
+- Update README.md (@pbchase)
+- Add schema upgrade scripts for release 1.39.0 (@pbchase)
+
 # rcc.billing 1.39.1 (released 2024-08-13)
 - Add return_all_records param to get_service_request_lines() (@pbchase, #239)
 
