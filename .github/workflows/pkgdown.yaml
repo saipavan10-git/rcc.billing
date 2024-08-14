@@ -41,7 +41,9 @@ jobs:
         run: Rscript -e 'install.packages("remotes")'
 
       - name: Install public R dependencies
-        run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
+        run: |
+          Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
+          Rscript -e 'install.packages("writexl")'
 
       - name: Install private R dependencies
         run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
