@@ -1,13 +1,13 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-  workflow_dispatch:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
   release:
     types: [published]
+  workflow_dispatch:
 
 name: pkgdown.yaml
 
@@ -37,6 +37,8 @@ jobs:
         run: Rscript -e 'install.packages("devtools")'
 
       - name: Install all dependencies for the current R environment
+        run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
+        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
         run: Rscript -e 'devtools::install(dependencies = TRUE, auth_token = Sys.getenv("CR_PAT"), upgrade = "never")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
