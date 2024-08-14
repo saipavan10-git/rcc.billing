@@ -1,3 +1,6 @@
+# rcc.billing 1.41.3 (released 2024-08-14)
+- Update github workflows to address missing dependencies (@pbchase)
+
 # rcc.billing 1.41.2 (released 2024-08-14)
 - Update image version in run-tests.yaml (@pbchase)
 - Resequence dependencies in pkgdown.yaml (@pbchase)
