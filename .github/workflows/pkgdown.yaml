@@ -47,7 +47,7 @@ jobs:
         run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
   
       - name: Install local package
-        run: Rscript -e 'remotes::install_local(dependencies = false, upgrade = "never")'
+        run: Rscript -e 'remotes::install_local(dependencies = FALSE, upgrade = "never")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
