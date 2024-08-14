@@ -21,7 +21,6 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CR_PAT: ${{ secrets.CR_PAT }}
     permissions:
       contents: write
     steps:
@@ -40,7 +39,7 @@ jobs:
         run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
 
       - name: Install private R dependencies
-        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$CR_PAT")'
+        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
