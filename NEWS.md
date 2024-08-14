@@ -1,3 +1,6 @@
+# rcc.billing 1.41.1 (released 2024-08-14)
+- Add dependencies in pkgdown.yaml (@pbchase)
+
 # rcc.billing 1.41.0 (released 2024-08-13)
 - Add first vignette, cleanup_bad_email_addresses (@pbchase)
 
