@@ -37,6 +37,9 @@ jobs:
       - name: Install devtools
         run: Rscript -e 'install.packages("devtools")'
 
+      - name: Install remotes
+        run: Rscript -e 'install.packages("remotes")'
+
       - name: Install public R dependencies
         run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
 
@@ -44,7 +47,7 @@ jobs:
         run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
   
       - name: Install local package
-        run: Rscript -e 'devtools::install(dependencies = TRUE, upgrade = "never")'
+        run: Rscript -e 'remotes::install_local(dependencies = TRUE, upgrade = "never")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
