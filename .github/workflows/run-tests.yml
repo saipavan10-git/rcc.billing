@@ -30,7 +30,7 @@ jobs:
         run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
 
       - name: Install private R dependencies
-        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$CR_PAT")'
+        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit")'
 
       - uses: actions/checkout@v2
 
