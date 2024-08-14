@@ -37,9 +37,10 @@ jobs:
         run: Rscript -e 'install.packages("devtools")'
 
       - name: Install all dependencies for the current R environment
-        run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
-        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
-        run: Rscript -e 'devtools::install(dependencies = TRUE, auth_token = Sys.getenv("CR_PAT"), upgrade = "never")'
+        run: |
+          Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
+          Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
+          Rscript -e 'devtools::install(dependencies = TRUE, auth_token = Sys.getenv("CR_PAT"), upgrade = "never")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
