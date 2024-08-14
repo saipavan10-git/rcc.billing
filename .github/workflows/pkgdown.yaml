@@ -21,6 +21,7 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS: ${{ secrets.PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS }}
     permissions:
       contents: write
     steps:
@@ -36,6 +37,12 @@ jobs:
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+
+      - name: Install public R dependencies
+        run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
+
+      - name: Install private R dependencies
+        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS")'
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
