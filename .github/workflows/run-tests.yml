@@ -19,8 +19,18 @@ jobs:
 
     env:
       CI: "TRUE"
+      CR_PAT: ${{ secrets.CR_PAT }}
 
     steps:
+      - name: Install devtools
+        run: Rscript -e 'install.packages("devtools")'
+
+      - name: Install public R dependencies
+        run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
+
+      - name: Install private R dependencies
+        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$CR_PAT")'
+
       - uses: actions/checkout@v2
 
       - name: Check
