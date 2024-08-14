@@ -33,16 +33,16 @@ jobs:
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
-
       - name: Install public R dependencies
         run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
 
       - name: Install private R dependencies
         run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS")'
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgdown, local::.
+          needs: website
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
