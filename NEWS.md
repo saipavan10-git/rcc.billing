@@ -1,3 +1,7 @@
+# rcc.billing 1.41.2 (released 2024-08-14)
+- Update image version in run-tests.yaml (@pbchase)
+- Resequence dependencies in pkgdown.yaml (@pbchase)
+
 # rcc.billing 1.41.1 (released 2024-08-14)
 - Add dependencies in pkgdown.yaml (@pbchase)
 
