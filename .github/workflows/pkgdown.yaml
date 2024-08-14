@@ -21,7 +21,7 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS: ${{ secrets.PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS }}
+      CR_PAT: ${{ secrets.CR_PAT }}
     permissions:
       contents: write
     steps:
@@ -33,11 +33,14 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install devtools
+        run: Rscript -e 'install.packages("devtools")'
+
       - name: Install public R dependencies
         run: Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
 
       - name: Install private R dependencies
-        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$PBCHASE_READ_PRIVATE_CTSIT_RCC_REPOS")'
+        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = "$CR_PAT")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
