@@ -23,8 +23,6 @@ Imports:
     lubridate,
     readr,
     rlang,
-    redcapcustodian,
-    rcc.ctsit,
     stringr,
     testthat,
     tidyr,
@@ -37,6 +35,9 @@ Suggests:
     purrr,
     knitr,
     rmarkdown
+Remotes: 
+    github::ctsit/rcc.ctsit,
+    github::ctsit/redcapcustodian
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 Depends: 
