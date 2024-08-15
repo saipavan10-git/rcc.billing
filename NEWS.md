@@ -1,5 +1,7 @@
-# rcc.billing 1.41.4 (released 2024-08-14)
+# rcc.billing 1.41.4 (released 2024-08-15)
 - Update github workflows to allow R to correctly access the PAT (@saipavan10-git)
+- Update description file to have a REMOTES section for ctsit packages (@saipavan10-git)
+- Update dependency installation for pkgdown workflow (@saipavan10-git)
 
 # rcc.billing 1.41.3 (released 2024-08-14)
 - Update github workflows to address missing dependencies (@pbchase)
