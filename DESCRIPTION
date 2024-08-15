@@ -1,5 +1,5 @@
 Package: rcc.billing
-Title: REDCap Custodian Billing
+Title: REDCap Automated Billing
 Version: 1.41.4
 Authors@R: c(
   person("Philip", "Chase", email = "pbc@ufl.edu", role = c("aut", "cre")),
