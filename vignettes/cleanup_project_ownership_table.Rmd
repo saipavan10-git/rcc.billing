@@ -1,0 +1,49 @@
+---
+title: "cleanup_project_ownership_table"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cleanup_project_ownership_table}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rcc.billing)
+```
+
+`cleanup_project_ownership_table.R` identifies projects with ownership issues, nominates a new owner if possible, and write that owner to the project ownership data. It cannot always determine a new owner. It logs the changes it makes to ownersuip data and the projects where it cannot fix the ownership data.
+
+_TODO: Insert a SIPOC diagram here. Create it in mermaid using the data below_
+
+# Sources
+- redcap database tables
+
+# Inputs
+ - redcap database tables:
+   - redcap_entity_project_ownership
+   - redcap_user_information
+   - redcap_projects
+   - redcap_user_rights
+   - redcap_user_roles
+
+# Processes
+ - Identify projects with ownership issues, nominate a new owner if possible, and write that owner to the ownership data.
+
+# Outputs
+ - redcap_entity_project_ownership
+    - blanked or revised project_ownership records
+ - rcc_job_log
+    - redcap_entity_project_ownership update_records
+    - redcap_entity_project_ownership insert_records
+    - project_ownership_records_with_issues_and_no_updates
+ 
+# Consumers
+- redcap database tables: redcap_entity_project_ownership
+- rcc billing tables: rcc_job_log

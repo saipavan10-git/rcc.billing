@@ -1,0 +1,75 @@
+---
+title: "update_invoice_line_items_with_invoicing_details"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{update_invoice_line_items_with_invoicing_details}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rcc.billing)
+```
+
+`update_invoice_line_items_with_invoicing_details.R` reads downloaded invoicing details provided by the fiscal team and applies them to billing tables and redcap tables. It does these things:
+
+ - Update invoice_line_item records with payment details.
+ - Insert invoice_line_item_communication records for each revised invoice_line_item
+ - Update service_instance records with new CTSI Study IDs
+ - Mirror invoice_line_item data to REDCap table of the same name
+ - Update banned_owners table for each PI who left the university
+
+_TODO: Insert a SIPOC diagram here. Create it in mermaid using the data below_
+
+# Sources
+- Fiscal team
+- redcap database tables
+- redcap billing database tables
+
+# Inputs
+ - invoicing detail file with payment details and PI status
+ - redcap database tables
+   - invoice_line_item
+ - redcap billing database tables:
+   - service_instance
+   - invoice_line_item
+   - invoice_line_item_communications
+   - banned_owners
+
+# Processes
+ - Update invoice_line_item records with payment details
+ - Insert invoice_line_item_communication records for each revised invoice_line_item
+ - Update service_instance records with new CTSI Study IDs
+ - Mirror invoice_line_item data to REDCap table of the same name
+ - Update banned_owners table for each PI who left the university
+
+# Outputs
+ - redcap billing database tables:
+   - service_instance updates
+   - invoice_line_item updates
+   - invoice_line_item_communications inserts
+   - banned_owners inserts
+ - redcap database tables:
+   - invoice_line_item a mirror of the redcap billing
+ - rcc_job_log
+   - service_instance updates
+   - invoice_line_item updates
+   - invoice_line_item_communications new records
+   - banned_owners updates
+ 
+# Consumers
+- redcap billing database
+   - service_instance
+   - invoice_line_item
+   - invoice_line_item_communications
+   - banned_owners
+- redcap database tables
+  - invoice_line_item
+- rcc billing tables: rcc_job_log
