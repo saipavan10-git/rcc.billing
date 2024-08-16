@@ -22,8 +22,8 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 
 ## Business workflows
 - Cleaning person data
-  - [cleanup_bad_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_email_addresses.html) 
-  - cleanup_bad_project_pi_email_addresses
+  - [cleanup_bad_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_email_addresses.html)
+  - [cleanup_bad_project_pi_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_project_pi_email_addresses.html)
   
 - Cleaning ownership data
   - cleanup_project_ownership_table
