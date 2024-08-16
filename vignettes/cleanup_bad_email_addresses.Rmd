@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(rcc.billing)
 ```
 
-Note: this script no longer functions. It failed in October 2022 when UF moved its Office 365 service to OAuth2.
+Note: this script can no longer read mailboxes. This started in October 2022 when UF moved its Office 365 service to OAuth2. The script will throw warnings about this issue, but it still runs.
 
 Locate bad UF addresses in REDCap replace them if possible, erase them if not, then disable accounts with no primary email address. 
 
@@ -29,7 +29,7 @@ _TODO: Insert a SIPOC diagram here. Create it in mermaid using the data below_
 # Inputs
  - redcap database tables: redcap_user_information
  - email stream from the sender of automated messages
- - rcc billing database tables: rcc_job_log
+ - rcc billing database tables: rcc_job_log to get log records about email address rejected by the mail host
  - vivo database tables: WH_UFDIR_PERSON_MDM, WH_GL_ACCT
  
 # Outputs
