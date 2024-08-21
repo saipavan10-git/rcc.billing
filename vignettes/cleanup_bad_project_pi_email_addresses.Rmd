@@ -14,8 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, echo = FALSE}
 library(rcc.billing)
+library(DiagrammeR)
 ```
 
 Note: this script can no longer read mailboxes. This started in October 2022 when UF moved its Office 365 service to OAuth2. The script will throw warnings about this issue, but it still runs.
@@ -24,7 +25,61 @@ Locate bad email addresses in Project PI data, replace them if possible, erase t
 
 This script reads the mail of a dummy in box that is used as the sender of numerous automated emails. When those messages generate bounce messages, they are delivered to the dummy inbox. This script reads that inbox, searches for message subject lines it recognizes and parses the message body to locate bad email addresses. It searches REDCap user information for a suitable replacement email address. If it finds one it replaces the bad address where it occurs. Otherwise it erases the bad email address from Project PI data.
 
-_TODO: Insert a SIPOC diagram here. Create it in mermaid using the data below_
+```{r mermaid_diagram, echo=FALSE, fig.width=8, fig.align='center'}
+DiagrammeR::mermaid("
+graph LR
+    subgraph Suppliers
+        S1[REDCap Database]
+        S2[Email System]
+        S3[RCC Billing Database]
+    end
+
+    subgraph Inputs
+        I1[REDCap User Information]
+        I4[REDCap Projects]
+        I2[Bounced Email Messages]
+        I3[RCC Job Log]
+    end
+
+    subgraph Process
+        P1[Read Dummy Inbox]
+        P2[Parse Message Body]
+        P3[Locate Bad UF PI Email Addresses]
+        P4[Search for Replacement]
+        P5[Update or Erase Address]
+    end
+
+    subgraph Outputs
+        O1[Updated REDCap Projects]
+        O2[Updated RCC Job Log]
+    end
+
+    subgraph Customers
+        C1[REDCap Users]
+        C2[RCC Billing System]
+    end
+
+    S1 --> I1
+    S1 --> I4
+    S2 --> I2
+    S3 --> I3
+
+    I1 --> P4
+    I2 --> P1
+    P1 --> P2
+    P2 --> P3
+    I4 --> P3
+    P3 --> P4
+    P4 --> P5
+    I3 --> P5
+
+    P5 --> O1
+    P5 --> O2
+
+    O1 --> C1
+    O2 --> C2
+")
+```
 
 # Inputs
  - redcap database tables: redcap_projects, redcap_user_information

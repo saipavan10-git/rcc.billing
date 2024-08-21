@@ -14,14 +14,78 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, echo=FALSE}
 library(rcc.billing)
+library(DiagrammeR)
 ```
 
-`cleanup_project_ownership_table.R` identifies projects with ownership issues, nominates a new owner if possible, and write that owner to the project ownership data. It cannot always determine a new owner. It logs the changes it makes to ownersuip data and the projects where it cannot fix the ownership data.
+`cleanup_project_ownership_table.R` identifies projects with ownership issues, nominates a new owner if possible, and write that owner to the project ownership data. It cannot always determine a new owner. It logs the changes it makes to ownership data and the projects where it cannot fix the ownership data.
+```{r mermaid_diagram, echo=FALSE, fig.width=8, fig.align='center'}
+DiagrammeR::mermaid("
+graph LR
+    subgraph Suppliers
+        S1[REDCap Database]
+    end
 
-_TODO: Insert a SIPOC diagram here. Create it in mermaid using the data below_
+    subgraph Inputs
+        I1[redcap_entity_project_ownership]
+        I2[redcap_user_information]
+        I3[redcap_projects]
+        I4[redcap_user_rights]
+        I5[redcap_user_roles]
+    end
 
+    subgraph Process
+        P1[Identify Projects with Ownership Issues]
+        P2[Get Projects Needing New Owners]
+        P3[Get Projects Without Owners]
+        P4[Get Research Projects Not Using Viable PI Data]
+        P5[Nominate New Owners]
+        P6[Update Project Ownership Data]
+        P7[Blank Unresolvable Ownership Records]
+        P8[Log Changes and Issues]
+
+        P1 --> P2
+        P1 --> P3
+        P1 --> P4
+        P2 --> P5
+        P3 --> P5
+        P4 --> P5
+        P5 --> P6
+        P5 --> P7
+        P6 --> P8
+        P7 --> P8
+    end
+
+    subgraph Outputs
+        O1[Updated redcap_entity_project_ownership]
+        O2[rcc_job_log]
+    end
+
+    subgraph Customers
+        C1[REDCap Database]
+        C2[RCC Billing System]
+    end
+
+    S1 --> I1
+    S1 --> I2
+    S1 --> I3
+    S1 --> I4
+    S1 --> I5
+
+    I1 --> P1
+    I2 --> P1
+    I3 --> P1
+    I4 --> P1
+    I5 --> P1
+
+    P8 --> O1
+    P8 --> O2
+
+    O1 --> C1
+    O2 --> C2
+")
+```
 # Sources
 - redcap database tables
 
