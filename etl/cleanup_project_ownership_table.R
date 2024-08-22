@@ -93,20 +93,6 @@ project_pis <- get_project_pis(
     priority = 1
   )
 
-unsuspended_high_privilege_faculty <- get_privileged_user(
-  redcap_projects = redcap_projects_needing_correction,
-  redcap_user_information = redcap_user_information,
-  redcap_staff_employment_periods = ctsit_staff_employment_periods,
-  redcap_user_rights = redcap_user_rights,
-  redcap_user_roles = redcap_user_roles,
-  filter_for_faculty = T,
-  return_project_ownership_format = T
-) %>%
-  mutate(
-    reason = "unsuspended_high_privilege_faculty",
-    priority = 2
-  )
-
 unsuspended_high_privilege_user <- get_privileged_user(
   redcap_projects = redcap_projects_needing_correction,
   redcap_user_information = redcap_user_information,

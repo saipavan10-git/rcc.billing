@@ -8,7 +8,6 @@ library(dotenv)
 library(redcapcustodian)
 library(DBI)
 library(RMariaDB)
-library(rcc.ctsit)
 library(rcc.billing)
 
 init_etl("cleanup_bad_email_addresses")
@@ -72,6 +71,7 @@ person <- dplyr::tribble(
   "foo", "bar"
 ) |>
   dplyr::filter(F)
+
 redcap_email_revisions <- get_redcap_email_revisions(bad_redcap_user_emails, person)
 update_n <- update_redcap_email_addresses(
   conn = conn,
