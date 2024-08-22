@@ -46,15 +46,13 @@ graph LR
     end
 
     subgraph Process
-        P1[Read Invoicing Details]
-        P2[Update invoice_line_item with Payment Details]
-        P3[Insert invoice_line_item_communication Records]
-        P4[Update service_instance with CTSI Study IDs]
-        P5[Mirror invoice_line_item to REDCap]
-        P6[Update banned_owners with PIs no longer at UF]
+        P2[Align invoice_line_item<br/>with Payment Details]
+        P3[New invoice_line_item_communication<br/>Records]
+        P4[Identify new CTSI Study<br/>IDs for service_instance]
+        P5[Mirror invoice_line_item<br/>to REDCap]
+        P6[Identify new<br/>banned_owners]
         P7[Log All Activities]
 
-        P1 --> P2
         P2 --> P3
         P2 --> P4
         P2 --> P5
@@ -66,11 +64,11 @@ graph LR
     end
 
     subgraph Outputs
-        O1[Updated Billing: service_instance]
-        O2[Updated Billing: invoice_line_item]
-        O3[New Billing: invoice_line_item_communications]
-        O4[Updated Billing: banned_owners]
-        O5[Updated REDCap: invoice_line_item]
+        O1[service_instance<br/>updates]
+        O2[invoice_line_item<br/>updates]
+        O3[invoice_line_item_communications<br/>inserts]
+        O4[banned_owners<br/>updates]
+        O5[invoice_line_item<br/>updates]
         O6[rcc_job_log]
     end
 
@@ -87,7 +85,7 @@ graph LR
     S3 --> I5
     S3 --> I6
 
-    I1 --> P1
+    I1 --> P2
     I2 --> P5
     I3 --> P4
     I4 --> P2
@@ -107,51 +105,6 @@ graph LR
     O4 --> C1
     O5 --> C2
     O6 --> C3
-")
+", width = 900, height = 500)
 ```
 
-# Sources
-- Fiscal team
-- redcap database tables
-- redcap billing database tables
-
-# Inputs
- - invoicing detail file with payment details and PI status
- - redcap database tables
-   - invoice_line_item
- - redcap billing database tables:
-   - service_instance
-   - invoice_line_item
-   - invoice_line_item_communications
-   - banned_owners
-
-# Processes
- - Update invoice_line_item records with payment details
- - Insert invoice_line_item_communication records for each revised invoice_line_item
- - Update service_instance records with new CTSI Study IDs
- - Mirror invoice_line_item data to REDCap table of the same name
- - Update banned_owners table for each PI who left the university
-
-# Outputs
- - redcap billing database tables:
-   - service_instance updates
-   - invoice_line_item updates
-   - invoice_line_item_communications inserts
-   - banned_owners inserts
- - redcap database tables:
-   - invoice_line_item a mirror of the redcap billing
- - rcc_job_log
-   - service_instance updates
-   - invoice_line_item updates
-   - invoice_line_item_communications new records
-   - banned_owners updates
- 
-# Consumers
-- redcap billing database
-   - service_instance
-   - invoice_line_item
-   - invoice_line_item_communications
-   - banned_owners
-- redcap database tables
-  - invoice_line_item
-- rcc billing tables: rcc_job_log
