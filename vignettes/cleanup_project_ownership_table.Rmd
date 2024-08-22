@@ -19,10 +19,10 @@ library(rcc.billing)
 library(DiagrammeR)
 ```
 
-`cleanup_project_ownership_table.R` identifies projects with ownership issues, nominates a new owner if possible, and write that owner to the project ownership data. It cannot always determine a new owner. It logs the changes it makes to ownership data and the projects where it cannot fix the ownership data.
-```{r mermaid_diagram, echo=FALSE, fig.width=8, fig.align='center'}
+`cleanup_project_ownership_table.R` identifies projects with ownership issues, nominates a new owner if possible, and writes that owner to the project ownership data. It cannot always determine a new owner. It logs the changes it makes to ownership data and the projects where it cannot fix the ownership data.
+```{r mermaid_diagram, echo=FALSE, fig.align='center'}
 DiagrammeR::mermaid("
-graph LR
+graph TD
     subgraph Suppliers
         S1[REDCap Database]
     end
@@ -36,14 +36,14 @@ graph LR
     end
 
     subgraph Process
-        P1[Identify Projects with Ownership Issues]
-        P2[Get Projects Needing New Owners]
-        P3[Get Projects Without Owners]
-        P4[Get Research Projects Not Using Viable PI Data]
-        P5[Nominate New Owners]
-        P6[Update Project Ownership Data]
-        P7[Blank Unresolvable Ownership Records]
-        P8[Log Changes and Issues]
+        P1[Identify Projects with<br/>Ownership Issues]
+        P2[Get Projects<br/>Needing New Owners]
+        P3[Get Projects<br/>Without Owners]
+        P4[Get Research Projects<br/>Not Using Viable PI Data]
+        P5[Nominate<br/>New Owners]
+        P6[Create owner<br/>updates dataset]
+        P7[Create owner<br/>erasures dataset]
+        P8[Combine owner updates<br/>and erasures]
 
         P1 --> P2
         P1 --> P3
@@ -58,7 +58,7 @@ graph LR
     end
 
     subgraph Outputs
-        O1[Updated redcap_entity_project_ownership]
+        O1[redcap_entity_project_ownership<br/>updates]
         O2[rcc_job_log]
     end
 
@@ -84,30 +84,5 @@ graph LR
 
     O1 --> C1
     O2 --> C2
-")
+", width = 700, height= 700)
 ```
-# Sources
-- redcap database tables
-
-# Inputs
- - redcap database tables:
-   - redcap_entity_project_ownership
-   - redcap_user_information
-   - redcap_projects
-   - redcap_user_rights
-   - redcap_user_roles
-
-# Processes
- - Identify projects with ownership issues, nominate a new owner if possible, and write that owner to the ownership data.
-
-# Outputs
- - redcap_entity_project_ownership
-    - blanked or revised project_ownership records
- - rcc_job_log
-    - redcap_entity_project_ownership update_records
-    - redcap_entity_project_ownership insert_records
-    - project_ownership_records_with_issues_and_no_updates
- 
-# Consumers
-- redcap database tables: redcap_entity_project_ownership
-- rcc billing tables: rcc_job_log
