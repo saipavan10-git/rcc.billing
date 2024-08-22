@@ -30,8 +30,9 @@ To turn our REDCap system from a cost center into a revenue generator and addres
   - Ban accounts/emails of people who left your institution. See  [update_invoice_line_items_with_invoicing_details](https://ctsit.github.io/rcc.billing/articles/update_invoice_line_items_with_invoicing_details.html)
 
 
-- Exempt special people and special projects from billing.
-  - update_project_billable_attribute
+- Exempt special people and special projects from billing
+  - [update_project_billable_attribute](https://ctsit.github.io/rcc.billing/articles/update_project_billable_attribute.html)  
+
 
 - Manage abandoned projects
   - delete_abandoned_projects
