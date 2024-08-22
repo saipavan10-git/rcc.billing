@@ -22,12 +22,13 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 
 ## Business workflows
 - Cleaning person data
-  - [cleanup_bad_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_email_addresses.html) 
-  - cleanup_bad_project_pi_email_addresses
+  - [cleanup_bad_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_email_addresses.html)
+  - [cleanup_bad_project_pi_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_project_pi_email_addresses.html)
   
 - Cleaning ownership data
-  - cleanup_project_ownership_table
-  - Ban accounts/emails of people who left your institution. (See update_invoice_line_items_with_invoicing_details)
+  - [cleanup_project_ownership_table](https://ctsit.github.io/rcc.billing/articles/cleanup_project_ownership_table.html)
+  - Ban accounts/emails of people who left your institution. See  [update_invoice_line_items_with_invoicing_details](https://ctsit.github.io/rcc.billing/articles/update_invoice_line_items_with_invoicing_details.html)
+
 
 - Exempt special people and special projects from billing.
   - update_project_billable_attribute
@@ -38,7 +39,7 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 
 - Create & Manage charging records
   - create_and_send_new_invoice_line_items
-  - update_invoice_line_items_with_invoicing_details
+  - [update_invoice_line_items_with_invoicing_details](https://ctsit.github.io/rcc.billing/articles/update_invoice_line_items_with_invoicing_details.html)
   - sequester_unpaid_projects
   - cancel_invoice_line_items (Ad hoc)
 
