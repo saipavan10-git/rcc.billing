@@ -41,7 +41,7 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 - Create & Manage charging records
   - [create_and_send_new_invoice_line_items](https://ctsit.github.io/rcc.billing/articles/create_and_send_new_invoice_line_items.html)
   - [update_invoice_line_items_with_invoicing_details](https://ctsit.github.io/rcc.billing/articles/update_invoice_line_items_with_invoicing_details.html)
-  - sequester_unpaid_projects
+  - [sequester_unpaid_projects](https://ctsit.github.io/rcc.billing/articles/sequester_unpaid_projects.html)
   - cancel_invoice_line_items (Ad hoc)
 
 - Manage organizational data
