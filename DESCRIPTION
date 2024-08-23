@@ -24,9 +24,9 @@ Imports:
     readr,
     rlang,
     stringr,
-    testthat,
     tidyr,
-    writexl
+    writexl,
+    RMariaDB
 Suggests:
     RSQLite,
     duckdb,
@@ -34,9 +34,9 @@ Suggests:
     fs,
     purrr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 Remotes: 
-    github::ctsit/rcc.ctsit,
     github::ctsit/redcapcustodian
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2

@@ -202,7 +202,6 @@ get_creators <- function(redcap_projects,
 #'
 #' Returns a dataframe of project IDs and usernames of users with design or user_rights
 #'  who are non-suspended, non-redcap-staff, with a primary email address.
-#'  Optionally require users be faculty.
 #'  Optionally include users with any privilege on the project.
 #'  Optionally include suspended users.
 #'
@@ -212,7 +211,6 @@ get_creators <- function(redcap_projects,
 #'        intervals with one interval per row
 #' @param redcap_user_rights, The contents of the REDCap table of the same name.
 #' @param redcap_user_roles, The contents of the REDCap table of the same name.
-#' @param filter_for_faculty, Require users be faculty
 #' @param include_low_privilege_users, Include users whose accounts have any permission on a project
 #' @param include_suspended_users, Include users whose accounts are suspended
 #' @param return_project_ownership_format, Rename the columns to match the
@@ -223,16 +221,6 @@ get_creators <- function(redcap_projects,
 #'
 #' @examples
 #' \dontrun{
-#' unsuspended_high_privilege_faculty <- get_privileged_user(
-#'   redcap_projects = redcap_projects,
-#'   redcap_user_information = redcap_user_information,
-#'   redcap_staff_employment_periods = ctsit_staff_employment_periods,
-#'   redcap_user_rights = redcap_user_rights,
-#'   redcap_user_roles = redcap_user_roles,
-#'   filter_for_faculty = T,
-#'   return_project_ownership_format = T
-#' )
-#'
 #' unsuspended_high_privilege_user <- get_privileged_user(
 #'   redcap_projects = redcap_projects,
 #'   redcap_user_information = redcap_user_information,
@@ -269,7 +257,6 @@ get_privileged_user <- function(redcap_projects,
                                 redcap_staff_employment_periods,
                                 redcap_user_rights,
                                 redcap_user_roles,
-                                filter_for_faculty = FALSE,
                                 include_low_privilege_users = FALSE,
                                 include_suspended_users = FALSE,
                                 return_project_ownership_format = FALSE) {
@@ -296,8 +283,6 @@ get_privileged_user <- function(redcap_projects,
     dplyr::filter(is.na(.data$user_suspended_time) | include_suspended_users) |>
     dplyr::left_join(redcap_staff_employment_periods, by = c("username" = "redcap_username")) |>
     dplyr::filter(!.data$creation_time %in% .data$employment_interval) |>
-    # filter_for_faculty adds this test
-    dplyr::filter(!filter_for_faculty | is_faculty(.data$username)) |>
     dplyr::select(
       "project_id",
       "username"

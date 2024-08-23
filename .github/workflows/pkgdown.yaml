@@ -22,7 +22,6 @@ jobs:
     env:
       CI: "TRUE"
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CR_PAT: ${{ secrets.CR_PAT }}
     permissions:
       contents: write
     steps:
@@ -37,20 +36,13 @@ jobs:
       - name: Install devtools
         run: Rscript -e 'install.packages("devtools")'
 
-      - name: Install public R dependencies
+      - name: Install Documentation dependencies
         run: |
-          Rscript -e 'devtools::install_github("ctsit/redcapcustodian")'
-          Rscript -e 'install.packages(c("remotes", "pkgdown", "writexl"))'
-
-      - name: Install private R dependencies
-        run: Rscript -e 'devtools::install_github("ctsit/rcc.ctsit", auth_token = Sys.getenv("CR_PAT"))'
-  
-      - name: Install local package
-        run: Rscript -e 'remotes::install_local(dependencies = FALSE, upgrade = "never")'
+          Rscript -e 'install.packages(c("DiagrammeR"))'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown
+          extra-packages: any::pkgdown, local::.
           needs: website
 
       - name: Build site
