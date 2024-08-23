@@ -35,13 +35,11 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 
 
 - Manage abandoned projects
-  - [delete_abandoned_projects](https://ctsit.github.io/rcc.billing/articles/delete_abandoned_projects.
-html)
-  - [sequester_orphans](https://ctsit.github.io/rcc.billing/articles/sequester_orphans.
-html)
+  - [delete_abandoned_projects](https://ctsit.github.io/rcc.billing/articles/delete_abandoned_projects.html)
+  - [sequester_orphans](https://ctsit.github.io/rcc.billing/articles/sequester_orphans.html)
 
 - Create & Manage charging records
-  - create_and_send_new_invoice_line_items
+  - [create_and_send_new_invoice_line_items](https://ctsit.github.io/rcc.billing/articles/create_and_send_new_invoice_line_items.html)
   - [update_invoice_line_items_with_invoicing_details](https://ctsit.github.io/rcc.billing/articles/update_invoice_line_items_with_invoicing_details.html)
   - sequester_unpaid_projects
   - cancel_invoice_line_items (Ad hoc)

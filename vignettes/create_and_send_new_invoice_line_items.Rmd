@@ -1,0 +1,124 @@
+---
+title: "create_and_send_new_invoice_line_items"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{create_and_send_new_invoice_line_items}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`create_and_send_new_invoice_line_items` decides what services to bill at the beginning of each month. It reads service request data and redcap project data to create a dataset of records that will be used by the fiscal team to create line items on invoices. The dataset will include records that describe service request work completed in the previous month. The dataset will also have one record for each REDCap project with an anniversary in the previous month and also meets several other criteria.
+
+```{r mermaid-diagram, echo=FALSE, fig.align='center', fig.cap="create_and_send_new_invoice_line_items data processing workflow"}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Service Request Suppliers
+        SRS1[REDCap Database]
+        SRS2[RCC Billing database]
+        SRS3[REDCap Service Request project]
+    end
+    subgraph Service Request Inputs
+        SRI1[redcap_entity_project_ownership]
+        SRI2[redcap_projects]
+        SRI3[redcap_user_information]
+        SRI4[invoice_line_item]
+        SRI7[REDCap Service Requests]
+    end
+
+    subgraph Project Suppliers
+        S1[REDCap Database]
+        S2[RCC Billing database]
+    end
+    subgraph Project Inputs
+        I1[redcap_entity_project_ownership]
+        I2[redcap_projects]
+        I3[redcap_user_information]
+        I4[invoice_line_item]
+        I5[invoice_line_item_communications]
+        I6[service_instance]
+    end
+
+    subgraph Process
+        P1[Get service request line items]
+        P2[Get project line items]
+        P3[Combine line items]
+        P4[Identify new service instances]
+        P5[Combine loggable data]
+        P6[Create new invoice_line_item_communications records]
+    end
+    subgraph Outputs
+        O1[invoice_line_item dataset]
+        O2[invoice_line_item inserts]
+        O3[invoice_line_item_communications inserts]
+        O4[service_instance updates]
+        O5[Log data]
+    end
+    subgraph Customers
+        C1[RCC Billing System]
+        C2[RCC Billing System: rcc_job_log]
+        C3[Fiscal team]
+    end
+    SRS1 --> SRI1
+    SRS1 --> SRI2
+    SRS1 --> SRI3
+    SRS2 --> SRI4
+    SRS3 --> SRI7
+
+    S1 --> I1
+    S1 --> I2
+    S1 --> I3
+    S2 --> I4
+    S2 --> I5
+    S2 --> I6
+    
+    SRI1 --> P1
+    SRI2 --> P1
+    SRI3 --> P1
+    SRI4 --> P1
+    SRI7 --> P1
+
+    I1 --> P2
+    I2 --> P2
+    I3 --> P2
+    I4 --> P2
+    
+    P1 --> P3
+    P2 --> P3
+    
+    I6 --> P4
+    P3 --> P4
+    
+    I5 --> P6
+    P3 --> P6
+    
+    P3 --> O1
+    P3 --> O2
+    
+    P6 --> O3
+    
+    P4 --> O4
+    
+    P3 --> P5
+    P4 --> P5
+    
+    P5 --> O5
+    
+    O1 --> C3
+    O2 --> C1
+    O3 --> C1
+    O4 --> C1
+    O5 --> C2
+", width = 850, height= 300)
+```
