@@ -20,6 +20,10 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 - Use an incremental and iterative approach.
 - Automate everything.
 
+## Novel Concepts
+
+REDCap Automated Billing introduces some concepts outside the normal scope of a REDCap system. These are described in [Novel Concepts](https://ctsit.github.io/rcc.billing/articles/novel_concepts.html)
+
 ## Business workflows
 - Cleaning person data
   - [cleanup_bad_email_addresses](https://ctsit.github.io/rcc.billing/articles/cleanup_bad_email_addresses.html)
@@ -45,8 +49,8 @@ To turn our REDCap system from a cost center into a revenue generator and addres
   - cancel_invoice_line_items (Ad hoc)
 
 - Manage organizational data
-  - write_uf_fiscal_orgs_to_org_hierarchies
-  - write_uf_fiscal_orgs_to_person_org
+  - write_uf_fiscal_orgs_to_org_hierarchies (temporarily disabled)
+  - write_uf_fiscal_orgs_to_person_org (temporarily disabled)
 
 - Manage pro bono service request work
   - update_free_support_time_remaining
@@ -57,8 +61,8 @@ To turn our REDCap system from a cost center into a revenue generator and addres
   - revenue_status_and_projections
 
 - Manage customer communications
-  - remind_owners_to_review_ownership
-  - request_correction_of_bad_ownership_data
+  - [remind_owners_to_review_ownership](https://ctsit.github.io/rcc.billing/articles/remind_owners_to_review_ownership.html)
+  - [request_correction_of_bad_ownership_data](https://ctsit.github.io/rcc.billing/articles/request_correction_of_bad_ownership_data.html)
   - warn_owners_of_impending_bill
 
 

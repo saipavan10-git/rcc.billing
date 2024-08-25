@@ -1,0 +1,29 @@
+---
+title: "Novel Concepts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{novel_concepts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+```
+
+The REDCap Automated Billing project requires novel concepts to decide how to manage a project's lifecycle, and who to bill for what. These concepts extend REDCap or modifies its behavior to suit the needs of the billing workflows. 
+
+## Sequestration
+
+Project sequestration is a novel project lifecycle stage for orphaned and unpaid projects. It's a step on the path to project deletion.
+Sequestration co-opts REDCap's *completed projects* concept rebranding it via a few UI changes provided by the [project_sequestration_ui_hack](https://github.com/ctsit/project_sequestration_ui_hack), a REDCap external module created just for this purpose. A sequestered module will appear like this in the REDCap's My Projects page:
+
+![A sequestered project appearing in My Projects](images/sequestered_project_in_my_projects.png)
+
