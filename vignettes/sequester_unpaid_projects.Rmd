@@ -47,10 +47,12 @@ graph TD
         O2[redcap_projects updates]
         O3[redcap_log_eventN inserts]
         O4[rcc_job_log]
+        O5[Emails about ownership]
     end
     subgraph Customers
         C1[RCC Billing System: rcc_job_log]
         C2[REDCap Database]
+        C3[Project owners]
     end
     S1 --> I1
     S1 --> I2
@@ -74,6 +76,9 @@ graph TD
 
     P4 --> O4
     
+    P3 --> O5
+    O5 --> C3
+
     O4 --> C1
     
     O1 --> C2
