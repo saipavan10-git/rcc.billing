@@ -53,17 +53,17 @@ REDCap Automated Billing introduces some concepts outside the normal scope of a 
   - write_uf_fiscal_orgs_to_person_org (temporarily disabled)
 
 - Manage pro bono service request work
-  - update_free_support_time_remaining
-  - update_probono_service_request_records
+  - [update_free_support_time_remaining](https://ctsit.github.io/rcc.billing/articles/update_free_support_time_remaining.html)
+  - [update_probono_service_request_records](https://ctsit.github.io/rcc.billing/articles/update_probono_service_request_records.html)
 
 - Internal reporting
-  - billable_candidates
-  - revenue_status_and_projections
+  - [billable_candidates](https://ctsit.github.io/rcc.billing/articles/billable_candidates.html)
+  - [revenue_status_and_projections](https://ctsit.github.io/rcc.billing/articles/revenue_status_and_projections.html)
 
 - Manage customer communications
   - [remind_owners_to_review_ownership](https://ctsit.github.io/rcc.billing/articles/remind_owners_to_review_ownership.html)
   - [request_correction_of_bad_ownership_data](https://ctsit.github.io/rcc.billing/articles/request_correction_of_bad_ownership_data.html)
-  - warn_owners_of_impending_bill
+  - [warn_owners_of_impending_bill](https://ctsit.github.io/rcc.billing/articles/warn_owners_of_impending_bill.html)
 
 
 ## When jobs run
