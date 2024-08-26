@@ -1,7 +1,7 @@
 # REDCap Automated Billing
 
 ## Overview
-REDCap Automated Billing is a automated, data-driven service billing system for a REDCap system. 
+REDCap Automated Billing is an automated, data-driven service billing system for a REDCap system. 
 
 To turn our REDCap system from a cost center into a revenue generator and address the proliferation of orphaned REDCap projects, the University of Florida’s CTS-IT charges a modest annual fee for each project. To do this we created REDCap Automated Billing. It generates revenue, reduces data privacy risks by incentivizing the deletion of abandoned projects, and improves the quality of research productivity metrics. This requires us to improve our investigator and project metadata, partner with fiscal staff, and automate novel data workflows. 
 
@@ -23,6 +23,10 @@ To turn our REDCap system from a cost center into a revenue generator and addres
 ## Novel Concepts
 
 REDCap Automated Billing introduces some concepts outside the normal scope of a REDCap system. These are described in [Novel Concepts](https://ctsit.github.io/rcc.billing/articles/novel_concepts.html)
+
+## Billing for support work
+
+The complexities of billing for REDCap support work are described in [Billing for REDCap support work](https://ctsit.github.io/rcc.billing/articles/billing_for_support.html)
 
 ## Business workflows
 - Cleaning person data
