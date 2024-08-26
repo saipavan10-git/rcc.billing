@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_new_project_invoice_line_items <- function(
+#' get_new_project_invoice_line_items(
 #'   projects_to_invoice,
 #'   initial_invoice_line_item,
 #'   rc_conn,

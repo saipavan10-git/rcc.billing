@@ -1,0 +1,53 @@
+---
+title: "update_probono_service_request_records"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{update_probono_service_request_records}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`update_probono_service_request_records` enforces a business rule to provide a free customer service consultation of up to one hour for each REDCap project. It reads the customer service database, groups the data by project ID, and determines which projects have logged hours which should receive hourly rate adjust down to \$0/hour. This marks the records as _pro bono_. Those records will be invoiced like other work but at the \$0/hour rate and the "pro bono" label.
+
+```{r mermaid-diagram, echo=FALSE, fig.align='center', fig.cap="update_probono_service_request_records data processing workflow"}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Suppliers
+        S1[REDCap Service Request project]
+    end
+    subgraph Inputs
+        I1[Service Request dataset]
+    end
+
+    subgraph Process
+        P1[Identify records that should be marked Probono]
+    end
+    subgraph Outputs
+        O1[Service Request updates]
+    end
+    subgraph Customers
+        C1[REDCap Service Request project]
+        C2[RCC Billing System: rcc_job_log]
+    end
+    
+    S1 --> I1
+    I1 --> P1
+    P1 --> O1
+    
+    O1 --> C1
+    O1 --> C2
+
+", width = 850, height= 300)
+```

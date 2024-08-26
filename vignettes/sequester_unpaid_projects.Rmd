@@ -1,0 +1,88 @@
+---
+title: "sequester_unpaid_projects"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sequester_unpaid_projects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`sequester_unpaid_projects` identifies projects with an unpaid invoice more than 101 days old and makes them visible but inaccessible to the project team. It co-opts REDCap's *completed projects* concept rebranding it via a few UI changes provided by the [project_sequestration_ui_hack](https://github.com/ctsit/project_sequestration_ui_hack), a REDCap external module created just for this purpose. A sequestered module will appear like this in the REDCap's My Projects page:
+
+![A sequestered project appearing in My Projects](images/sequestered_project_in_my_projects.png)
+
+```{r mermaid-diagram, echo=FALSE, fig.align='center', fig.cap="sequester_unpaid_projects data processing workflow"}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Suppliers
+        S1[REDCap Database]
+        S2[RCC Billing database]
+    end
+    subgraph Inputs
+        I1[redcap_projects]
+        I2[redcap_config]
+        I3[redcap_entity_project_ownership]
+        I4[invoice_line_item]
+    end
+    subgraph Process
+        P1[Identify a list of non-deleted, non-sequester projects with old, unpaid invoices]
+        P2[Sequester projects]
+        P3[Email each person who has projects being sequestered]
+        P4[Combine sequestration and email logs]
+    end
+    subgraph Outputs
+        O1[redcap_entity_project_ownership updates]
+        O2[redcap_projects updates]
+        O3[redcap_log_eventN inserts]
+        O4[rcc_job_log]
+        O5[Emails about ownership]
+    end
+    subgraph Customers
+        C1[RCC Billing System: rcc_job_log]
+        C2[REDCap Database]
+        C3[Project owners]
+    end
+    S1 --> I1
+    S1 --> I2
+    S1 --> I3
+    S2 --> I4
+    
+    I1 --> P1
+    I3 --> P1
+    I4 --> P1
+
+    P1 --> P2
+    P1 --> P3
+    I2 --> P3
+    
+    P2 --> P4
+    P3 --> P4
+    
+    P2 --> O1
+    P2 --> O2
+    P2 --> O3
+
+    P4 --> O4
+    
+    P3 --> O5
+    O5 --> C3
+
+    O4 --> C1
+    
+    O1 --> C2
+    O2 --> C2
+    O3 --> C2
+", width = 700, height= 500)
+```

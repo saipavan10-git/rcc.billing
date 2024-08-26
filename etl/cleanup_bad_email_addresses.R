@@ -8,7 +8,6 @@ library(dotenv)
 library(redcapcustodian)
 library(DBI)
 library(RMariaDB)
-library(rcc.ctsit)
 library(rcc.billing)
 
 init_etl("cleanup_bad_email_addresses")
@@ -67,10 +66,12 @@ bounce_data <-
 bad_redcap_user_emails <- redcap_emails$tall %>%
   inner_join(bounce_data, by = c("email"))
 
-person <- get_uf_person_data_by_gatorlink(
-  user_ids = bad_redcap_user_emails$username
-  ) %>%
-  select(user_id, email)
+person <- dplyr::tribble(
+  ~user_id, ~email,
+  "foo", "bar"
+) |>
+  dplyr::filter(F)
+
 redcap_email_revisions <- get_redcap_email_revisions(bad_redcap_user_emails, person)
 update_n <- update_redcap_email_addresses(
   conn = conn,

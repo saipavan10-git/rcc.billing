@@ -1,0 +1,64 @@
+---
+title: "update_project_billable_attribute"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{update_project_billable_attribute}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`update_project_billable_attribute` identifies and new projects that do not have the `billable` attribute set and sets that attribute according to business rules. It marks projects as billable once they are one month old. It marks projects as non-billable if they are owned by the REDCap admin team. 
+
+```{r mermaid_diagram, echo=FALSE, fig.align='center'}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Suppliers
+        S1[REDCap Database]
+        S2[RCC Billing package datasets]
+    end
+    subgraph Inputs
+        I1[redcap_entity_project_ownership]
+        I2[redcap_projects]
+        I3[ctsit_staff_employment_periods]
+    end
+    subgraph Process
+        P1[Identify projects older than one month without<br/>a billable attribute, exclude projects owned by<br/>CTS-IT staff, set the billable attribute<br/>on the remaining projects to TRUE.]
+        P2[Identify projects owned CTS-IT staff, set the<br/> billable attribute on them to FALSE.]
+    end
+    subgraph Outputs
+        O1[redcap_entity_project_ownership<br/>updates]
+    end
+    subgraph Customers
+        C1[REDCap Database]
+        C2[RCC Billing System: rcc_job_log]
+    end
+    S1 --> I1
+    S1 --> I2
+    S2 --> I3
+    
+    I1 --> P1
+    I2 --> P1
+    I3 --> P1
+
+    I1 --> P2
+    I2 --> P2
+    I3 --> P2
+
+    P1 --> O1
+    P2 --> O1
+    O1 --> C1
+    O1 --> C2
+", width = 700, height= 700)
+```
