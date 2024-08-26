@@ -122,7 +122,6 @@ unsuspended_low_privilege_user <- get_privileged_user(
 
 project_ownership_updates <- bind_rows(
   project_pis,
-  unsuspended_high_privilege_faculty,
   unsuspended_high_privilege_user,
   unsuspended_low_privilege_user
 ) %>%
