@@ -72,4 +72,4 @@ The complexities of billing for REDCap support work are described in [Billing fo
 
 ## When jobs run
 
-Most ETLs and reports are run in a regular basis via Cron. The schedul of those events can be found at [When jobs run](https://docs.google.com/document/d/1a5Zfsi4us32uIRTZ49TQbvH7OrIRTUXFeYZdMWU3g44/edit#heading=h.b18i1tfzijre)
+Most ETLs and reports are run in a regular basis via Cron. The schedule of those events can be found at [When jobs run](https://ctsit.github.io/rcc.billing/articles/when_jobs_run.html)

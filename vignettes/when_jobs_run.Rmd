@@ -1,0 +1,49 @@
+---
+title: "When jobs run"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{When jobs run}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+```
+
+The scripts in the billing system are dependent upon one another to clean data, backfill new records, communicate with customers, decide what to bill, acknowledge receipt of funds, and enforce policy. Each is dependent on the other tasks. To assure that everything happens when on schedule, almost all tasks in the billing system are run on a regular basis via cron. Data cleaning and updating happen on a daily or weekly cycle. Internal reporting happens on a weekly cycle. Everything that decides which projects will get billed happens on a monthly cycle. The detailed schedule of jobs is show below.
+
+## Daily
+
+-   00:47 - [cleanup_project_ownership_table](cleanup_project_ownership_table.html)
+-   1:05 - [update_project_billable_attribute](update_project_billable_attribute.html)
+
+## Weekday business hours, every two hours, 7:00 - 19:00
+
+-   7:03 - 17:03 - [update_probono_service_request_records](update_probono_service_request_records.html)
+-   7:07 - 17:07 - [update_free_support_time_remaining](update_free_support_time_remaining.html)
+
+## Weekly
+
+-   Monday at 3:11 - update uf fiscal orgs data (on an indefinite hold)
+-   Monday at 7:03 - Send [billable_candidates](billable_candidates.html) report
+-   Tuesday at 10:00 - [cleanup_bad_email_addresses](cleanup_bad_email_addresses.html)
+-   Tuesday at 10:03 - [cleanup_bad_project_pi_email_addresses](cleanup_bad_project_pi_email_addresses.html)
+
+## Monthly
+
+-   First Tuesday of the month - [sequester_unpaid_projects](sequester_unpaid_projects.html)
+-   Day 1 at 8:02 - [sequester_orphans](sequester_orphans.html)
+-   Day 1 at 10:03 - [warn_owners_of_impending_bill](warn_owners_of_impending_bill.html) in the next month
+-   Day 1 at 10:05 - [request_correction_of_bad_ownership_data](request_correction_of_bad_ownership_data.html) by the study team
+-   Day 5 at 8:05 - [create_and_send_new_invoice_line_items](create_and_send_new_invoice_line_items.html)
+-   Day 23 at 8:02 - [sequester_orphans](sequester_orphans.html)
+-   Day 23 at 10:03 - [warn_owners_of_impending_bill](warn_owners_of_impending_bill.html) in the next month
+-   Day 28 at 8:02 - [sequester_orphans](sequester_orphans.html)
