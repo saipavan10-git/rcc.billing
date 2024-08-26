@@ -1,3 +1,7 @@
+# rcc.billing 1.42.0 (released 2024-08-26)
+- Add ORCIDs in package authors (@pbchase, #249)
+- Add vignettes for most ETLs and reports (@pbchase, @saipavan10-git, #244, #245, #246, #247)
+
 # rcc.billing 1.41.4 (released 2024-08-15)
 - Update github workflows to allow R to correctly access the PAT (@saipavan10-git)
 - Update description file to have a REMOTES section for ctsit packages (@saipavan10-git)
