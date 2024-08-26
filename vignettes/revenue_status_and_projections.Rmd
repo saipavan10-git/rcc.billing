@@ -46,5 +46,5 @@ graph TD
     P1 --> O1
     O1 --> C1
     
-", width = 300, height= 600)
+", width = 700, height= 460)
 ```
