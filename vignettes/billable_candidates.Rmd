@@ -1,0 +1,77 @@
+---
+title: "billable_candidates"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{billable_candidates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`billable_candidates` is a weekly report of every project on the system with a billable attribute of TRUE. It provides numerous details that justify why a project would or wouldn't be billed. The audience is fiscal staff and REDCap admin staff. 
+
+```{r mermaid-diagram, echo=FALSE, fig.align='center', fig.cap="billable_candidates data processing workflow"}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Suppliers
+        S1[REDCap Database]
+        S2[RCC Billing database]
+    end
+    subgraph Project Inputs
+        I1[redcap_entity_project_ownership]
+        I2[redcap_projects]
+        I3[redcap_user_information]
+        I4[redcap_records]
+        I5[redcap_config]
+        I6[invoice_line_item]
+        I7[person_org]
+        I8[org_hierarchies]
+    end
+
+    subgraph Process
+        P1[Call get_billable_candidates]
+    end
+    subgraph Outputs
+        O1[Billable Candidates dataset]
+        O2['Sent billing candidates']
+    end
+    subgraph Customers
+        C1[Fiscal team and REDCap admins]
+        C2[RCC Billing System: rcc_job_log]
+    end
+
+    S1 --> I1
+    S1 --> I2
+    S1 --> I3
+    S1 --> I4
+    S1 --> I5
+    S2 --> I6
+    S2 --> I7
+    S2 --> I8
+    
+    I1 --> P1
+    I2 --> P1
+    I3 --> P1
+    I4 --> P1
+    I5 --> P1
+    I6 --> P1
+    I7 --> P1
+    I8 --> P1
+
+    P1 --> O1
+
+    O1 --> C1
+    O2 --> C2
+", width = 850, height= 300)
+```

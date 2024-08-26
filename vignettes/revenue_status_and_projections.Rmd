@@ -1,0 +1,50 @@
+---
+title: "revenue_status_and_projections"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{revenue_status_and_projections}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`revenue_status_and_projections` is a report of financial metrics of the project. It's run weekly for the REDCap admins and director-level staff and adhoc as revenue is collected. The report provides graphs and tables on _Revenue and Receivables_, _Revenue and projections by fiscal year_, and _Aging_
+
+```{r mermaid-diagram, echo=FALSE, fig.align='center', fig.cap="revenue_status_and_projections data processing workflow"}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Suppliers
+        S1[RCC Billing database]
+    end
+    subgraph Project Inputs
+        I1[invoice_line_item]
+    end
+
+    subgraph Process
+        P1[Generate graphs and tables]
+    end
+    subgraph Outputs
+        O1[REDCap Annual Project<br/>Billing Revenue, Status,<br/>and Projections]
+    end
+    subgraph Customers
+        C1[REDCap admins and Director level leadership]
+    end
+
+    S1 --> I1
+    I1 --> P1
+    P1 --> O1
+    O1 --> C1
+    
+", width = 700, height= 460)
+```

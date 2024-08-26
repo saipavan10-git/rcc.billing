@@ -1,0 +1,78 @@
+---
+title: "sequester_orphans"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sequester_orphans}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(rcc.billing)
+library(DiagrammeR)
+```
+
+`sequester_orphans` identifies abandoned projects and makes them visible but inaccessible to the project team. It co-opts REDCap's *completed projects* concept rebranding it via a few UI changes provided by the [project_sequestration_ui_hack](https://github.com/ctsit/project_sequestration_ui_hack), a REDCap external module created just for this purpose. A sequestered module will appear like this in the REDCap's My Projects page:
+
+![A sequestered project appearing in My Projects](images/sequestered_project_in_my_projects.png)
+
+```{r mermaid-diagram, echo=FALSE, fig.align='center', fig.cap="sequester_orphans data processing workflow"}
+DiagrammeR::mermaid("
+graph TD
+    subgraph Suppliers
+        S1[REDCap Database]
+        S2[RCC Billing database]
+    end
+    subgraph Inputs
+        I1[redcap_entity_project_ownership]
+        I2[redcap_projects]
+        I3[invoice_line_item]
+        I4[rcc_job_log]
+    end
+    subgraph Process
+        P1[Identify old, unpaid projects]
+        P2[Identify old, orphaned projects]
+        P3[Identify deleted projects]
+        P4[Combine unpaid and<br/>orphaned projects, removing<br/>already-deleted projects]
+        P5[Delete the list of projects]
+    end
+    subgraph Outputs
+        O1[deleted_projects dataset]
+        O2[redcap_projects updates]
+        O3[redcap_log_eventN inserts]
+    end
+    subgraph Customers
+        C1[RCC Billing System: rcc_job_log]
+        C2[REDCap Database]
+    end
+    S1 --> I1
+    S1 --> I2
+    S2 --> I3
+    S2 --> I4
+    
+    I1 --> P1
+    I2 --> P1
+    I3 --> P1
+
+    I4 --> P2
+    I2 --> P3
+    
+    P1 --> P4
+    P2 --> P4
+    P3 --> P4
+    P4 --> P5
+    P5 --> O1
+    P5 --> O2
+    P5 --> O3
+    O1 --> C1
+    O2 --> C2
+    O3 --> C2
+", width = 700, height= 700)
+```
