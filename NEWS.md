@@ -1,3 +1,6 @@
+# rcc.billing 1.42.1 (released 2024-08-26)
+- Remove unsuspended_high_privilege_faculty from cleanup_project_ownership_table.R (@pbchase)
+
 # rcc.billing 1.42.0 (released 2024-08-26)
 - Add ORCIDs in package authors (@pbchase, #249)
 - Add vignettes for most ETLs and reports (@pbchase, @saipavan10-git, #244, #245, #246, #247)
