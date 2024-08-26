@@ -32,7 +32,7 @@ sequester projects listed in `project_ids` that can be sequestered
 \dontrun{
 sequester_projects(
   conn = rc_conn,
-  project_id = project_ids_to_sequester
+  project_id = project_ids_to_sequester,
   reason = reasons_project_ids_should_be_sequestered
 }
 }

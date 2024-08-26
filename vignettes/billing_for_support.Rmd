@@ -2,7 +2,7 @@
 title: "Billing for REDCap support work"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{billing_for_support}
+  %\VignetteIndexEntry{Billing for REDCap support work}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

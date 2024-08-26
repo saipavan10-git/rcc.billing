@@ -29,6 +29,7 @@ Imports:
     writexl
 Suggests:
     RSQLite,
+    DiagrammeR,
     duckdb,
     digest,
     fs,

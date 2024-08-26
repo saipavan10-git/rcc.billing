@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_user_rights_and_info <- function(
+#' get_user_rights_and_info(
 #'   rc_conn = rc_conn,
 #'   require_active_account = T,
 #'   require_active_permissions = T
