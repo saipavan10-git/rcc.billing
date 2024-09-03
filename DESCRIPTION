@@ -28,8 +28,8 @@ Authors@R: c(
         comment=c(ORCID = "0000-0001-7114-1992")),
   person("Sai Pavan", "Kamma",
         email = "saipavankamma@ufl.edu",
-        role = "aut"
-        )
+        role = "aut",
+        comment=c(ORCID = "0009-0004-4619-0409"))
   )
 Maintainer: Philip B Chase <pbc@ufl.edu>
 Description: Automated, data-driven service billing implemented on REDCap Custodian.
