@@ -9,6 +9,7 @@ A data frame with 7 rows and 2 variables:
 \describe{
   \item{\code{redcap_username}}{character a REDCap username. Typically this is Gatorlink ID.}
   \item{\code{employment_interval}}{double a lubridate time interval}
+  \item{\code{term_date_is_accurate}}{boolean indicating the quality of the termination date}
 }
 }
 \usage{
