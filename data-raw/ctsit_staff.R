@@ -2,33 +2,6 @@ library(tibble)
 library(usethis)
 library(lubridate)
 
-ctsit_staff <- tribble(
-  ~redcap_username,
-  "theriaqu",
-  "tls",
-  "amcmurra",
-  "cabernat",
-  "cpb",
-  "pbc",
-  "mbentz",
-  "kyle.chesney",
-  "lawjames1",
-  "melimore86",
-  "s.emerson",
-  "maxprok",
-  "kshanson",
-  "cooper.martin",
-  "colembl",
-  "j.johnston",
-  "tbembersimeao",
-  "marlycormar",
-  "taeber"
-)
-
-usethis::use_data(ctsit_staff, overwrite = TRUE)
-
-# sinew::makeOxygen(ctsit_staff)
-
 ctsit_staff_employment_periods <- tribble(
   ~redcap_username,
   ~employment_interval,
@@ -57,3 +30,12 @@ ctsit_staff_employment_periods <- tribble(
 usethis::use_data(ctsit_staff_employment_periods, overwrite = TRUE)
 
 # sinew::makeOxygen(ctsit_staff_employment_periods)
+
+ctsit_staff <- ctsit_staff_employment_periods |>
+  distinct(redcap_username) |>
+  arrange(redcap_username)
+
+usethis::use_data(ctsit_staff, overwrite = TRUE)
+
+# sinew::makeOxygen(ctsit_staff)
+
