@@ -1,3 +1,6 @@
+# rcc.billing 1.43.1 (released 2024-09-04)
+- Deselect term_date_is_accurate in project functions (@pbchase)
+
 # rcc.billing 1.43.0 (released 2024-09-04)
 - Fix doc formatting for service_request_time() (@pbchase)
 - Add Sai's ORCID in DESCRIPTION (@pbchase)
