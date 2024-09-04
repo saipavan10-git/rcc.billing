@@ -337,7 +337,7 @@ update_billable_by_ownership <- function(conn) {
     ) |>
     # correct non-staff NA values
     dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) |>
-    dplyr::select(-c("employment_interval")) |>
+    dplyr::select(-c("employment_interval", "term_date_is_accurate")) |>
     # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
     dplyr::arrange(.data$pid, .data$billable) |>
     dplyr::distinct(.data$pid, .keep_all = TRUE) |>
@@ -397,7 +397,7 @@ update_billable_if_owned_by_ctsit <- function(conn) {
     ) |>
     # correct non-staff NA values
     dplyr::mutate(billable = dplyr::if_else(is.na(.data$billable), 1, .data$billable)) |>
-    dplyr::select(-c("employment_interval")) |>
+    dplyr::select(-c("employment_interval", "term_date_is_accurate")) |>
     # address "duplicate" rows from ctsit staff with multiple employment periods, keep the non-billable entry
     dplyr::arrange(.data$pid, .data$billable) |>
     dplyr::distinct(.data$pid, .keep_all = TRUE) |>
@@ -543,3 +543,4 @@ get_research_projects_not_using_viable_pi_data <- function(redcap_projects,
 
   return(result)
 }
+
