@@ -1,3 +1,12 @@
+# rcc.billing 1.43.0 (released 2024-09-04)
+- Fix doc formatting for service_request_time() (@pbchase)
+- Add Sai's ORCID in DESCRIPTION (@pbchase)
+- Add employees to ctsit_staff* data frames (@pbchase, #250)
+- Refactor ctsit_staff.R to make it easier to maintain (@pbchase, #250)
+- Update revenue_status_and_projections.qmd (@pbchase)
+- Add 'REDCap consulting revenue' section to revenue_status_and_projections.qmd (@pbchase)
+- Update vignettes (@pbchase)
+
 # rcc.billing 1.42.1 (released 2024-08-26)
 - Remove unsuspended_high_privilege_faculty from cleanup_project_ownership_table.R (@pbchase)
 
