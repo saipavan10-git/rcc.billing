@@ -13,7 +13,7 @@ service_request_time(time_minutes, time_hours)
 }
 \value{
 A numeric vector with the processed time in hours. For input times in minutes
-        that are part of the set {15, 30, 45, 60}, the time is converted to hours.
+        that are part of the set \{15, 30, 45, 60\}, the time is converted to hours.
         For time in hours greater than 1, the original hours are returned. Otherwise,
         `NA_real_` is returned for those cases not matching the conditions.
 }
