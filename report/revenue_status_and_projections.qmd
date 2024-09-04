@@ -290,3 +290,65 @@ invoice_status %>%
   count(`Aging Group`, name = "Invoices") %>%
   arrange(desc(`Aging Group`))
 ```
+
+```{r}
+#| label: invoicing-by-service-type
+#| echo: false
+#| warning: false
+
+service_type_data <- tbl(rcc_billing_conn, "service_type") |> collect()
+
+invoicing_by_service_type <-
+  tbl(rcc_billing_conn, "invoice_line_item") |>
+  collect() |>
+  mutate(service_type = factor(x = service_type_code,
+       levels = service_type_data$service_type_code,
+       labels = service_type_data$service_type)) |>
+  mutate(invoice_month = as.Date(lubridate::floor_date(created - dmonths(1), unit = "month"))) |>
+  filter(invoice_month >= ymd("2024-07-01")) |>
+  filter(!status %in% c("canceled", "sent")) |>
+   group_by(status, invoice_month, service_type) |>
+  summarise(total = sum(amount_due, na.rm = T)) |>
+  tidyr::pivot_wider(
+    id_cols = c("invoice_month", "service_type"),
+    names_from = status,
+    values_from = total
+  ) |>
+  mutate(
+    invoices_sent = coalesce(invoiced, 0) + coalesce(paid, 0)
+  ) |>
+  ungroup() |>
+  arrange(invoice_month)
+
+```
+
+## REDCap consulting revenue
+
+Automated billing for REDCap consulting started in July 2024. It's revenue is included in the data shown in this this report. Its revenue details are broken out here. @fig-invoicing-by-service-type shows its portion of the monthly revenue since REDCap consulting billing started.
+
+Note that July 2024 was very light on support calls, but had a backlog of unbilled consulting work from May and June. This is a by-product of delayed start for support billing. The REDCap team will be moving all its hourly billing work into the REDCap Automated Billing model in August and September of 2024. This will include all project build invoicing, GRACE, MBL, Bloomer Tech, and all new work. These changes could make REDCap Consulting service look exceptionally lucrative. Going forward, we will report on exceptional projects that generate an out-sized portion of the revenue and projects with underlying MOUs. The Red Team's goal is the blur the distinction between large and small projects creating a large middle of projects generating work on-the-fly from agreements wrought in an email dialog. In this way we hope to keep overhead low and our income base broad. That's the philosophy behind REDCap Automated Billing and we hope to extend it into more and larger consulting projects. We will write the new reports describing the out-sized and MOU projects in late September 2024 as these project become measurable in the automated billing datasets.
+
+```{r}
+#| label: fig-invoicing-by-service-type
+#| fig-cap: "Invoicing by service since REDCap consulting billing began"
+#| echo: false
+#| warning: false
+
+invoicing_by_service_type |>
+  rename(`Month Received` = invoice_month) |>
+  ggplot(mapping = aes(x = `Month Received`, fill = service_type, y = invoices_sent)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_y_continuous(
+    labels = dollar,
+  ) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 30)) +
+  geom_text(aes(y = invoices_sent, label = invoices_sent),
+    vjust = -0.5,
+    position = position_dodge(width = 0.9),
+    size = 3
+  ) +
+  xlab("Month Received") +
+  ylab("Amount invoiced") +
+  labs(fill="Service")
+```

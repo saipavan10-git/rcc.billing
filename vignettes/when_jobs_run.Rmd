@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(rcc.billing)
 ```
 
-The scripts in the billing system are dependent upon one another to clean data, backfill new records, communicate with customers, decide what to bill, acknowledge receipt of funds, and enforce policy. Each is dependent on the other tasks. To assure that everything happens when on schedule, almost all tasks in the billing system are run on a regular basis via cron. Data cleaning and updating happen on a daily or weekly cycle. Internal reporting happens on a weekly cycle. Everything that decides which projects will get billed happens on a monthly cycle. The detailed schedule of jobs is show below.
+The scripts in the billing system are dependent upon one another to clean data, backfill new records, communicate with customers, decide what to bill, acknowledge receipt of funds, and enforce policy. Each is dependent on the other tasks. To assure everything happens on schedule, almost all tasks in the billing system are run on a regular basis via cron. Data cleaning and updating happen on a daily or weekly cycle. Internal reporting happens on a weekly cycle. Everything that decides which projects will get billed happens on a monthly cycle. The detailed schedule of jobs is shown below.
 
 ## Daily
 
