@@ -21,10 +21,10 @@ a vector of project IDs
 Returns the project IDs of projects that are owned by a REDCap user that has no primary email address
 }
 \examples{
+\dontrun{
 get_projects_needing_new_owners(
-  redcap_entity_project_ownership =
-    cleanup_project_ownership_test_data$redcap_entity_project_ownership,
-  redcap_user_information =
-    cleanup_project_ownership_test_data$redcap_user_information
+  redcap_entity_project_ownership = redcap_entity_project_ownership,
+  redcap_user_information = redcap_user_information
 )
+}
 }

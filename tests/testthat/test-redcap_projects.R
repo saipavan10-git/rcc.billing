@@ -1,3 +1,6 @@
+# load cleanup_project_ownership_test_data into memory
+load(file = testthat::test_path("cleanup_project_ownership", "cleanup_project_ownership_test_data.rda"))
+
 testthat::test_that("service_type sqlite schema is created and correct test data is returned", {
     table_name <- "redcap_projects"
     test_data <- get0(paste0(table_name, "_test_data"))

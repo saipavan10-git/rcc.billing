@@ -24,12 +24,11 @@ a vector of project IDs
 Returns the project_ids of projects that have no viable PI data
 }
 \examples{
+\dontrun{
 get_research_projects_not_using_viable_pi_data(
-  redcap_projects =
-    cleanup_project_ownership_test_data$redcap_projects,
-  redcap_entity_project_ownership =
-    cleanup_project_ownership_test_data$redcap_entity_project_ownership,
-  redcap_user_information =
-    cleanup_project_ownership_test_data$redcap_user_information
+  redcap_projects = redcap_projects,
+  redcap_entity_project_ownership = redcap_entity_project_ownership,
+  redcap_user_information = redcap_user_information
 )
+}
 }

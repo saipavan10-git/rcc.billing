@@ -44,12 +44,12 @@ get_last_project_user <- function(con, pid) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' get_projects_needing_new_owners(
-#'   redcap_entity_project_ownership =
-#'     cleanup_project_ownership_test_data$redcap_entity_project_ownership,
-#'   redcap_user_information =
-#'     cleanup_project_ownership_test_data$redcap_user_information
+#'   redcap_entity_project_ownership = redcap_entity_project_ownership,
+#'   redcap_user_information = redcap_user_information
 #' )
+#' }
 get_projects_needing_new_owners <- function(redcap_entity_project_ownership,
                                             redcap_user_information) {
   projects_needing_new_owners <- redcap_entity_project_ownership |>
@@ -71,12 +71,12 @@ get_projects_needing_new_owners <- function(redcap_entity_project_ownership,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' get_projects_without_owners(
-#'   redcap_projects =
-#'     cleanup_project_ownership_test_data$redcap_projects,
-#'   redcap_entity_project_ownership =
-#'     cleanup_project_ownership_test_data$redcap_entity_project_ownership
+#'   redcap_projects = redcap_projects,
+#'   redcap_entity_project_ownership = redcap_entity_project_ownership
 #' )
+#' }
 get_projects_without_owners <- function(redcap_projects,
                                         redcap_entity_project_ownership) {
   redcap_projects |>
@@ -97,11 +97,12 @@ get_projects_without_owners <- function(redcap_projects,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' get_project_pis(
-#'   redcap_projects =
-#'     cleanup_project_ownership_test_data$redcap_projects,
+#'   redcap_projects = redcap_projects,
 #'   return_project_ownership_format = TRUE
 #' )
+#' }
 get_project_pis <- function(redcap_projects,
                             return_project_ownership_format = FALSE) {
   non_blank_project_pis <- redcap_projects |>
@@ -501,14 +502,13 @@ get_reassigned_line_items <- function(sent_line_items, rc_conn) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' get_research_projects_not_using_viable_pi_data(
-#'   redcap_projects =
-#'     cleanup_project_ownership_test_data$redcap_projects,
-#'   redcap_entity_project_ownership =
-#'     cleanup_project_ownership_test_data$redcap_entity_project_ownership,
-#'   redcap_user_information =
-#'     cleanup_project_ownership_test_data$redcap_user_information
+#'   redcap_projects = redcap_projects,
+#'   redcap_entity_project_ownership = redcap_entity_project_ownership,
+#'   redcap_user_information = redcap_user_information
 #' )
+#' }
 get_research_projects_not_using_viable_pi_data <- function(redcap_projects,
                                                            redcap_entity_project_ownership,
                                                            redcap_user_information) {

@@ -18,10 +18,10 @@ a vector of project IDs
 Returns the project_ids of projects without owners
 }
 \examples{
+\dontrun{
 get_projects_without_owners(
-  redcap_projects =
-    cleanup_project_ownership_test_data$redcap_projects,
-  redcap_entity_project_ownership =
-    cleanup_project_ownership_test_data$redcap_entity_project_ownership
+  redcap_projects = redcap_projects,
+  redcap_entity_project_ownership = redcap_entity_project_ownership
 )
+}
 }
