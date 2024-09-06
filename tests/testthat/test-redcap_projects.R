@@ -1,26 +1,6 @@
 # load cleanup_project_ownership_test_data into memory
 load(file = testthat::test_path("cleanup_project_ownership", "cleanup_project_ownership_test_data.rda"))
 
-testthat::test_that("service_type sqlite schema is created and correct test data is returned", {
-    table_name <- "redcap_projects"
-    test_data <- get0(paste0(table_name, "_test_data"))
-    conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
-
-    sqlite_schema <- convert_schema_to_sqlite(table_name = table_name)
-    create_table(
-        conn = conn,
-        schema = sqlite_schema
-    )
-    results <- populate_table(
-        conn = conn,
-        table_name = table_name,
-        use_test_data = T
-    ) %>% fix_data_in_redcap_projects()
-
-    DBI::dbDisconnect(conn)
-    testthat::expect_equal(dplyr::as_tibble(results), test_data)
-})
-
 testthat::test_that("get_projects_needing_new_owners returns the correct vector of project IDs", {
   expected_result <- seq(from = 29, to = 33)
   testthat::expect_equal(
@@ -78,7 +58,7 @@ testthat::test_that("get_creators returns unsuspended creators in RCPO format", 
   testthat::expect_equal(
     expected_result,
     get_creators(
-      redcap_projects = cleanup_project_ownership_test_data$redcap_projects %>%
+      redcap_projects = cleanup_project_ownership_test_data$redcap_projects |>
         dplyr::filter(project_id >= 28),
       redcap_user_information = cleanup_project_ownership_test_data$redcap_user_information,
       redcap_staff_employment_periods = ctsit_staff_employment_periods,
@@ -96,7 +76,7 @@ testthat::test_that("get_creators returns any creator in RCPO format", {
   testthat::expect_equal(
     expected_result,
     get_creators(
-      redcap_projects = cleanup_project_ownership_test_data$redcap_projects %>%
+      redcap_projects = cleanup_project_ownership_test_data$redcap_projects |>
         dplyr::filter(project_id >= 28),
       redcap_user_information = cleanup_project_ownership_test_data$redcap_user_information,
       redcap_staff_employment_periods = ctsit_staff_employment_periods,
@@ -115,7 +95,7 @@ testthat::test_that("get_privileged_user returns unsuspended, high-privilege use
   testthat::expect_equal(
     expected_result,
     get_privileged_user(
-      redcap_projects = cleanup_project_ownership_test_data$redcap_projects %>%
+      redcap_projects = cleanup_project_ownership_test_data$redcap_projects |>
         dplyr::filter(project_id >= 28),
       redcap_user_information = cleanup_project_ownership_test_data$redcap_user_information,
       redcap_staff_employment_periods = ctsit_staff_employment_periods,
@@ -136,7 +116,7 @@ testthat::test_that("get_privileged_user returns unsuspended users with any priv
   testthat::expect_equal(
     expected_result,
     get_privileged_user(
-      redcap_projects = cleanup_project_ownership_test_data$redcap_projects %>%
+      redcap_projects = cleanup_project_ownership_test_data$redcap_projects |>
         dplyr::filter(project_id >= 28),
       redcap_user_information = cleanup_project_ownership_test_data$redcap_user_information,
       redcap_staff_employment_periods = ctsit_staff_employment_periods,
@@ -150,42 +130,24 @@ testthat::test_that("get_privileged_user returns unsuspended users with any priv
 
 
 test_that("update_billable_by_ownership", {
-  expected_result <- tribble(
+  expected_result <- dplyr::tribble(
     ~pid, ~username, ~billable,
     2345, NA, 1,
     6490, "tls", 0
   )
-  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 
-  # populate project ownership table
-  po_table_name <- "redcap_entity_project_ownership"
-  po_test_data <- get0(paste0(po_table_name, "_test_data"))
-  po_sqlite_schema <- convert_schema_to_sqlite(table_name = po_table_name)
-  create_table(
-    conn = conn,
-    schema = po_sqlite_schema
-  )
-  populate_table(
-    conn = conn,
-    table_name = po_table_name,
-    use_test_data = T
-  )
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-01-01 12:00:00"))
 
-  rcp_table_name <- "redcap_projects"
-  rcp_test_data <- get0(paste0(rcp_table_name, "_test_data"))
-  rcp_sqlite_schema <- convert_schema_to_sqlite(table_name = rcp_table_name)
-  create_table(
-    conn = conn,
-    schema = rcp_sqlite_schema
-  )
-  populate_table(
-    conn = conn,
-    table_name = rcp_table_name,
-    use_test_data = T
-  )
+  conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+
+  load(file = testthat::test_path("redcap_entity_project_ownership", "test_data.rda"))
+  duckdb::duckdb_register(conn, "redcap_entity_project_ownership", redcap_entity_project_ownership_test_data)
+
+  load(file = testthat::test_path("redcap_projects", "redcap_projects_test_data.rda"))
+  duckdb::duckdb_register(conn, "redcap_projects", redcap_projects_test_data)
 
   output <- update_billable_by_ownership(conn)
-  results <- output$update_records %>%
+  results <- output$update_records |>
     dplyr::select(pid, username, billable)
 
   DBI::dbDisconnect(conn)
@@ -194,25 +156,18 @@ test_that("update_billable_by_ownership", {
 
 
 test_that("update_billable_if_owned_by_ctsit", {
-  expected_result <- tribble(
+  expected_result <- dplyr::tribble(
     ~pid, ~username, ~billable,
     6490, "tls", 0
   )
-  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-01-01 12:00:00"))
+
+  conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
 
   # populate project ownership table
-  po_table_name <- "redcap_entity_project_ownership"
-  po_test_data <- get0(paste0(po_table_name, "_test_data"))
-  po_sqlite_schema <- convert_schema_to_sqlite(table_name = po_table_name)
-  create_table(
-    conn = conn,
-    schema = po_sqlite_schema
-  )
-  populate_table(
-    conn = conn,
-    table_name = po_table_name,
-    use_test_data = T
-  )
+  load(file = testthat::test_path("redcap_entity_project_ownership", "test_data.rda"))
+  duckdb::dbWriteTable(conn, "redcap_entity_project_ownership", redcap_entity_project_ownership_test_data)
 
   # hack the data for tls show that the project show owns is billable
   sql = "update redcap_entity_project_ownership set billable = 1 where username = 'tls'"
@@ -221,21 +176,11 @@ test_that("update_billable_if_owned_by_ctsit", {
     statement = sql
     )
 
-  rcp_table_name <- "redcap_projects"
-  rcp_test_data <- get0(paste0(rcp_table_name, "_test_data"))
-  rcp_sqlite_schema <- convert_schema_to_sqlite(table_name = rcp_table_name)
-  create_table(
-    conn = conn,
-    schema = rcp_sqlite_schema
-  )
-  populate_table(
-    conn = conn,
-    table_name = rcp_table_name,
-    use_test_data = T
-  )
+  load(file = testthat::test_path("redcap_projects", "redcap_projects_test_data.rda"))
+  duckdb::dbWriteTable(conn, "redcap_projects", redcap_projects_test_data)
 
   output <- update_billable_if_owned_by_ctsit(conn)
-  results <- output$update_records %>%
+  results <- output$update_records |>
     dplyr::select(pid, username, billable)
 
   DBI::dbDisconnect(conn)
@@ -246,22 +191,21 @@ test_that("update_billable_if_owned_by_ctsit", {
 testthat::test_that(
   "get_reassigned_line_items returns a df with project ownership data from redcap_entity_project_ownership",
   {
-    table_names <-
-      c("redcap_entity_project_ownership", "invoice_line_item")
+    redcapcustodian::set_script_run_time(lubridate::ymd_hms("2023-01-01 12:00:00"))
 
-    conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+    conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
 
-    for (table_name in table_names) {
-      create_and_load_test_table(
-        table_name = table_name,
-        conn = conn,
-        load_test_data = T,
-        is_sqllite = T
-      )
-    }
+    # populate project ownership table
+    load(file = testthat::test_path("redcap_entity_project_ownership", "test_data.rda"))
+    redcap_entity_project_ownership <- redcap_entity_project_ownership_test_data |>
+      dplyr::mutate(project_id = stringr::str_replace(pid, "\\.0", ""))
+      duckdb::dbWriteTable(conn, "redcap_entity_project_ownership", redcap_entity_project_ownership)
+
+    invoice_line_item <- readRDS(testthat::test_path("invoice_line_item", "invoice_line_item.rds"))
+    duckdb::dbWriteTable(conn, "invoice_line_item", invoice_line_item)
 
     sent_line_items <-
-      get_unpaid_redcap_prod_per_project_line_items(conn) %>%
+      rcc.billing::get_unpaid_redcap_prod_per_project_line_items(conn) |>
       dplyr::mutate(
         pi_last_name = dplyr::if_else(
           pi_last_name == "Chase",
@@ -286,21 +230,21 @@ testthat::test_that(
       )
 
     reassigned_line_items <-
-      get_reassigned_line_items(sent_line_items, conn) %>%
-      dplyr::select(pi_last_name, pi_first_name, pi_email, gatorlink) %>%
+      rcc.billing::get_reassigned_line_items(sent_line_items, rc_conn = conn) |>
+      dplyr::select(pi_last_name, pi_first_name, pi_email, gatorlink) |>
       dplyr::arrange(dplyr::desc(pi_last_name))
 
     expected_result <-
-      dplyr::tbl(conn, "redcap_entity_project_ownership") %>%
-      dplyr::filter(pid %in% !!sent_line_items$project_id) %>%
-      dplyr::mutate_at("pid", as.character) %>%
+      dplyr::tbl(conn, "redcap_entity_project_ownership") |>
+      dplyr::filter(pid %in% !!sent_line_items$project_id) |>
+      dplyr::mutate_at("pid", as.character) |>
       dplyr::select(
         pi_last_name = lastname,
         pi_first_name = firstname,
         pi_email = email,
         gatorlink = username
-      ) %>%
-      dplyr::arrange(dplyr::desc(pi_last_name)) %>%
+      ) |>
+      dplyr::arrange(dplyr::desc(pi_last_name)) |>
       dplyr::collect()
 
     DBI::dbDisconnect(conn)
@@ -311,8 +255,8 @@ testthat::test_that(
 
 testthat::test_that("get_research_projects_not_using_viable_pi_data can detect a project with non-viable PI data", {
   redcap_projects <-
-    cleanup_project_ownership_test_data$redcap_projects %>%
-    mutate(purpose = 2) %>%
+    cleanup_project_ownership_test_data$redcap_projects |>
+    mutate(purpose = 2) |>
     mutate(project_pi_email = if_else(
       project_id %in% c(21, 22, 25),
       "you@example.org",
@@ -320,9 +264,9 @@ testthat::test_that("get_research_projects_not_using_viable_pi_data can detect a
     ))
 
   redcap_entity_project_ownership <-
-    cleanup_project_ownership_test_data$redcap_entity_project_ownership %>%
-    mutate(username = if_else(pid %in% c(22,25), as.character(NA), username)) %>%
-    mutate(email = if_else(pid == 22, "you@example.org", email)) %>%
+    cleanup_project_ownership_test_data$redcap_entity_project_ownership |>
+    mutate(username = if_else(pid %in% c(22,25), as.character(NA), username)) |>
+    mutate(email = if_else(pid == 22, "you@example.org", email)) |>
     mutate(email = if_else(pid == 25, "not_the_pi@example.org", email))
 
   redcap_user_information <-

@@ -13,7 +13,7 @@ testthat::test_that("service_type sqlite schema is created and correct test data
     date_sent = as.POSIXct(date_sent, tz = "UTC"),
     date_received = as.POSIXct(date_received, tz = "UTC")
   )
-  sqlite_schema <- convert_schema_to_sqlite(table_name = table_name)
+  sqlite_schema <- convert_schema_to_sqlite(table_name)
   create_table(
     conn = mem_conn,
     schema = sqlite_schema

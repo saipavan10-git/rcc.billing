@@ -125,7 +125,7 @@ fix_data_in_invoice_line_item_communication <- function(data) {
 #'
 #' @examples
 #' \dontrun{
-#' fix_data_in_redcap_projects(redcap_projects_test_data)
+#' fix_data_in_redcap_projects(redcap_projects)
 #' }
 #' @export
 fix_data_in_redcap_projects <- function(data) {

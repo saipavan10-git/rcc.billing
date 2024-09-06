@@ -457,10 +457,12 @@ get_reassigned_line_items <- function(sent_line_items, rc_conn) {
   redcap_entity_project_ownership <- dplyr::tbl(rc_conn, "redcap_entity_project_ownership") |>
     dplyr::filter(.data$pid %in% !!sent_line_items$project_id) |>
     dplyr::mutate_at("pid", as.character) |>
+    dplyr::mutate(dplyr::across("pid", ~stringr::str_replace(., "\\.0", ""))) |>
     dplyr::select(-c("id", "created", "updated")) |>
     dplyr::collect()
 
-  reassigned_line_items <- sent_line_items |>
+  reassigned_line_items <-
+    sent_line_items |>
     dplyr::left_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) |>
     dplyr::filter(
       .data$gatorlink  != .data$username |
