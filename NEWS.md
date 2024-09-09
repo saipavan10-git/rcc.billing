@@ -1,3 +1,7 @@
+# rcc.billing 1.44.0 (released 2024-09-09)
+- Update docs for publication (@pbchase)
+- Reactivate cron/create_and_send_new_invoice_line_items (@pbchase)
+
 # rcc.billing 1.43.1 (released 2024-09-04)
 - Deselect term_date_is_accurate in project functions (@pbchase)
 
