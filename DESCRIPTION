@@ -1,6 +1,6 @@
 Package: rcc.billing
 Title: REDCap Automated Billing
-Version: 1.43.1
+Version: 1.44.0
 Authors@R: c(
   person("Philip", "Chase",
         email = "pbc@ufl.edu",
@@ -32,7 +32,7 @@ Authors@R: c(
         comment=c(ORCID = "0009-0004-4619-0409"))
   )
 Maintainer: Philip B Chase <pbc@ufl.edu>
-Description: Automated, data-driven service billing implemented on REDCap Custodian.
+Description: REDCap Automated Billing is an automated, data-driven service billing system for a REDCap system. The University of Florida’s CTS-IT designed and wrote this system to charge a modest annual fee for each project and bill for customer support work logged in a REDCap-based service request system. This generates revenue, reduces data privacy risks by incentivizing the deletion of abandoned projects, and improves the quality of research productivity metrics.
 License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true

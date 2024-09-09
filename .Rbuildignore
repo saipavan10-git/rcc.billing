@@ -27,3 +27,4 @@ wip.*
 ^docs$
 ^pkgdown$
 ^\.github$
+.zenodo.json
