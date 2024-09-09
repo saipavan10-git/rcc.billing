@@ -1,3 +1,9 @@
+# rcc.billing 1.44.1 (released 2024-09-09)
+- Update .zenodo.json with references and creator edits (@pbchase)
+- Add DOI to README.md (@pbchase)
+- Move functions and data into test space (@pbchase, #251)
+- Move cleanup_project_ownership_test_data into test space (@pbchase, #251)
+
 # rcc.billing 1.44.0 (released 2024-09-09)
 - Update docs for publication (@pbchase)
 - Reactivate cron/create_and_send_new_invoice_line_items (@pbchase)
