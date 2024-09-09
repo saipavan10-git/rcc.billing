@@ -64,5 +64,5 @@ Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 Depends: 
     R (>= 3.5.0)
-URL: https://ctsit.github.io/rcc.billing/
+URL: https://ctsit.github.io/rcc.billing/, https://github.com/ctsit/rcc.billing/
 VignetteBuilder: knitr
