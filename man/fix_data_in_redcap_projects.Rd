@@ -18,6 +18,6 @@ This allows testing in SQLite3 while production is MariaDB
 }
 \examples{
 \dontrun{
-fix_data_in_redcap_projects(redcap_projects_test_data)
+fix_data_in_redcap_projects(redcap_projects)
 }
 }

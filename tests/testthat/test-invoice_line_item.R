@@ -14,7 +14,7 @@ testthat::test_that("service_type sqlite schema is created and correct test data
     date_received = as.POSIXct(date_received, tz = "UTC")
   )
 
-  sqlite_schema <- convert_schema_to_sqlite(table_name = table_name)
+  sqlite_schema <- convert_schema_to_sqlite(table_name)
   create_table(
     conn = conn,
     schema = sqlite_schema
@@ -23,8 +23,9 @@ testthat::test_that("service_type sqlite schema is created and correct test data
     conn = conn,
     table_name = table_name,
     use_test_data = TRUE
-  ) %>% fix_data_in_invoice_line_item()
+  ) |> fix_data_in_invoice_line_item()
 
   expect_identical(test_data, dplyr::as_tibble(results))
   DBI::dbDisconnect(conn)
 })
+

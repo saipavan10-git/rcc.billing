@@ -19,9 +19,10 @@ a dataframe of project_PI details from redcap_projects
 Returns a dataframe of all project_PI details in redcap_projects for PIs with an email address in project_pi_email
 }
 \examples{
+\dontrun{
 get_project_pis(
-  redcap_projects =
-    cleanup_project_ownership_test_data$redcap_projects,
+  redcap_projects = redcap_projects,
   return_project_ownership_format = TRUE
 )
+}
 }

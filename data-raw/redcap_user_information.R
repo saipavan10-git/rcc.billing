@@ -1,4 +1,4 @@
-## Create redcap_projects_test_data from invoice_line_items_test_data
+## Create redcap_user_information from the database of a testing system
 
 library(redcapcustodian)
 library(rcc.billing)
@@ -18,7 +18,7 @@ my_table <- "redcap_user_information"
 #   collect() %>%
 #   filter(ui_id >= 3)
 #
-# # werite the test data
+# # write the test data
 # usethis::use_data(redcap_user_information_test_data, overwrite = T)
 #
 # # write the schema

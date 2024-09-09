@@ -4,6 +4,9 @@ library(rcc.billing)
 library(tidyverse)
 library(lubridate)
 
+load(file = testthat::test_path("redcap_projects",
+                                "redcap_projects_test_data.rda"))
+
 redcap_entity_project_ownership_test_data <-
   redcap_projects_test_data %>%
   select(
@@ -38,4 +41,6 @@ redcap_entity_project_ownership_test_data <-
   mutate(billable = if_else(pid == 2345, NA_real_, billable)) %>%
   select(id, created, updated, pid, username, email, firstname, lastname, billable, sequestered)
 
-usethis::use_data(redcap_entity_project_ownership_test_data, overwrite = T)
+save(redcap_entity_project_ownership_test_data,
+     file = testthat::test_path("redcap_entity_project_ownership",
+                                "redcap_entity_project_ownership_test_data.rda"))
