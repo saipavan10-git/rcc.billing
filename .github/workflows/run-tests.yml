@@ -13,13 +13,9 @@ jobs:
 
     container:
       image: ghcr.io/ctsit/rstudio-ci:4.3.3
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.CR_PAT }}
 
     env:
       CI: "TRUE"
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Install devtools
         run: Rscript -e 'install.packages("devtools")'
