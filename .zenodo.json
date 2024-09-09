@@ -1,0 +1,49 @@
+{
+    "title": "REDCap Automated Billing",
+    "upload_type": "software",
+    "creators": [{
+            "name": "Chase, Philip B",
+            "affiliation": "University of Florida",
+            "orcid": "0000-0002-5318-9420"
+        },
+        {
+            "name": "James-Woodley, Laurence",
+            "affiliation": "University of Florida",
+            "orcid": "0000-0002-6418-2742"
+        },
+        {
+            "name": "Chesney, Kyle",
+            "affiliation": "University of Florida",
+            "orcid": "0000-0002-0479-7251"
+        },
+        {
+            "name": "Stoffs, Taryn L",
+            "affiliation": "University of Florida",
+            "orcid": "0000-0002-0830-8179"
+        },
+        {
+            "name": "Bentz, Michael",
+            "affiliation": "University of Florida",
+            "orcid": "0000-0002-5790-4268"
+        },
+        {
+            "name": "Barnes, Christopher P",
+            "affiliation": "University of Florida",
+            "orcid": "0000-0001-7114-1992"
+        },
+        {
+            "name": "Sai Pavan, Kamma",
+            "affiliation": "University of Florida",
+            "orcid": "0009-0004-4619-0409"
+        }
+    ],
+    "description": "REDCap Automated Billing is an automated, data-driven service billing system for a REDCap system. The University of Florida’s CTS-IT designed and wrote this system to charge a modest annual fee for each project and bill for customer support work logged in a REDCap-based service request system. This generates revenue, reduces data privacy risks by incentivizing the deletion of abandoned projects, and improves the quality of research productivity metrics.",
+    "access_right": "open",
+    "license": "Apache-2.0",
+    "keywords": [
+        "redcap",
+        "clinical science",
+        "data management",
+        "R"
+    ]
+}
