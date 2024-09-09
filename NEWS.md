@@ -1,3 +1,8 @@
+# rcc.billing 1.44.2 (released 2024-09-09)
+- Add source code URL to URL param in DESCRIPTION (@pbchase, #252)
+- Update run-tests.yml (@saipavan10-git, #252)
+- Add SIPOC for cleanup_bad_email_addresses (@saipavan10-git, @pbchase, #252)
+
 # rcc.billing 1.44.1 (released 2024-09-09)
 - Update .zenodo.json with references and creator edits (@pbchase)
 - Add DOI to README.md (@pbchase)
