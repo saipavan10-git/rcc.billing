@@ -16,6 +16,7 @@ jobs:
 
     env:
       CI: "TRUE"
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Install devtools
         run: Rscript -e 'install.packages("devtools")'
