@@ -2,6 +2,15 @@
 title: "REDCap Annual Project Billing Revenue, Status, and Projections"
 author: "Philip Chase"
 format:
+  typst: 
+    papersize: a3
+    margin: 
+      x: 1.9cm
+      y: 1.9cm
+    columns: 1
+    df-print: kable
+    fig-width: 9
+    fig-height: 3.5
   html:
     code-fold: true
     code-tools: true
@@ -334,18 +343,20 @@ Note that July 2024 was very light on support calls, but had a backlog of unbill
 #| echo: false
 #| warning: false
 
+max_invoices_sent = max(invoicing_by_service_type$invoices_sent)
+
 invoicing_by_service_type |>
   rename(`Month Received` = invoice_month) |>
   ggplot(mapping = aes(x = `Month Received`, fill = service_type, y = invoices_sent)) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_y_continuous(
     labels = dollar,
+    limits = c(0, 1.05 * max_invoices_sent)
   ) +
   scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
   geom_text(aes(y = invoices_sent, label = invoices_sent),
     vjust = -0.5,
-    position = position_dodge(width = 0.9),
     size = 3
   ) +
   xlab("Month Received") +
