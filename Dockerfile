@@ -1,4 +1,4 @@
-FROM redcapcustodian
+FROM --platform=linux/amd64 redcapcustodian
 
 WORKDIR /home/rocker
 
@@ -15,11 +15,6 @@ RUN R -e "install.packages(c( \
 ## Install our private rcc.ctsit package
 ## see: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ## Also see https://docs.github.com/en/developers/apps/getting-started-with-apps/about-apps
-ARG GITHUB_PAT=personal_access_token
-## Stop using cache to ensure latest private package is always installed
-## https://stackoverflow.com/a/49772666/7418735
-ARG TIMESTAMP=1611761435
-RUN R -e "devtools::install_github('ctsit/rcc.ctsit', auth_token = '$GITHUB_PAT')"
 
 ## e.g. pin to a specific version of an R package
 # RUN R -e "devtools::install_github('OuhscBbmc/REDCapR', ref='c5bce6a')"
