@@ -11,16 +11,16 @@ format:
     df-print: kable
     fig-width: 9
     fig-height: 3.5
-  html:
-    code-fold: true
-    code-tools: true
-    df-print: kable
-  pdf:
-    geometry:
-      - margin=19mm
-      - bottom=30mm
-    fig-pos: 'H'
-    df-print: kable
+  # html:
+  #   code-fold: true
+  #   code-tools: true
+  #   df-print: kable
+  # pdf:
+  #   geometry:
+  #     - margin=19mm
+  #     - bottom=30mm
+  #   fig-pos: 'H'
+  #   df-print: kable
 editor: visual
 date: "`r Sys.Date()`"
 ---
