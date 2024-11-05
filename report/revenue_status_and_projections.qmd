@@ -2,19 +2,21 @@
 title: "REDCap Annual Project Billing Revenue, Status, and Projections"
 author: "Philip Chase"
 format:
-  typst: 
-    papersize: a3
-    margin: 
-      x: 1.9cm
-      y: 1.9cm
-    columns: 1
+  html:
+    code-fold: true
+    code-tools: true
     df-print: kable
     fig-width: 9
     fig-height: 3.5
-  # html:
-  #   code-fold: true
-  #   code-tools: true
+  # typst:
+  #   papersize: a3
+  #   margin:
+  #     x: 1.9cm
+  #     y: 1.9cm
+  #   columns: 1
   #   df-print: kable
+  #   fig-width: 9
+  #   fig-height: 3.5
   # pdf:
   #   geometry:
   #     - margin=19mm
