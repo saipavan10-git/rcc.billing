@@ -1,3 +1,14 @@
+# rcc.billing 1.44.3 (released 2024-12-04)
+- Add is_sequestered filter to sequestered_orphans (@saipavan10-git, #255, #256)
+- Merge pull request #253 from pbchase/move_revenue_report_to_typst (@pbchase)
+- Update revenue_status_and_projections.qmd (@ljwoodley, @pbchase, #253)
+  - Embed html resources
+  - Adjust figure dimensions
+  - Set default format to html
+  - Add typst support
+- Remove final dependency on rcc.ctsit (@pbchase, #253)
+- Update render_report.R to redcapcustodian 1.25.0 (@pbchase, #253)
+
 # rcc.billing 1.44.2 (released 2024-09-09)
 - Add source code URL to URL param in DESCRIPTION (@pbchase, #252)
 - Update run-tests.yml (@saipavan10-git, #252)
