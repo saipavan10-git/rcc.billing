@@ -58,7 +58,7 @@ if (nrow(sequestered_orphans) > 0) {
     select(project_ownership_sync_updates) |>
     unnest(project_ownership_sync_updates) |>
     select(pid) |>
-    # Filter projects that are only currently sequesetered
+    # Only include projects that are currently sequestered
     filter(pid %in% is_sequestered) |>
     mutate(reason = "orphaned project")
 } else {
