@@ -34,6 +34,13 @@ if(nrow(old_unpaid_invoices) > 0) {
   unpaid_projects <- data.frame(pid = integer(), reason = character())
 }
 
+is_sequestered <- tbl(rc_conn, "redcap_projects") |>
+  left_join(tbl(rc_conn, "redcap_entity_project_ownership"), by = c("project_id" = "pid")) |>
+  filter(!is.na(completed_time) & sequestered == 1) |>
+  select(project_id) |>
+  collect() |>
+  pull(project_id)
+
 sequestered_orphans <- tbl(rcc_billing_conn, "rcc_job_log") |>
   filter(
     script_name == "sequester_orphans" &
@@ -51,6 +58,8 @@ if (nrow(sequestered_orphans) > 0) {
     select(project_ownership_sync_updates) |>
     unnest(project_ownership_sync_updates) |>
     select(pid) |>
+    # Only include projects that are currently sequestered
+    filter(pid %in% is_sequestered) |>
     mutate(reason = "orphaned project")
 } else {
   orphaned_projects <- data.frame(pid = integer(), reason = character())
@@ -74,4 +83,3 @@ log_job_success(jsonlite::toJSON(activity_log))
 
 dbDisconnect(rc_conn)
 dbDisconnect(rcc_billing_conn)
-
