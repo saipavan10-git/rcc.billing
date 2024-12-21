@@ -7,7 +7,7 @@
 get_orphaned_projects(rc_conn, rcc_billing_conn, months_previous = 0)
 }
 \arguments{
-\item{rc_conn}{- a connection to a redcap database, \code{\link{connect_to_redcap_db}}}
+\item{rc_conn}{- a connection to a redcap database, \code{\link[redcapcustodian]{connect_to_redcap_db}}}
 
 \item{rcc_billing_conn}{- a connection to an rcc_billing database, \code{\link{connect_to_rcc_billing_db}}}
 

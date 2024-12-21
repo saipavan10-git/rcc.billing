@@ -37,12 +37,11 @@ License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true
 Imports:
-    DBI,
     bit64,
     dplyr,
     jsonlite,
     lubridate,
-    readr,
+    redcapcustodian,
     rlang,
     stringr,
     tidyr,
@@ -50,12 +49,14 @@ Imports:
     RMariaDB
 Suggests:
     RSQLite,
+    DBI,
     DiagrammeR,
     duckdb,
     digest,
     fs,
     purrr,
     knitr,
+    readr,
     rmarkdown,
     testthat
 Remotes: 

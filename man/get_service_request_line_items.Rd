@@ -11,7 +11,7 @@ get_service_request_line_items(service_requests, rc_billing_conn, rc_conn)
 
 \item{rc_billing_conn}{A connection to REDCap billing database containing an invoice_line_items table. \code{\link{connect_to_rcc_billing_db}}}
 
-\item{rc_conn}{A connection to REDCap database. \code{\link{connect_to_redcap_db}}}
+\item{rc_conn}{A connection to REDCap database. \code{\link[redcapcustodian]{connect_to_redcap_db}}}
 }
 \value{
 A data frame of line items for service requests billing.

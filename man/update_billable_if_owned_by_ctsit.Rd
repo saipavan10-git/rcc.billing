@@ -10,7 +10,7 @@ update_billable_if_owned_by_ctsit(conn)
 \item{conn}{- A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}}
 }
 \value{
-A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
+A \code{\link[redcapcustodian]{dataset_diff}} containing updates to project ownerhsip's "billable" column
 }
 \description{
 Ignore the current state billable and review every project owned by CTS-IT staff

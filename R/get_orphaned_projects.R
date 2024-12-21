@@ -2,7 +2,7 @@
 #'
 #' Return a dataframe of projects that have been orphaned
 #'
-#' @param rc_conn - a connection to a redcap database, \code{\link{connect_to_redcap_db}}
+#' @param rc_conn - a connection to a redcap database, \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #' @param rcc_billing_conn - a connection to an rcc_billing database, \code{\link{connect_to_rcc_billing_db}}
 #' @param months_previous - the nth month previous to today to consider
 #'

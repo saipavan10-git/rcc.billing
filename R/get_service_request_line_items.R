@@ -2,7 +2,7 @@
 #'
 #' @param service_requests A data frame of service requests, REDCap Service Request PID 1414.
 #' @param rc_billing_conn  A connection to REDCap billing database containing an invoice_line_items table. \code{\link{connect_to_rcc_billing_db}}
-#' @param rc_conn A connection to REDCap database. \code{\link{connect_to_redcap_db}}
+#' @param rc_conn A connection to REDCap database. \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #'
 #' @return A data frame of line items for service requests billing.
 #'
