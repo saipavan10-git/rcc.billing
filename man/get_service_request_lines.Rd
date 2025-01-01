@@ -4,12 +4,22 @@
 \alias{get_service_request_lines}
 \title{Get Service Request Lines}
 \usage{
-get_service_request_lines(service_requests, return_all_records = F)
+get_service_request_lines(
+  service_requests,
+  return_all_records = F,
+  months_previous = 1
+)
 }
 \arguments{
-\item{service_requests}{A data frame of service requests, REDCap Service Request PID 1414.}
+\item{service_requests}{A data frame of service requests, REDCap Service
+Request PID 1414.}
 
-\item{return_all_records}{A boolean to indicate every record should be returned or just last month's records}
+\item{return_all_records}{A boolean to indicate every record should be
+returned or just last month's records}
+
+\item{months_previous}{A double indicating how many months back we should
+look when querying the service_requests for service_request_lines.
+Defaults to 1.}
 }
 \value{
 A data frame with response details to the service request
@@ -18,7 +28,13 @@ A data frame with response details to the service request
 This function processes a dataset of service requests to extract and transform
 various service details. It groups response data by record_id, service_date,
 and probono status to summarize response data and create a source dataset for
-invoice line items and other tasks.
+invoice line items and other tasks. It returns one month of data. By default,
+the data returned is from the previous month. You can return the current
+month by setting `months_previous = 0`. Get earlier months by setting
+`months_previous` to higher number.
+}
+\details{
+To get _all_ of the data, set `return_all_records = T`.
 }
 \examples{
 \dontrun{

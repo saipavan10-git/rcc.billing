@@ -305,7 +305,7 @@ get_privileged_user <- function(redcap_projects,
 #'
 #' @importFrom lubridate "%within%"
 #'
-#' @return A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
+#' @return A \code{\link[redcapcustodian]{dataset_diff}} containing updates to project ownership's "billable" column
 #' @export
 #'
 #' @examples
@@ -362,7 +362,7 @@ update_billable_by_ownership <- function(conn) {
 #'
 #' @importFrom lubridate "%within%"
 #'
-#' @return A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
+#' @return A \code{\link[redcapcustodian]{dataset_diff}} containing updates to project ownerhsip's "billable" column
 #' @export
 #'
 #' @examples

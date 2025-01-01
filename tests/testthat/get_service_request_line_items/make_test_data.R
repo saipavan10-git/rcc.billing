@@ -44,6 +44,7 @@ service_requests <- read_service_requests |>
     redcap_username,
     gatorlink,
     billable_rate,
+    probono_reason,
     time2,
     time_more,
     mtg_scheduled_yn,
