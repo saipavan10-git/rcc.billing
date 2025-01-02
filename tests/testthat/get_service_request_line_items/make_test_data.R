@@ -21,14 +21,17 @@ read_service_requests <- redcap_read(
   # records = record_ids
 )$data
 
-service_requests_of_interest <-
-  read_service_requests |>
-  filter(!is.na(project_id)) |>
-    arrange(desc(record_id)) |>
-    slice_head(n = 100)
+# Filter for only the last 100 requests before 2025-01-02 17:00:00
+service_requests_of_interest <- read_service_requests |>
+  arrange(desc(record_id)) |>
+  dplyr::filter(submit_date <= lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York")) |>
+  slice_head(n = 100)
 
+# Filter for responses that were started and finished before 2025-01-02 17:00:00
 service_requests <- read_service_requests |>
   filter(record_id %in% service_requests_of_interest$record_id) |>
+  dplyr::filter(is.na(date_of_work) | date_of_work <= lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York")) |>
+  dplyr::filter(is.na(end_date) | end_date <= lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York")) |>
   select(
     record_id,
     redcap_repeat_instrument,
@@ -56,6 +59,7 @@ service_requests <- read_service_requests |>
     fiscal_contact_fn,
     fiscal_contact_ln,
     fiscal_contact_email,
+    study_name,
     help_desk_response_complete
   ) |>
   mutate(
@@ -68,6 +72,7 @@ service_requests <- read_service_requests |>
     redcap_username = if_else(!is.na(redcap_username), "bogus_rc_username", redcap_username),
     gatorlink= if_else(!is.na(gatorlink), "bogus_gatorlink", gatorlink),
     response = if_else(!is.na(response), "fake response", response),
+    study_name = if_else(!is.na(study_name), "Fake Study", study_name),
     comments = if_else(!is.na(comments), "fake comment", comments),
     irb_number = c("123"),
     fiscal_contact_fn = c("John"),

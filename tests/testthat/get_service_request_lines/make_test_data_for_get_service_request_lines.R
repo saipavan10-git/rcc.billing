@@ -63,6 +63,7 @@ service_requests <- read_service_requests |>
     fiscal_contact_fn,
     fiscal_contact_ln,
     fiscal_contact_email,
+    study_name,
     help_desk_response_complete
   ) |>
   # de-identify the person and study identifiers
@@ -72,6 +73,7 @@ service_requests <- read_service_requests |>
     redcap_username = if_else(!is.na(redcap_username), "bogus_rc_username", redcap_username),
     gatorlink = if_else(!is.na(gatorlink), "bogus_gatorlink", gatorlink),
     response = if_else(!is.na(response), "fake response", response),
+    study_name = if_else(!is.na(study_name), "Fake Study", study_name),
     comments = if_else(!is.na(comments), "fake comment", comments)
   ) |>
   # de-identify more person identifiers

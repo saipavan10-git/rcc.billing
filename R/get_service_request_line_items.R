@@ -59,7 +59,7 @@ get_service_request_line_items <- function(service_requests,
     dplyr::rename_with(~ gsub("_srv$", "", .), dplyr::ends_with("_srv")) |>
     dplyr::mutate(
       name_of_service = "Biomedical Informatics Consulting",
-      name_of_service_instance = .data$app_title,
+      name_of_service_instance = dplyr::coalesce(.data$app_title, .data$study_name),
       fiscal_year = fiscal_year_invoiced,
       month_invoiced = previous_month_name,
       gatorlink = service_request_lines$username,

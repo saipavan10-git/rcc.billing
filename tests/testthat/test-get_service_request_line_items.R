@@ -1,26 +1,28 @@
+# Test get_service_request_line_items
+#
+# DuckDB setup
+mem_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+test_tables <- c(
+  "redcap_projects", # lives in REDCap DB
+  "redcap_entity_project_ownership", # ibid
+  "redcap_user_information", # ibid
+  "invoice_line_item", # lives in rcc_billing DB
+  "service_requests" # lives in REDCap PID 1414
+)
+purrr::walk(
+  test_tables,
+  ~ create_a_table_from_rds_test_data(
+    .x, mem_conn,
+    "get_service_request_line_items"
+  )
+)
+
+service_requests <- dplyr::tbl(mem_conn, "service_requests") |>
+  dplyr::collect()
+
 # Test the function with updated expected_result to include all fields
-test_that("get_service_request_line_items returns correct results", {
+test_that("get_service_request_line_items always has a non-NA pi_email", {
   redcapcustodian::set_script_run_time(lubridate::ymd_hms("2024-08-01 12:00:00"))
-
-  # DuckDB setup
-  mem_conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
-  test_tables <- c(
-    "redcap_projects", # lives in REDCap DB
-    "redcap_entity_project_ownership", # ibid
-    "redcap_user_information", # ibid
-    "invoice_line_item", # lives in rcc_billing DB
-    "service_requests" # lives in REDCap PID 1414
-  )
-  purrr::walk(
-    test_tables,
-    ~ create_a_table_from_rds_test_data(
-      .x, mem_conn,
-      "get_service_request_line_items"
-    )
-  )
-
-  service_requests <- dplyr::tbl(mem_conn, "service_requests") |>
-    dplyr::collect()
 
   result <- get_service_request_line_items(
     service_requests = service_requests,
@@ -32,6 +34,17 @@ test_that("get_service_request_line_items returns correct results", {
     dplyr::filter(is.na(pi_email)) |>
     nrow()
   testthat::expect_equal(result_na_pi_email, 0)
+}
+)
+
+test_that("get_service_request_line_items returns the correct list of columns", {
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2024-08-01 12:00:00"))
+
+  result <- get_service_request_line_items(
+    service_requests = service_requests,
+    rc_billing_conn = mem_conn,
+    rc_conn = mem_conn
+  )
 
   expected_columns <- c(
     "service_identifier",
@@ -60,7 +73,32 @@ test_that("get_service_request_line_items returns correct results", {
     "fiscal_contact_email"
   )
   testthat::expect_equal(colnames(result), expected_columns)
-
-  # Disconnect from DuckDB
-  DBI::dbDisconnect(mem_conn, shutdown = TRUE)
 })
+
+test_that("get_service_request_line_items sees one 'Fake Study'", {
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York"))
+
+  result <- get_service_request_line_items(
+    service_requests = service_requests,
+    rc_billing_conn = mem_conn,
+    rc_conn = mem_conn
+  ) |>
+    dplyr::filter(name_of_service_instance == "Fake Study")
+
+  testthat::expect_equal(nrow(result), 1)
+})
+
+test_that("get_service_request_line_items sees 16 rows of data", {
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York"))
+
+  result <- get_service_request_line_items(
+    service_requests = service_requests,
+    rc_billing_conn = mem_conn,
+    rc_conn = mem_conn
+  )
+
+  testthat::expect_equal(nrow(result), 16)
+})
+
+# Disconnect from DuckDB
+DBI::dbDisconnect(mem_conn, shutdown = TRUE)
