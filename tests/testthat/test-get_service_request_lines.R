@@ -8,6 +8,7 @@ expected_output <- tibble(
   service_instance_id = c("2-6267", "2-6267-PB", "2-6436-PB", "2-6445-PB", "2-6469", "2-6473", "2-7093"),
   username = c("bogus_rc_username", "bogus_rc_username", "bogus_rc_username", "bogus_rc_username", "bogus_rc_username", "bogus_gatorlink", "bogus_gatorlink"),
   irb_number = c("123", "123", NA_character_, "123", "123", NA_character_, NA_character_),
+  study_name = c(NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, "Fake Study"),
   pi_last_name = c("PI", "PI", "l_name", "PI", "PI", "l_name", "PI"),
   pi_first_name = c("Bogus", "Bogus", "f_name","Bogus", "Bogus", "f_name", "Bogus"),
   pi_email = c("pi_email@ufl.edu", "pi_email@ufl.edu", "bogus@ufl.edu", "pi_email@ufl.edu", "pi_email@ufl.edu", "bogus@ufl.edu", "pi_email@ufl.edu"),
