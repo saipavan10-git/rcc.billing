@@ -2,7 +2,7 @@
 #'
 #' @param service_requests A data frame of service requests, REDCap Service Request PID 1414.
 #' @param rc_billing_conn  A connection to REDCap billing database containing an invoice_line_items table. \code{\link{connect_to_rcc_billing_db}}
-#' @param rc_conn A connection to REDCap database. \code{\link{connect_to_redcap_db}}
+#' @param rc_conn A connection to REDCap database. \code{\link[redcapcustodian]{connect_to_redcap_db}}
 #'
 #' @return A data frame of line items for service requests billing.
 #'
@@ -59,7 +59,7 @@ get_service_request_line_items <- function(service_requests,
     dplyr::rename_with(~ gsub("_srv$", "", .), dplyr::ends_with("_srv")) |>
     dplyr::mutate(
       name_of_service = "Biomedical Informatics Consulting",
-      name_of_service_instance = .data$app_title,
+      name_of_service_instance = dplyr::coalesce(.data$app_title, .data$study_name),
       fiscal_year = fiscal_year_invoiced,
       month_invoiced = previous_month_name,
       gatorlink = service_request_lines$username,

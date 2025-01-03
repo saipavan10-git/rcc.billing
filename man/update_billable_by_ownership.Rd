@@ -11,7 +11,7 @@ update_billable_by_ownership(conn)
 \item{conn}{- A REDCap database connection, e.g. the object returned from \code{\link[redcapcustodian]{connect_to_redcap_db}}}
 }
 \value{
-A \code{\link{dataset_diff}} containing updates to project ownerhsip's "billable" column
+A \code{\link[redcapcustodian]{dataset_diff}} containing updates to project ownership's "billable" column
 }
 \description{
 Get a dataframe of updated billable status for project ownership projects,
