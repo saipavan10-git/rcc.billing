@@ -1,3 +1,9 @@
+# rcc.billing 1.45.0 (released 2024-01-03)
+- Fix missing name_of_service_instance in get_service_request_line_items() result (@pbchase, #259)
+- Bill for some support requests without project IDs #257 (@pbchase, #257, #258)
+- Restyle get_service_request_lines.R (@pbchase, #258)
+- Add ProjectId to rcc.billing.Rproj (@pbchase, #258)
+
 # rcc.billing 1.44.3 (released 2024-12-04)
 - Add is_sequestered filter to sequestered_orphans (@saipavan10-git, #255, #256)
 - Merge pull request #253 from pbchase/move_revenue_report_to_typst (@pbchase)
