@@ -1,5 +1,5 @@
-# sequester unpaid projects every Tuesday at 8:04 a.m. 
+# sequester unpaid projects every Tuesday at 8:04 a.m.
 # Note: Date tests internal to the script will quietly exit the code
 #       on Days 8-31. This will force the sequestration events to happen
 #       only on the *first* Tuesday of the month.
-4 8 * * 2 root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/sequester_unpaid_projects.R
+4 8 * * 2 root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/run_etl.R etl/sequester_unpaid_projects.R

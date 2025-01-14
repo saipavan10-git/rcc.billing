@@ -1,2 +1,2 @@
 # Report bad ownership on the first of every month at 10:05 a.m.
-5 10 1 * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript report/request_correction_of_bad_ownership_data.R
+5 10 1 * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/run_etl.R report/request_correction_of_bad_ownership_data.R
