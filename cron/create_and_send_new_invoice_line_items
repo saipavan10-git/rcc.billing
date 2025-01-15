@@ -1,2 +1,2 @@
 # send invoice line items on the 5th of the month at 8:05 a.m.
-5 8 5 * * root /usr/bin/docker run -v /rcc/rcc.billing:/root --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/create_and_send_new_invoice_line_items.R
+5 8 5 * * root /usr/bin/docker run -v /rcc/rcc.billing:/root --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/run_etl.R etl/create_and_send_new_invoice_line_items.R

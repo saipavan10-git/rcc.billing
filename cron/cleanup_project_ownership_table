@@ -1,2 +1,2 @@
 # This script will run daily at 12:47 AM
-47 0 * * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/cleanup_project_ownership_table.R
+47 0 * * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/run_etl.R etl/cleanup_project_ownership_table.R
