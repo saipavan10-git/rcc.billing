@@ -1,3 +1,6 @@
+# rcc.billing 1.46.0 (released 2025-01-15)
+- Add run_etl and use it (@ljwoodley, #260, #261)
+
 # rcc.billing 1.45.0 (released 2024-01-03)
 - Fix missing name_of_service_instance in get_service_request_line_items() result (@pbchase, #259)
 - Bill for some support requests without project IDs #257 (@pbchase, #257, #258)
