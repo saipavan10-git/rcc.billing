@@ -59,9 +59,9 @@ collapse_with_omit_blank <- function(x, sep = " ") paste(x[!is.na(x) & x != ""],
 project_contact_information <- user_rights_and_info %>%
   filter(project_id %in% projects_with_unresolvable_ownership_issues$project_id) %>%
   inner_join(rcp, by = "project_id") %>%
-  inner_join(rcui, by = "username") |>
+  inner_join(rcui, by = "username")  %>%
   # take user_firstname and user_lastname from user_rights
-  select(project_id, username, user_firstname.x, user_lastname.x, starts_with("user_email"), app_title, design) |>
+  select(project_id, username, user_firstname.x, user_lastname.x, starts_with("user_email"), app_title, design)  %>%
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
   mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_base, project_id), "\">", app_title, "</a>")) %>%
