@@ -20,17 +20,16 @@ rc_conn <- connect_to_redcap_db()
 # rc_conn <- conn
 # ...and the rcui line below
 
-rcp <- tbl(rc_conn, "redcap_projects")
-rcpo <- tbl(rc_conn, "redcap_entity_project_ownership")
-rcur <- tbl(rc_conn, "redcap_user_rights")
-rcui <- tbl(rc_conn, "redcap_user_information")
+rcp <- tbl(rc_conn, "redcap_projects") |> collect()
+rcpo <- tbl(rc_conn, "redcap_entity_project_ownership") |> collect()
+rcui <- tbl(rc_conn, "redcap_user_information") |> collect()
+user_rights_and_info <- get_user_rights_and_info(rc_conn)
 # Run the line below when testing to make email go to you instead of bouncing
 # rcui <- tbl(rc_conn, "redcap_user_information") %>%
 #    mutate(across(starts_with("user_email"), ~ if_else(is.na(.), ., paste0(Sys.getenv("USER"), "@ufl.edu"))))
 
 redcap_version <- tbl(rc_conn, "redcap_config") %>%
   filter(field_name == "redcap_version") %>%
-  collect() %>%
   pull(value)
 
 redcap_project_uri_base <- str_remove(Sys.getenv("URI"), "/api") %>%
@@ -46,11 +45,10 @@ projects_with_unresolvable_ownership_issues <- rcp %>%
   inner_join(rcpo, by = c("project_id" = "pid")) %>%
   filter(billable == 1) %>%
   filter(is.na(date_deleted)) %>%
-  filter(is.na(email) || email == "") %>%
-  filter(is.na(firstname) || firstname == "") %>%
-  filter(is.na(lastname) || lastname == "") %>%
-  filter(is.na(username) || username == "") %>%
-  collect() %>%
+  filter(is.na(email) | email == "") %>%
+  filter(is.na(firstname) | firstname == "") %>%
+  filter(is.na(lastname) | lastname == "") %>%
+  filter(is.na(username) | username == "") %>%
   mutate_columns_to_posixct("updated") %>%
   filter(get_script_run_time() - ddays(120) < updated)
 
@@ -58,12 +56,12 @@ projects_with_unresolvable_ownership_issues <- rcp %>%
 # https://stackoverflow.com/a/49201394/7418735
 collapse_with_omit_blank <- function(x, sep = " ") paste(x[!is.na(x) & x != ""], collapse = sep)
 
-project_contact_information <- rcur %>%
-  filter(project_id %in% local(projects_with_unresolvable_ownership_issues$project_id)) %>%
+project_contact_information <- user_rights_and_info %>%
+  filter(project_id %in% projects_with_unresolvable_ownership_issues$project_id) %>%
   inner_join(rcp, by = "project_id") %>%
-  inner_join(rcui, by = "username") %>%
-  select(project_id, username, user_firstname, user_lastname, starts_with("user_email"), app_title, design) %>%
-  collect() %>%
+  inner_join(rcui, by = "username") |>
+  # take user_firstname and user_lastname from user_rights
+  select(project_id, username, user_firstname.x, user_lastname.x, starts_with("user_email"), app_title, design) |>
   mutate(link_to_project = paste0(redcap_project_uri_base, project_id)) %>%
   mutate(app_title = str_replace_all(app_title, '"', "")) %>%
   mutate(project_hyperlink = paste0("<a href=\"", paste0(redcap_project_uri_base, project_id), "\">", app_title, "</a>")) %>%
