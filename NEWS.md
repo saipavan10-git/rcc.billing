@@ -1,3 +1,7 @@
+# rcc.billing 1.46.1 (released 2025-01-22)
+- Handle an empty update in request_correction_of_bad_ownership_data.R (@pbchase)
+- use get_user_rights to find project designers (@ljwoodley, #248, #262)
+
 # rcc.billing 1.46.0 (released 2025-01-15)
 - Add run_etl and use it (@ljwoodley, #260, #261)
 
