@@ -221,25 +221,23 @@ send_sequestered_today_alert_email <- function(row) {
   return(send_alert_email(row, email_subject = "REDCap project sequestered"))
 }
 
-sequestered_today_log <- apply(
-  sequestered_today_email_df,
-  MARGIN = 1,
-  FUN = send_sequestered_today_alert_email
+if (nrow(sequestered_today_email_df) > 0) {
+  sequestered_today_log <- apply(
+    sequestered_today_email_df,
+    MARGIN = 1,
+    FUN = send_sequestered_today_alert_email
   ) %>%
-  # turn list into dataframe
-  do.call("rbind", .) %>%
-  mutate(reason = "sequestered_today")
+    # turn list into dataframe
+    do.call("rbind", .) %>%
+    mutate(reason = "sequestered_today")
 
-###############################################################################
-#                             Cleanup and logging                             #
-###############################################################################
+  # log the activity
+  activity_log <- bind_rows(
+    please_fix_log,
+    sequestered_today_log
+  )
 
-
-activity_log <- bind_rows(
-  please_fix_log,
-  sequestered_today_log
-)
-
-log_job_success(jsonlite::toJSON(activity_log))
+  log_job_success(jsonlite::toJSON(activity_log))
+}
 
 dbDisconnect(rc_conn)
