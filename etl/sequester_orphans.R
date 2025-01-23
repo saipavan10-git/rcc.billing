@@ -81,6 +81,11 @@ email_info <-
   filter(!is.na(project_owner_email)) %>%
   select(project_owner_email, project_owner_full_name, user_suspended_time, project_id, app_title, project_hyperlink, creation_time, last_logged_event)
 
+# if there is nothing to do, then exit
+if(nrow(orphaned_projects) == 0) {
+  quit()
+}
+
 # Sequester the orphans
 result <- sequester_projects(
   conn = rc_conn,
