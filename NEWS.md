@@ -1,3 +1,6 @@
+# rcc.billing 1.46.4 (released 2025-02-03)
+- Disable write_uf_fiscal_orgs* jobs (@pbchase)
+
 # rcc.billing 1.46.3 (released 2025-02-03)
 - Remove reference to rcc.ctsit from request_correction_of_bad_ownership_data.R (@pbchase)
 
