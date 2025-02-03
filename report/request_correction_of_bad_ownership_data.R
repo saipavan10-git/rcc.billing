@@ -8,7 +8,6 @@ library(sendmailR)
 library(tableHTML)
 library(DBI)
 library(RMariaDB)
-library(rcc.ctsit)
 
 init_etl("request_correction_of_bad_ownership_data")
 
