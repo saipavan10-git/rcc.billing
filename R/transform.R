@@ -328,7 +328,7 @@ service_request_time <- function(time_minutes, time_hours) {
   ) |>
     dplyr::mutate(time = dplyr::case_when(
       .data$time_minutes %in% c(15,30,45,60) ~ .data$time_minutes/60,
-      .data$time_hours > 1 ~ .data$time_hours,
+      .data$time_hours >= 0 ~ .data$time_hours,
       TRUE ~ NA_real_
     )) |>
     dplyr::pull(.data$time)
