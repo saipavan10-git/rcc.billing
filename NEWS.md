@@ -1,3 +1,7 @@
+# rcc.billing 1.46.5 (released 2025-03-05)
+- Update create_and_send_new_invoice_line_items.R (@pbchase)
+- Fix bug in service request time. (@pbchase)
+
 # rcc.billing 1.46.4 (released 2025-02-03)
 - Disable write_uf_fiscal_orgs* jobs (@pbchase)
 

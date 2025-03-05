@@ -31,8 +31,10 @@ service_request_line_items <- get_service_request_line_items(
   rc_billing_conn = rcc_billing_conn,
   rc_conn = rc_conn
 ) |>
-# fix incorrect data types
-mutate(across(c("service_type_code", "ctsi_study_id", "price_of_service", "qty_provided", "amount_due"), as.double))
+  # fix incorrect data types
+  mutate(across(c("service_type_code", "ctsi_study_id", "price_of_service", "qty_provided", "amount_due"), as.double)) |>
+  # Remove records we have already inserted
+  anti_join(initial_invoice_line_item, by = c("service_instance_id", "fiscal_year", "month_invoiced"))
 
 # Derive the service_instances from service_request_line_items
 service_request_service_instances <-
@@ -100,16 +102,18 @@ new_invoice_line_item_writes <- dplyr::bind_rows(
   # TODO: remove this line after we add support for fiscal contact info in https://github.com/ctsit/rcc.billing/milestone/21
   select(-starts_with("fiscal_contact"))
 
-# Write the new invoice line items
-redcapcustodian::write_to_sql_db(
-  conn = rcc_billing_conn,
-  table_name = "invoice_line_item",
-  df_to_write = new_invoice_line_item_writes,
-  schema = NA,
-  overwrite = F,
-  db_name = "rcc_billing",
-  append = T
-)
+if (nrow(new_invoice_line_item_writes) > 0) {
+  # Write the new invoice line items
+  redcapcustodian::write_to_sql_db(
+    conn = rcc_billing_conn,
+    table_name = "invoice_line_item",
+    df_to_write = new_invoice_line_item_writes,
+    schema = NA,
+    overwrite = F,
+    db_name = "rcc_billing",
+    append = T
+  )
+}
 
 # Send new line items #########################################################
 previous_month_name <- rcc.billing::previous_month(
@@ -124,7 +128,6 @@ fiscal_year_invoiced <- rcc.billing::fiscal_years |>
 
 new_invoice_line_items <- tbl(rcc_billing_conn, "invoice_line_item") %>%
   filter(
-    status == "draft",
     month_invoiced == previous_month_name,
     fiscal_year == fiscal_year_invoiced
   ) %>%
