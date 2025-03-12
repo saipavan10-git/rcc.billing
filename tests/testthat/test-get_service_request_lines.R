@@ -1,6 +1,6 @@
 service_requests <- readRDS(testthat::test_path("get_service_request_lines", "service_requests.rds"))
 
-expected_output <- tibble(
+expected_output <- dplyr::tibble(
   record_id = c(6267, 6267, 6436, 6445, 6469, 6473, 7093),
   project_id = c("14242", "14242", "11843", "10929", "12665", "13433", NA_character_),
   service_identifier = c("6267", "6267", "6436", "6445", "6469", "6473", "7093"),
@@ -16,7 +16,7 @@ expected_output <- tibble(
     "6267 : bogus_rc_username : 2024-02-29 : fake response",
     "6267 : bogus_rc_username : 2024-02-29 : Pro-bono : fake response",
     "6436 : bogus_rc_username : 2024-04-23 : Pro-bono : fake response",
-    "6445 : bogus_rc_username : 2024-04-24 : Pro-bono : fake comment",
+    "6445 : bogus_rc_username : 2024-04-24 : Pro-bono : fake response",
     "6469 : bogus_rc_username : 2024-04-30 : fake response",
     "6473 : bogus_gatorlink : 2024-05-01 : fake response",
     "7093 : bogus_gatorlink : 2024-12-10 : fake response fake response fake response fake response fake response fake response"
@@ -39,7 +39,7 @@ expected_output <- tibble(
 )
 
 testthat::test_that("get_service_request_lines returns nothing when billable_rate is not set", {
-  redcapcustodian::set_script_run_time(ymd_hms("2014-10-03 12:00:00"))
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2014-10-03 12:00:00"))
   testthat::expect_equal(
     get_service_request_lines(service_requests) |> nrow(),
     0
@@ -47,23 +47,23 @@ testthat::test_that("get_service_request_lines returns nothing when billable_rat
 })
 
 testthat::test_that("get_service_request_lines returns multiple lines both Paid and Probono", {
-  redcapcustodian::set_script_run_time(ymd_hms("2024-05-03 12:00:00"))
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2024-05-03 12:00:00"))
   testthat::expect_equal(
     get_service_request_lines(service_requests),
-    expected_output |> filter(service_date == as.Date("2024-04-01"))
+    expected_output |> dplyr::filter(service_date == as.Date("2024-04-01"))
   )
 })
 
 testthat::test_that("get_service_request_lines returns lines for a different time period", {
-  redcapcustodian::set_script_run_time(ymd_hms("2024-06-03 12:00:00"))
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2024-06-03 12:00:00"))
   testthat::expect_equal(
     get_service_request_lines(service_requests),
-    expected_output |> filter(service_date == as.Date("2024-05-01"))
+    expected_output |> dplyr::filter(service_date == as.Date("2024-05-01"))
   )
 })
 
 testthat::test_that("get_service_request_lines returns all the lines", {
-  redcapcustodian::set_script_run_time(ymd_hms("2024-06-03 12:00:00"))
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2024-06-03 12:00:00"))
   testthat::expect_equal(
     get_service_request_lines(service_requests, return_all_records = T),
     expected_output
@@ -71,10 +71,10 @@ testthat::test_that("get_service_request_lines returns all the lines", {
 })
 
 testthat::test_that("get_service_request_lines returns a line of paid service for a request with no project ID", {
-  redcapcustodian::set_script_run_time(ymd_hms("2025-01-03 12:00:00"))
+  redcapcustodian::set_script_run_time(lubridate::ymd_hms("2025-01-03 12:00:00"))
   testthat::expect_equal(
     get_service_request_lines(service_requests),
-    expected_output |> filter(service_date == as.Date("2024-12-01"))
+    expected_output |> dplyr::filter(service_date == as.Date("2024-12-01"))
   )
   testthat::expect_equal(
     get_service_request_lines(service_requests)$project_id,

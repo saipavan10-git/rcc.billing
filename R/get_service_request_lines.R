@@ -93,24 +93,12 @@ get_service_request_lines <- function(
     dplyr::filter(.data$help_desk_response_complete == 2) |>
     #
     dplyr::rename(price_of_service = "billable_rate") |>
-    dplyr::mutate(service_date = lubridate::floor_date(
-      dplyr::coalesce(
-        .data$end_date,
-        as.Date(.data$meeting_date_time),
-        as.Date(.data$date_of_work)
-      ),
-      unit = "month"
-    )) |>
+    dplyr::mutate(service_date = lubridate::floor_date(.data$end_date, unit = "month")) |>
     # Filter for service_dates in the month of interest
     dplyr::filter(return_all_records |
       .data$service_date ==
         lubridate::floor_date(redcapcustodian::get_script_run_time() -
           lubridate::dmonths(months_previous), unit = "month")) |>
-    dplyr::mutate(response = dplyr::coalesce(
-      .data$response,
-      .data$comments,
-      dplyr::if_else(.data$mtg_scheduled_yn == 1, "Meeting", NA_character_)
-    )) |>
     dplyr::mutate(time = rcc.billing::service_request_time(.data$time2, .data$time_more)) |>
     # Summarize responses into invoice line items
     dplyr::group_by(.data$record_id, .data$service_date, .data$probono, .data$price_of_service) |>

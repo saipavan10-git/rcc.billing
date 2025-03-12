@@ -4,6 +4,7 @@ library(redcapcustodian)
 library(REDCapR)
 library(tidyverse)
 library(rcc.billing)
+library(RMariaDB)
 
 dotenv::load_dot_env("prod.env")
 source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
@@ -30,7 +31,6 @@ service_requests_of_interest <- read_service_requests |>
 # Filter for responses that were started and finished before 2025-01-02 17:00:00
 service_requests <- read_service_requests |>
   filter(record_id %in% service_requests_of_interest$record_id) |>
-  dplyr::filter(is.na(date_of_work) | date_of_work <= lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York")) |>
   dplyr::filter(is.na(end_date) | end_date <= lubridate::ymd_hms("2025-01-02 17:00:00", tz = "America/New_York")) |>
   select(
     record_id,
@@ -43,19 +43,14 @@ service_requests <- read_service_requests |>
     first_name,
     pi_email,
     email,
-    role,
     redcap_username,
     gatorlink,
     billable_rate,
     probono_reason,
     time2,
     time_more,
-    mtg_scheduled_yn,
-    meeting_date_time,
-    date_of_work,
     end_date,
     response,
-    comments,
     fiscal_contact_fn,
     fiscal_contact_ln,
     fiscal_contact_email,
@@ -73,7 +68,6 @@ service_requests <- read_service_requests |>
     gatorlink= if_else(!is.na(gatorlink), "bogus_gatorlink", gatorlink),
     response = if_else(!is.na(response), "fake response", response),
     study_name = if_else(!is.na(study_name), "Fake Study", study_name),
-    comments = if_else(!is.na(comments), "fake comment", comments),
     irb_number = c("123"),
     fiscal_contact_fn = c("John"),
     fiscal_contact_ln = c("Doe"),
