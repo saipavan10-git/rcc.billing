@@ -1,3 +1,7 @@
+# rcc.billing 1.47.0 (released 2025-03-12)
+- Add REDCapServiceRequest.xml (@pbchase)
+- Update get_service_request_lines() and get_service_request_line_items() for a simplified project design (@pbchase)
+
 # rcc.billing 1.46.5 (released 2025-03-05)
 - Update create_and_send_new_invoice_line_items.R (@pbchase)
 - Fix bug in service request time. (@pbchase)
