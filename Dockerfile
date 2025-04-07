@@ -1,6 +1,6 @@
 FROM --platform=linux/amd64 redcapcustodian
 
-WORKDIR /home/rocker
+WORKDIR /home/rcc.billing
 
 ## install additional system libraries not included in redcapcustodian if necessary
 # e.g. to add sftp support
@@ -20,13 +20,13 @@ RUN R -e "install.packages(c( \
 # RUN R -e "devtools::install_github('OuhscBbmc/REDCapR', ref='c5bce6a')"
 
 # build and install this package
-ADD . /home/rocker/rcc.billing
+ADD . /home/rcc.billing/rcc.billing
 RUN R CMD build rcc.billing
 RUN R CMD INSTALL rcc.billing_*.tar.gz
 RUN rm -rf rcc.billing
 
 # Add non-package things
-ADD . /home/rocker
+ADD . /home/rcc.billing
 RUN rm -rf .Rbuildignore
 RUN rm -rf NAMESPACE
 RUN rm -rf R
