@@ -136,14 +136,10 @@ invoice_status |>
   ggplot(mapping = aes(x = `Month Invoiced`, fill = Status, y = amount_invoiced)) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_y_continuous(
-    labels = dollar,
-    limits = c(0, max(revenue$invoices_sent))
+    labels = dollar
     ) +
   scale_x_date(date_breaks = "2 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
-  geom_text(aes(y = amount_invoiced, label = amount_invoiced),
-    vjust = -0.5, position = position_dodge(width = 0.9), size = 2
-  ) +
   xlab("Month Invoiced") +
   ylab("Amount")
 
@@ -197,10 +193,6 @@ revenue_by_month_received |>
   ) +
   scale_x_date(date_breaks = "2 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
-  geom_text(aes(y = amount_received, label = amount_received),
-    vjust = -0.5,
-    size = 2
-  ) +
   xlab("Month Received") +
   ylab("Amount")
 ```
@@ -278,7 +270,7 @@ revenue_by_fy_received_with_projections |>
 
 ## Aging Report
 
-The unpaid invoices breakdown as shown in @fig-aging-report. For invoices more than 4 months old, the payment rate is `r scales::percent(average_portion_paid)`. Whereas the incentives to pay have only gotten stronger since this project began in September 2022, that represents the lowest bar for the payment rate we can expect going forward.
+The unpaid invoices breakdown as shown in @fig-aging-report. For invoices more than 4 months old, the payment rate is `r scales::percent(average_portion_paid)`.
 
 ```{r}
 #| label: fig-aging-report
@@ -336,9 +328,9 @@ invoicing_by_service_type <-
 
 ## REDCap consulting revenue
 
-Automated billing for REDCap consulting started in July 2024. It's revenue is included in the data shown in this this report. Its revenue details are broken out here. @fig-invoicing-by-service-type shows its portion of the monthly revenue since REDCap consulting billing started.
+Automated billing for REDCap consulting started in July 2024. It's revenue is included in the data shown in this report. Its revenue details are broken out here. @fig-invoicing-by-service-type shows its portion of the monthly revenue since REDCap consulting billing started.
 
-Note that July 2024 was very light on support calls, but had a backlog of unbilled consulting work from May and June. This is a by-product of delayed start for support billing. The REDCap team will be moving all its hourly billing work into the REDCap Automated Billing model in August and September of 2024. This will include all project build invoicing, GRACE, MBL, Bloomer Tech, and all new work. These changes could make REDCap Consulting service look exceptionally lucrative. Going forward, we will report on exceptional projects that generate an out-sized portion of the revenue and projects with underlying MOUs. The Red Team's goal is the blur the distinction between large and small projects creating a large middle of projects generating work on-the-fly from agreements wrought in an email dialog. In this way we hope to keep overhead low and our income base broad. That's the philosophy behind REDCap Automated Billing and we hope to extend it into more and larger consulting projects. We will write the new reports describing the out-sized and MOU projects in late September 2024 as these project become measurable in the automated billing datasets.
+The REDCap team moved all its hourly billing work into the REDCap Automated Billing model in August and September of 2024. This makes REDCap Consulting service look exceptionally lucrative. Going forward, we will report on exceptional projects that generate an out-sized portion of the revenue and projects with underlying MOUs. The Red Team's goal is to the blur the distinction between large and small projects creating a large middle of projects generating work on-the-fly from agreements wrought in an email dialog. In this way we hope to keep overhead low and our income base broad. That's the philosophy behind REDCap Automated Billing and we hope to extend it into more and larger consulting projects. We will write the new reports describing the out-sized and MOU projects as these project become measurable in the automated billing datasets.
 
 ```{r}
 #| label: fig-invoicing-by-service-type
