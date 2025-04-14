@@ -46,6 +46,7 @@ library(lubridate)
 library(dotenv)
 library(fs)
 library(scales)
+library(gt)
 
 if (Sys.getenv("RCCBILLING_DB_NAME") == "") dotenv::load_dot_env(here::here("prod.env"))
 
@@ -300,11 +301,42 @@ invoice_status %>%
 #| echo: false
 #| warning: false
 
-service_type_data <- tbl(rcc_billing_conn, "service_type") |> collect()
+## Identify contractual work
+source_credentials <- get_redcap_credentials(Sys.getenv("REDCAP_SERVICE_REQUEST_PID"))
+
+# Get raw Service Request data
+fields_to_fetch <- c("record_id", "study_name", "study_complete")
+service_requests <- REDCapR::redcap_read(
+  redcap_uri = source_credentials$redcap_uri,
+  token = source_credentials$token,
+  batch_size = 2000,
+  fields = fields_to_fetch
+)$data
+
+contract_support <- service_requests |>
+  filter(!is.na(study_name)) |>
+  select(any_of(fields_to_fetch)) |>
+  mutate(contractual = T,
+         record_id = as.character(record_id)
+  )
+
+service_type_data <- tbl(rcc_billing_conn, "service_type") |>
+  collect() |>
+  bind_rows(
+    tribble(
+      ~service_type_code, ~service_type, ~price, ~billing_frequency,
+      99, "Contractual", 130, 0
+    )
+  )
 
 invoicing_by_service_type <-
   tbl(rcc_billing_conn, "invoice_line_item") |>
   collect() |>
+  # Mutate service_type_code here to get 99s on contractual work
+  left_join(contract_support |> select(record_id, contractual), by = c("service_identifier" = "record_id")) |>
+  mutate(service_type_code = case_when(
+    contractual ~ 99,
+    T ~ service_type_code)) |>
   mutate(service_type = factor(x = service_type_code,
        levels = service_type_data$service_type_code,
        labels = service_type_data$service_type)) |>
@@ -323,14 +355,12 @@ invoicing_by_service_type <-
   ) |>
   ungroup() |>
   arrange(invoice_month)
-
 ```
+## REDCap Consulting and Contractual revenue
 
-## REDCap consulting revenue
+Automated billing for REDCap consulting started in July 2024. Its revenue is included in the data shown in this report. Its revenue details are broken out here. @fig-invoicing-by-service-type shows that portion of the monthly revenue as *REDCap consulting.* Between September 2024 and January 2025, the REDCap team moved all its contracted hourly billing work into the REDCap Automated Billing model. These are projects covered by MOUs and REDCap project build work. This work is labeled as *Contractual.*
 
-Automated billing for REDCap consulting started in July 2024. It's revenue is included in the data shown in this report. Its revenue details are broken out here. @fig-invoicing-by-service-type shows its portion of the monthly revenue since REDCap consulting billing started.
-
-The REDCap team moved all its hourly billing work into the REDCap Automated Billing model in August and September of 2024. This makes REDCap Consulting service look exceptionally lucrative. Going forward, we will report on exceptional projects that generate an out-sized portion of the revenue and projects with underlying MOUs. The Red Team's goal is to the blur the distinction between large and small projects creating a large middle of projects generating work on-the-fly from agreements wrought in an email dialog. In this way we hope to keep overhead low and our income base broad. That's the philosophy behind REDCap Automated Billing and we hope to extend it into more and larger consulting projects. We will write the new reports describing the out-sized and MOU projects as these project become measurable in the automated billing datasets.
+@fig-recent-contractual shows the Contractual revenue generated in the past 3 months
 
 ```{r}
 #| label: fig-invoicing-by-service-type
@@ -350,11 +380,60 @@ invoicing_by_service_type |>
   ) +
   scale_x_date(date_breaks = "1 month", date_labels = "%Y-%m") +
   theme(axis.text.x = element_text(angle = 30)) +
-  geom_text(aes(y = invoices_sent, label = invoices_sent),
-    vjust = -0.5,
-    size = 3
-  ) +
   xlab("Month Received") +
   ylab("Amount invoiced") +
   labs(fill="Service")
+```
+
+
+```{r}
+#| label: contract_intermediate_calcs
+#| echo: false
+#| warning: false
+#| include: false
+
+invoiced_payable_consulting_with_invoice_month <-
+  tbl(rcc_billing_conn, "invoice_line_item") |>
+    filter(service_identifier %in% contract_support$record_id) |>
+    filter(service_type_code == 2) |>
+    filter(price_of_service > 0) |>
+    filter(!status %in% c("canceled", "sent")) |>
+    collect() |>
+    mutate(invoice_month = as.Date(lubridate::floor_date(created - dmonths(1), unit = "month")))
+
+start_month <- as.Date(lubridate::floor_date(today() - dmonths(4), unit = "month"))
+end_month <- invoiced_payable_consulting_with_invoice_month |> summarise(end_month = max(invoice_month)) |>
+  pull(end_month)
+
+```
+
+```{r}
+#| label: fig-recent-contractual
+#| fig-cap: "Recent Contractual invoices by invoiced amount"
+#| echo: false
+#| warning: false
+
+  invoiced_payable_consulting_with_invoice_month |>
+    left_join(contract_support |> select(record_id, study_name), by = c("service_identifier" = "record_id")) |>
+    # get the last 3 months of Contractual invoices
+    filter(invoice_month >= start_month) |>
+    group_by(status, invoice_month, study_name) |>
+    summarise(total = sum(amount_due, na.rm = T)) |>
+    pivot_wider(
+      id_cols = c("invoice_month", "study_name"),
+      names_from = "status",
+      values_from = "total"
+    ) |>
+    ungroup() |>
+    arrange(invoice_month, desc(coalesce(paid, invoiced))) |>
+    gt(groupname_col = "invoice_month", rowname_col = "study_name") |>
+    tab_header(
+      title = "Recent Contractual invoicing and revenue",
+      subtitle = glue::glue("Service months: {start_month} - {end_month}")
+    ) |>
+    fmt_currency() |>
+    tab_stub_indent(
+      rows = everything(),
+      indent = 3
+    )
 ```
