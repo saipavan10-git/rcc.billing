@@ -1,3 +1,12 @@
+# rcc.billing 1.48.0 (released 2025-04-16)
+- Add unsequester_erroneously_sequestered_projects.R and run it regularly (@pbchase)
+- Update revenue_status_and_projections.qmd (@pbchase, #271)
+    - Add contractual work concept.
+    - Refocus report on three distinct services: : Annual Project Billing, Support Billing, and Contractual work
+    - Remove income estimates.
+    - Let plot y-axis float.
+- Update WORKDIR in docker env (saipavankamma@ufl.edu, #266)
+
 # rcc.billing 1.47.0 (released 2025-03-12)
 - Add REDCapServiceRequest.xml (@pbchase)
 - Update get_service_request_lines() and get_service_request_line_items() for a simplified project design (@pbchase)
