@@ -12,6 +12,8 @@ RUN R -e "install.packages(c( \
     'argparse' \
 ))"
 
+RUN R -e "install.packages('gt')"
+
 ## Install our private rcc.ctsit package
 ## see: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ## Also see https://docs.github.com/en/developers/apps/getting-started-with-apps/about-apps
