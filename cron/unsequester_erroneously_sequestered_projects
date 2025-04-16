@@ -1,0 +1,2 @@
+# unsequester_erroneously_sequestered_projects on the 1st, 5th, 14th, 23rd, and 28th of the month at 6:03 a.m.
+3 6 1,5,14,23,28 * * root /usr/bin/docker run --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/run_etl.R etl/unsequester_erroneously_sequestered_projects.R
