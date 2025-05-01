@@ -1,0 +1,27 @@
+pandoc: 3.1.11
+pkgdown: 2.1.2
+pkgdown_sha: ~
+articles:
+  billable_candidates: billable_candidates.html
+  billing_for_support: billing_for_support.html
+  cleanup_bad_email_addresses: cleanup_bad_email_addresses.html
+  cleanup_bad_project_pi_email_addresses: cleanup_bad_project_pi_email_addresses.html
+  cleanup_project_ownership_table: cleanup_project_ownership_table.html
+  create_and_send_new_invoice_line_items: create_and_send_new_invoice_line_items.html
+  delete_abandoned_projects: delete_abandoned_projects.html
+  novel_concepts: novel_concepts.html
+  remind_owners_to_review_ownership: remind_owners_to_review_ownership.html
+  request_correction_of_bad_ownership_data: request_correction_of_bad_ownership_data.html
+  revenue_status_and_projections: revenue_status_and_projections.html
+  sequester_orphans: sequester_orphans.html
+  sequester_unpaid_projects: sequester_unpaid_projects.html
+  update_free_support_time_remaining: update_free_support_time_remaining.html
+  update_invoice_line_items_with_invoicing_details: update_invoice_line_items_with_invoicing_details.html
+  update_probono_service_request_records: update_probono_service_request_records.html
+  update_project_billable_attribute: update_project_billable_attribute.html
+  warn_owners_of_impending_bill: warn_owners_of_impending_bill.html
+  when_jobs_run: when_jobs_run.html
+last_built: 2025-05-01T15:10Z
+urls:
+  reference: https://ctsit.github.io/rcc.billing/reference
+  article: https://ctsit.github.io/rcc.billing/articles
