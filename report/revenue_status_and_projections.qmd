@@ -361,7 +361,10 @@ apb_service_rate <- tbl(rcc_billing_conn, "invoice_line_item") |>
   count(fiscal_year, month_invoiced, price_of_service) |>
   ungroup() |>
   collect() |>
-  mutate(old_order = row_number()) |>
+  mutate(
+    old_order = row_number(),
+    month_invoiced = as.character(match(month_invoiced, month.name))
+  ) |>
   arrange(desc(n)) |>
   distinct(fiscal_year, month_invoiced, .keep_all = T) |>
   arrange(old_order) |>
