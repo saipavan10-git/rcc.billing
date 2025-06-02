@@ -1,0 +1,2 @@
+# Daily sync redcap_projects table to redcap_projects_history table
+0 0 * * * root /usr/bin/docker run -v /rcc/rcc.billing:/root --rm --env-file /rcc/default.env --env-file /rcc/rcc.billing/prod.env rcc.billing Rscript etl/run_etl.R etl/sync_redcap_projects_to_history.R
