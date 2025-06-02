@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   billable_candidates: billable_candidates.html
@@ -21,7 +21,7 @@ articles:
   update_project_billable_attribute: update_project_billable_attribute.html
   warn_owners_of_impending_bill: warn_owners_of_impending_bill.html
   when_jobs_run: when_jobs_run.html
-last_built: 2025-05-01T15:10Z
+last_built: 2025-06-02T21:21Z
 urls:
   reference: https://ctsit.github.io/rcc.billing/reference
   article: https://ctsit.github.io/rcc.billing/articles
