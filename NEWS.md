@@ -1,3 +1,10 @@
+# rcc.billing 1.49.0 (released 2025-06-02)
+- Describe probono work (@saipavan10-git, @pbchase, #269, #270, #272)
+    - Add new pro bono section and related figures to revenue_status_and_projections.qmd (@saipavan10-git, @pbchase, #269, #272)
+    - ETL script and cron for daily sync to history table (@saipavan10-git, @pbchase, #269, #272)
+    - Create backfill_redcap_history_table.R  (@saipavan10-git, @pbchase, #269, #272)
+- Remove Tracy Blair from the addressees (@pbchase)
+
 # rcc.billing 1.48.0 (released 2025-04-16)
 - Add unsequester_erroneously_sequestered_projects.R and run it regularly (@pbchase)
 - Update revenue_status_and_projections.qmd (@pbchase, #271)
