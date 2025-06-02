@@ -47,6 +47,7 @@ library(dotenv)
 library(fs)
 library(scales)
 library(gt)
+library(ggplot2)
 
 if (Sys.getenv("RCCBILLING_DB_NAME") == "") dotenv::load_dot_env(here::here("prod.env"))
 
@@ -292,6 +293,233 @@ invoicing_by_service_type |>
   theme(legend.position="bottom") +
   xlab("Month Received") +
   ylab("Amount invoiced")
+```
+
+## Pro Bono work
+
+CTS-IT does not charge for all services. It offers a free consultation of up to an hour for every REDCap project on the CTSI REDCap system. This allows our customers to get free REDCap expertise as they plan their data collection efforts. Similarly, CTS-IT forgives up to a year of charges for every REDCap project if the owner deletes it before the next invoicing. This allows study teams to learn REDCap for free, taking tutorials, building projects, testing designs, and building the data collection instruments they will ultimately use in their study. Studies can be built, deployed, and completed entirely free of charge if done in under one year.
+
+Table @fig-probono-summary-table shows the value of these services by fiscal year since CTS-IT started carefully accounting for charged and non-charged services. Figure @fig-probono-faceted shows the monthly detail underlying the annual figures. Support billing started 21 months after the annual project billing.
+
+```{r}
+#| label: probono-support-prep
+#| echo: false
+#| warning: false
+
+# Support billing - Pro Bono
+probono_support <- tbl(rcc_billing_conn, "invoice_line_item") |>
+  filter(service_type_code == 2, price_of_service == 0) |>
+  select(id, qty_provided, fiscal_year, month_invoiced, created) |>
+  collect() |>
+  mutate(invoice_date = lubridate::floor_date(created - lubridate::dmonths(1), unit = "month")) |> 
+  rename(month_invoiced_name = month_invoiced) |>
+  mutate(month_invoiced = match(month_invoiced_name, month.name))
+
+normal_service_rate <- tbl(rcc_billing_conn, "invoice_line_item") |>
+  filter(service_type_code == 2, price_of_service > 0) |>
+  select(fiscal_year, month_invoiced, price_of_service) |>
+  group_by(fiscal_year, month_invoiced, price_of_service) |>
+  count(fiscal_year, month_invoiced, price_of_service) |>
+  ungroup() |>
+  collect() |>
+  mutate(old_order = row_number()) |>
+  arrange(desc(n)) |>
+  distinct(fiscal_year, month_invoiced, .keep_all = T) |>
+  arrange(old_order) |>
+  select(-c(old_order, n))
+
+probono_support_with_rate <- probono_support |>
+  left_join(normal_service_rate, by = c("fiscal_year", "month_invoiced_name" = "month_invoiced")) |>
+  mutate(value = qty_provided * price_of_service) |>
+  select(fiscal_year, month_invoiced, invoice_date, value) |>
+  mutate(revenue_source = "Support")
+```
+
+```{r}
+#| label: apb-probono
+#| echo: false
+#| warning: false
+
+rc_conn <- connect_to_redcap_db()
+
+redcap_projects <- tbl(rc_conn, "redcap_projects")|>
+  select(project_id, project_creation_time = creation_time, 
+         date_deleted)|>
+  collect()
+
+project_history_raw <- tbl(rcc_billing_conn, "redcap_projects_history")|>
+  select(project_id, project_creation_time = creation_time, 
+         date_deleted)|>
+  collect()
+
+# get the project billable field
+redcap_entity_project_ownership <- dplyr::tbl(rc_conn, "redcap_entity_project_ownership") |> collect()
+
+project_billable <- project_history_raw |>
+  dplyr::left_join(redcap_entity_project_ownership, by = c("project_id" = "pid")) |>
+  select(project_id, billable)
+
+project_history <- project_history_raw |>
+  arrange(date_deleted) |>
+  filter(date_deleted >= as.Date("2022-09-07")) |>
+  left_join(project_billable, by = "project_id") |>
+  filter(billable == 1)
+
+apb_service_rate <- tbl(rcc_billing_conn, "invoice_line_item") |>
+  filter(service_type_code == 1, price_of_service > 0) |>
+  select(fiscal_year, month_invoiced, price_of_service) |>
+  group_by(fiscal_year, month_invoiced, price_of_service) |>
+  count(fiscal_year, month_invoiced, price_of_service) |>
+  ungroup() |>
+  collect() |>
+  mutate(
+    old_order = row_number(),
+    month_invoiced = match(month_invoiced, month.name)
+  ) |>
+  arrange(desc(n)) |>
+  distinct(fiscal_year, month_invoiced, .keep_all = T) |>
+  arrange(old_order) |>
+  select(-c(old_order, n))
+
+probono_apb <-
+  project_history |>
+  filter(billable == 1, !is.na(date_deleted), date_deleted >= as.Date("2022-09-07")) |>
+  mutate(
+    days_active_in_final_year = (as.numeric(as.Date(date_deleted) - as.Date(project_creation_time))) %% 365,
+    month_invoiced = as.numeric(format(as.Date(date_deleted), "%m")),
+    fiscal_year = map_chr(date_deleted, ~ rcc.billing::fiscal_years |>
+      filter(as.Date(.x) %within% fy_interval) |>
+      pull(csbt_label))
+  ) |>
+  left_join(apb_service_rate, by = c("fiscal_year", "month_invoiced")) |>
+  mutate(
+    value = round((days_active_in_final_year / 365) * price_of_service, digits = 2),
+    invoice_date = lubridate::floor_date(date_deleted, unit = "months")
+  ) |>
+  select(project_id, fiscal_year, month_invoiced, invoice_date, value, days_active_in_final_year, price_of_service) |>
+  mutate(revenue_source = "Annual Project Billing")
+```
+
+```{r}
+#| label: combine-support-apb
+#| echo: false
+#| warning: false
+
+# Combine support and APB probono
+probono_combined <- bind_rows(probono_support_with_rate, probono_apb) |>
+  filter(!is.na(fiscal_year), !is.na(month_invoiced), !is.na(value))
+
+# Summarize by FY and by month
+probono_by_fy <- probono_combined |>
+  group_by(fiscal_year) |>
+  summarise(`Value of Pro Bono Services` = sum(value, na.rm = TRUE)) |>
+  ungroup()
+
+probono_by_month <- probono_combined |>
+  group_by(invoice_date) |>
+  summarise(`Value` = sum(value, na.rm = TRUE)) |>
+  ungroup()
+```
+
+```{r}
+#| label: fig-probono-summary-table
+#| fig-cap: "Pro Bono value by Fiscal Year. Value of Pro Bono Services is _not_ included in Revenue"
+#| echo: false
+#| warning: false
+
+probono_by_fy <- probono_combined |>
+  group_by(fiscal_year) |>
+  summarise(`Value of Pro Bono Services` = sum(value, na.rm = TRUE), .groups = "drop")
+
+invoice_line_items_with_fy_and_month_paid <- invoice_status |>
+  filter(status == "paid") |>
+  mutate(
+    `Month Received` = as.Date(lubridate::floor_date(je_posting_date, unit = "month"))
+  ) |>
+  mutate(month_received = lubridate::as_datetime(
+    `Month Received`,
+    tz = Sys.getenv("TIME_ZONE")
+  ) + lubridate::days(1)) |>
+  dplyr::left_join(rcc.billing::fiscal_years, by = character()) |>
+  filter(month_received %within% fy_interval) |>
+  rename(FY = csbt_label) |>
+  select(-c(fy_interval, month_received))
+
+revenue_by_service_type <- invoice_line_items_with_fy_and_month_paid |>
+  left_join(contract_support |> select(record_id, contractual, service_type_code),
+            by = c("service_identifier" = "record_id", "service_type_code")) |>
+  mutate(service_type_code = dplyr::case_when(
+    contractual ~ 99,
+    TRUE ~ service_type_code
+  )) |>
+  mutate(service_type = factor(
+    x = service_type_code,
+    levels = service_type_data$service_type_code,
+    labels = service_type_data$service_type
+  )) |>
+  group_by(FY, service_type) |>
+  summarise(revenue = sum(amount_due, na.rm = TRUE), .groups = "drop") |>
+  tidyr::pivot_wider(
+    id_cols = "FY",
+    names_from = "service_type",
+    values_from = "revenue"
+  ) |>
+  select(
+    `Fiscal Year` = FY,
+    "Annual REDCap Project Maintenance",
+    "Support",
+    "Contractual"
+  )
+
+revenue_by_fy <- revenue_by_service_type |>
+  mutate(
+    Revenue = rowSums(across(-`Fiscal Year`), na.rm = TRUE)
+  ) |>
+  select(FY = `Fiscal Year`, Revenue)
+
+probono_summary <- revenue_by_fy |>
+  left_join(probono_by_fy, by = c("FY" = "fiscal_year")) |>
+  mutate(
+    `Pro Bono Services as a portion of revenue` = `Value of Pro Bono Services` / Revenue
+  ) |>
+  select(
+    FY,
+    Revenue,
+    `Value of Pro Bono Services`,
+    `Pro Bono Services as a portion of revenue`
+  )
+
+gt::gt(probono_summary) |>
+  gt::fmt_currency(columns = c("Revenue", "Value of Pro Bono Services"), decimals = 0) |>
+  gt::fmt_percent(columns = "Pro Bono Services as a portion of revenue", decimals = 0) |>
+  gt::tab_header(
+    title = "Pro Bono Value and Portion of Revenue by Fiscal Year"
+  )
+```
+
+```{r}
+#| label: fig-probono-faceted
+#| fig-cap: "Pro Bono value by month and source"
+#| echo: false
+#| warning: false
+#| fig-height: 5
+
+probono_combined |>
+  mutate(date = as.Date(invoice_date) ) |>
+  filter(!is.na(date)) |>
+  group_by(revenue_source, date) |>
+  summarise(value = sum(value, na.rm = TRUE), .groups = "drop") |>
+  ggplot(aes(x = date, y = value, fill = revenue_source)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~revenue_source, ncol = 1) +
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(date_breaks = "3 month", date_labels = "%Y-%m") +
+  labs(
+    x = "Month",
+    y = "Pro Bono Value",
+    title = "Pro Bono Value by Month and Source"
+  ) +
+  theme(axis.text.x = element_text(angle = 30))
 ```
 
 ## Aging Report
