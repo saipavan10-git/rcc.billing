@@ -98,9 +98,7 @@ new_invoice_line_item_writes <- dplyr::bind_rows(
   dplyr::mutate(
     id = row_number() + max(initial_invoice_line_item$id),
     .before = "service_identifier"
-  ) |>
-  # TODO: remove this line after we add support for fiscal contact info in https://github.com/ctsit/rcc.billing/milestone/21
-  select(-starts_with("fiscal_contact"))
+  )
 
 if (nrow(new_invoice_line_item_writes) > 0) {
   # Write the new invoice line items
