@@ -1,3 +1,6 @@
+# rcc.billing 1.50.0 (released 2025-06-09)
+- Update create_and_send_new_invoice_line_items.R to send service request fiscal details. (@pbchase)
+
 # rcc.billing 1.49.0 (released 2025-06-02)
 - Describe probono work (@saipavan10-git, @pbchase, #269, #270, #272)
     - Add new pro bono section and related figures to revenue_status_and_projections.qmd (@saipavan10-git, @pbchase, #269, #272)
