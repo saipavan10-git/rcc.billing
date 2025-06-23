@@ -1,3 +1,9 @@
+# rcc.billing 1.50.1 (released 2025-06-23)
+- Remove VERSION file (@pbchase)
+    - This is no longer needed because we are using gfrc to manage releases.
+    - See https://gist.github.com/pbchase/83a7a156b6deac90b5833246e1edb305
+- Relabel 'CTSIT ID' to 'Other System Billing ID' in csbt_column_names.R (@pbchase)
+
 # rcc.billing 1.50.0 (released 2025-06-09)
 - Update create_and_send_new_invoice_line_items.R to send service request fiscal details. (@pbchase)
 
