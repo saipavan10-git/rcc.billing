@@ -60,6 +60,7 @@ get_new_project_invoice_line_items <- function(
       month_invoiced = previous_month_name,
       # TODO: should this be stripped from the PI email instead?
       gatorlink = .data$username,
+      irb_number = .data$project_irb_number,
       reason = "new_item",
       status = "draft",
       created = redcapcustodian::get_script_run_time(),
@@ -111,6 +112,7 @@ get_new_project_invoice_line_items <- function(
       "pi_first_name",
       "pi_email",
       "gatorlink",
+      "irb_number",
       "reason",
       "status",
       "created",

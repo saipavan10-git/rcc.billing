@@ -34,7 +34,7 @@ testthat::test_that("get_new_project_invoice_line_items works", {
     api_uri = "https://example.org/redcap/api/"
   )
 
-  DBI::dbDisconnect(mem_rc_conn, shutdown=TRUE)
+  DBI::dbDisconnect(mem_rc_conn, shutdown = TRUE)
 
   testthat::expect_equal(
     new_project_invoice_line_items$service_identifier,
@@ -67,6 +67,7 @@ testthat::test_that("get_new_project_invoice_line_items works", {
     "pi_first_name",
     "pi_email",
     "gatorlink",
+    "irb_number",
     "reason",
     "status",
     "created",
