@@ -14,6 +14,7 @@ ctsit <- c(
   "pi_last_name",
   "pi_first_name",
   "pi_email",
+  "irb_number",
   "fiscal_contact_name",
   "fiscal_contact_email"
 )
@@ -32,6 +33,7 @@ csbt <- c(
   "PI Last Name",
   "PI First Name",
   "PI Email",
+  "IRB Number",
   "Fiscal Contact Name",
   "Fiscal Contact Email"
 )
