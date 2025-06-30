@@ -189,7 +189,6 @@ fix_data_in_redcap_user_information <- function(data) {
 #' \dontrun{
 #' fix_data_in_redcap_log_event(redcap_log_event_test_data)
 #' }
-#' @export
 fix_data_in_redcap_log_event <- function(data) {
   integer64_columns <- c(
     "ts"
@@ -199,7 +198,7 @@ fix_data_in_redcap_log_event <- function(data) {
       dplyr::mutate(
         dplyr::across(
           dplyr::any_of(integer64_columns),
-          bit64::as.integer64.character
+          bit64::as.integer64
         )
       )
   } else {
@@ -327,7 +326,7 @@ service_request_time <- function(time_minutes, time_hours) {
     time_hours = time_hours
   ) |>
     dplyr::mutate(time = dplyr::case_when(
-      .data$time_minutes %in% c(15,30,45,60) ~ .data$time_minutes/60,
+      .data$time_minutes %in% c(15, 30, 45, 60) ~ .data$time_minutes / 60,
       .data$time_hours >= 0 ~ .data$time_hours,
       TRUE ~ NA_real_
     )) |>
