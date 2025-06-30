@@ -31,9 +31,10 @@ invoice_line_item_communications <- tribble(
 )
 
 invoice_line_item_communications <- dplyr::mutate(invoice_line_item_communications,
+  irb_number = c(NA_character_),
   fiscal_contact_fn = c(NA_character_),
   fiscal_contact_ln = c(NA_character_),
-  fiscal_contact_name = c(NA_character_), #paste(fiscal_contact_fn, fiscal_contact_ln
+  fiscal_contact_name = c(NA_character_), # paste(fiscal_contact_fn, fiscal_contact_ln
   fiscal_contact_email = c(NA_character_),
   .after = "gatorlink"
 )
